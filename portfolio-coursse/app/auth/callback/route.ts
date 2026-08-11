@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
+import { authorizeCurrentUser } from "@/lib/academic/authorize-current-user";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
 	const requestUrl = new URL(request.url);
 	const code = requestUrl.searchParams.get("code");
-	const next = requestUrl.searchParams.get("next") ?? "/dashboard";
+	const requestedNext = requestUrl.searchParams.get("next");
+	const next =
+		requestedNext?.startsWith("/") && !requestedNext.startsWith("//")
+			? requestedNext
+			: "/dashboard";
 
 	if (!code) {
 		return NextResponse.redirect(
@@ -21,39 +26,16 @@ export async function GET(request: Request) {
 		);
 	}
 
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	const authorization = await authorizeCurrentUser(supabase);
 
-	if (!user?.email) {
+	if (!authorization.ok) {
 		await supabase.auth.signOut();
+		const error =
+			authorization.reason === "sync-failed"
+				? "authorization"
+				: "unauthorized";
 		return NextResponse.redirect(
-			new URL("/login?error=unauthorized", requestUrl.origin),
-		);
-	}
-
-	const email = user.email.trim().toLowerCase();
-	const { data: profile } = await supabase
-		.from("profiles")
-		.select("role")
-		.eq("id", user.id)
-		.maybeSingle();
-
-	if (profile?.role === "teacher") {
-		return NextResponse.redirect(new URL(next, requestUrl.origin));
-	}
-
-	const { data: authorizations, error: authorizationError } = await supabase
-		.from("authorized_students")
-		.select("id")
-		.eq("email", email)
-		.eq("status", "active")
-		.limit(1);
-
-	if (authorizationError || !authorizations?.length) {
-		await supabase.auth.signOut();
-		return NextResponse.redirect(
-			new URL("/login?error=unauthorized", requestUrl.origin),
+			new URL(`/login?error=${error}`, requestUrl.origin),
 		);
 	}
 
