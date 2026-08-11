@@ -23,8 +23,8 @@ _Avoid_: Alumno registrado, usuario permitido.
 ## Estructura académica
 
 **Periodo académico**:
-Intervalo institucional que agrupa cursos de una edición académica, identificado por un código como `2025-I` o `2025-II`.
-_Avoid_: Semestre cuando la institución también pueda usar trimestres u otra nomenclatura.
+Intervalo institucional que agrupa cursos de una edición académica. Se identifica por año y periodo (`0` para verano, `I` o `II`); su código, como `2025-0` o `2025-I`, se genera automáticamente.
+_Avoid_: Semestre cuando se esté nombrando el periodo completo.
 
 **Curso**:
 Espacio académico administrado por un docente dentro de un periodo académico que contiene alumnos y, opcionalmente, grupos.

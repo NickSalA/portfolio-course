@@ -1,0 +1,226 @@
+.shell {
+	position: relative;
+	display: grid;
+	min-height: 100dvh;
+	grid-template-columns: minmax(0, 1.1fr) minmax(460px, 0.9fr);
+	overflow: hidden;
+	background: var(--background);
+}
+
+.grid {
+	position: absolute;
+	inset: 0 46% 0 0;
+	opacity: 0.55;
+	background-image:
+		linear-gradient(
+			color-mix(in srgb, var(--accent) 10%, transparent) 1px,
+			transparent 1px
+		),
+		linear-gradient(
+			90deg,
+			color-mix(in srgb, var(--accent) 10%, transparent) 1px,
+			transparent 1px
+		);
+	background-size: 48px 48px;
+	mask-image: linear-gradient(90deg, #000, transparent);
+}
+
+.glow {
+	position: absolute;
+	border-radius: 999px;
+	filter: blur(80px);
+	opacity: 0.18;
+	pointer-events: none;
+}
+
+.glowTop {
+	top: -250px;
+	left: 22%;
+	width: 430px;
+	height: 430px;
+	background: var(--accent);
+}
+
+.glowBottom {
+	right: 4%;
+	bottom: -290px;
+	width: 470px;
+	height: 470px;
+	background: var(--accent-soft);
+}
+
+.story,
+.panel {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+}
+
+.story {
+	padding: 48px clamp(36px, 8vw, 124px) 38px;
+}
+
+.themeToggle {
+	position: absolute;
+	z-index: 2;
+	top: 28px;
+	right: 30px;
+}
+
+.brand {
+	display: flex;
+	align-items: center;
+	gap: 11px;
+}
+
+.brandMark {
+	display: grid;
+	width: 38px;
+	height: 38px;
+	place-items: center;
+	border: 1px solid var(--accent);
+	color: var(--accent);
+	font-size: 17px;
+	font-weight: 700;
+}
+
+.brand strong,
+.brand small {
+	display: block;
+}
+
+.brand strong {
+	font-size: 12px;
+	letter-spacing: 0.14em;
+}
+
+.brand small {
+	margin-top: 3px;
+	color: var(--muted);
+	font-size: 9px;
+	letter-spacing: 0.13em;
+}
+
+.storyCopy {
+	max-width: 600px;
+	margin-top: auto;
+	margin-bottom: 24px;
+}
+
+.eyebrow {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	margin: 0;
+	color: var(--accent);
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+}
+
+.pulse {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: #22c55e;
+	box-shadow: 0 0 0 4px color-mix(in srgb, #22c55e 16%, transparent);
+}
+
+.storyCopy h1 {
+	max-width: 620px;
+	margin: 20px 0 18px;
+	font-size: clamp(42px, 5.2vw, 76px);
+	font-weight: 540;
+	letter-spacing: -0.075em;
+	line-height: 0.98;
+	text-wrap: balance;
+}
+
+.lead {
+	max-width: 440px;
+	margin: 0;
+	color: var(--muted);
+	font-size: 15px;
+	line-height: 1.7;
+}
+
+.panel {
+	justify-content: center;
+	border-left: 1px solid var(--border);
+	background: color-mix(in srgb, var(--surface) 88%, transparent);
+	padding: 48px clamp(30px, 7vw, 110px);
+}
+
+.card {
+	width: min(100%, 420px);
+	margin: auto;
+}
+
+.card h2 {
+	margin: 0 0 10px;
+	font-size: clamp(29px, 3vw, 39px);
+	font-weight: 540;
+	letter-spacing: -0.06em;
+	line-height: 1.05;
+}
+
+.cardCopy {
+	max-width: 350px;
+	margin: 0;
+	color: var(--muted);
+	font-size: 14px;
+	line-height: 1.65;
+}
+
+.panelNote {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	margin: 0;
+	color: var(--muted);
+	font-size: 10px;
+}
+
+@media (width <= 760px) {
+	.shell {
+		display: block;
+	}
+
+	.story {
+		min-height: 260px;
+		padding: 28px 24px 0;
+	}
+
+	.themeToggle {
+		top: 24px;
+		right: 24px;
+	}
+
+	.storyCopy {
+		margin-top: 70px;
+	}
+
+	.storyCopy h1 {
+		margin-top: 14px;
+		font-size: 38px;
+	}
+
+	.lead {
+		display: none;
+	}
+
+	.panel {
+		min-height: calc(100dvh - 260px);
+		border-top: 1px solid var(--border);
+		border-left: 0;
+		padding: 48px 24px 28px;
+	}
+
+	.panelNote {
+		margin-top: 34px;
+	}
+}

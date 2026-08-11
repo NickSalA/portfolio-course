@@ -1,26 +1,75 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--background: #f5f7fb;
+	--foreground: #172033;
+	--surface: #ffffff;
+	--surface-muted: #eef2f7;
+	--border: #dbe2ec;
+	--muted: #64748b;
+	--accent: #2563eb;
+	--accent-strong: #1d4ed8;
+	--accent-soft: #dbeafe;
+	--danger: #b42318;
+	--danger-soft: #fef3f2;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+	--background: #0b1020;
+	--foreground: #f8fafc;
+	--surface: #121a2d;
+	--surface-muted: #18233a;
+	--border: #293750;
+	--muted: #94a3b8;
+	--accent: #8db4ff;
+	--accent-strong: #b6cdff;
+	--accent-soft: #1e3a68;
+	--danger: #fda29b;
+	--danger-soft: #4c1d1d;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+	:root:not(.light) {
+		--background: #0b1020;
+		--foreground: #f8fafc;
+		--surface: #121a2d;
+		--surface-muted: #18233a;
+		--border: #293750;
+		--muted: #94a3b8;
+		--accent: #8db4ff;
+		--accent-strong: #b6cdff;
+		--accent-soft: #1e3a68;
+		--danger: #fda29b;
+		--danger-soft: #4c1d1d;
+	}
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-surface: var(--surface);
+	--color-surface-muted: var(--surface-muted);
+	--color-border: var(--border);
+	--color-muted: var(--muted);
+	--color-accent: var(--accent);
+	--color-accent-strong: var(--accent-strong);
+	--color-accent-soft: var(--accent-soft);
+	--color-danger: var(--danger);
+	--color-danger-soft: var(--danger-soft);
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
+}
+
+* {
+	border-color: var(--border);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	min-height: 100vh;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: Arial, Helvetica, sans-serif;
+	transition:
+		background-color 180ms ease,
+		color 180ms ease;
 }

@@ -30,6 +30,10 @@ No tratar el proyecto como la plantilla genérica de Next.js ni como un portafol
 - La ruta OAuth debe coordinar autenticación y redirección; la decisión de acceso debe vivir en el módulo de autorización y en PostgreSQL/RPC.
 - Preferir Server Components para lectura de datos y acciones server-side para mutaciones.
 - Los componentes de cliente solo deben usarse cuando se necesite interacción, estado local o APIs del navegador.
+- Las rutas de `app/` componen pantallas, rutas y metadatos; no deben concentrar lógica de UI reutilizable.
+- Los componentes reutilizables viven en `components/ui`; los componentes propios de una capacidad viven en `components/<capacidad>`.
+- La lógica de dominio reusable vive en `lib/academic`; los adaptadores de Supabase viven en `lib/supabase`.
+- Evitar dividir componentes por detalles triviales: extraer cuando haya reutilización, estado propio o una responsabilidad clara.
 
 ## Configuración y secretos
 
@@ -53,7 +57,8 @@ No tratar el proyecto como la plantilla genérica de Next.js ni como un portafol
 
 ## Modelo académico
 
-- Un curso pertenece a un periodo académico, identificado por códigos como `2025-I` o `2025-II`.
+- Un curso pertenece a un periodo académico compuesto por `academic_year` y `semester` (`0` para verano, `1` o `2`).
+- El código visible del periodo, como `2025-0` o `2025-I`, se genera desde esos valores y nunca se captura ni almacena como dato independiente.
 - No duplicar `period_id` en grupos, matrículas o movimientos: esas entidades heredan el periodo a través del curso.
 - Un curso puede funcionar con grupos o sin grupos.
 - `group_id` debe ser nullable cuando el curso no utilice grupos.

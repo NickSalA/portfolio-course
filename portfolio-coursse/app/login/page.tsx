@@ -1,64 +1,66 @@
-"use client";
+import { LoginCard } from "@/components/auth/login-card";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import styles from "./login-page.module.css";
 
-import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-
-const messages = {
-	oauth: "No se pudo completar el inicio de sesión con Google.",
-	authorization: "No se pudo validar tu autorización académica.",
-	unauthorized: "Tu cuenta no está autorizada en ningún curso.",
+type LoginPageProps = {
+	searchParams: Promise<{ error?: string }>;
 };
 
-export default function LoginPage() {
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-
-	async function signInWithGoogle() {
-		setLoading(true);
-		setError(null);
-
-		const supabase = createClient();
-		const { error: signInError } = await supabase.auth.signInWithOAuth({
-			provider: "google",
-			options: {
-				redirectTo: `${window.location.origin}/auth/callback`,
-			},
-		});
-
-		if (signInError) {
-			setError(signInError.message);
-			setLoading(false);
-		}
-	}
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+	const { error } = await searchParams;
 
 	return (
-		<main className="flex min-h-screen items-center justify-center bg-slate-950 px-6 py-12 text-white">
-			<section className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl shadow-black/20 backdrop-blur">
-				<p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-cyan-300">
-					Aula · Portafolio
-				</p>
-				<h1 className="text-3xl font-semibold tracking-tight">
-					Iniciar sesión
-				</h1>
-				<p className="mt-3 text-sm leading-6 text-slate-300">
-					Accede con tu cuenta institucional de Google. Los alumnos
-					deben haber sido cargados previamente por su docente.
-				</p>
+		<main className={styles.shell}>
+			<div className={styles.grid} aria-hidden="true" />
+			<div
+				className={`${styles.glow} ${styles.glowTop}`}
+				aria-hidden="true"
+			/>
+			<div
+				className={`${styles.glow} ${styles.glowBottom}`}
+				aria-hidden="true"
+			/>
+			<div
+				className={`${styles.glow} ${styles.glowBottom}`}
+				aria-hidden="true"
+			/>
+			<div className={styles.themeToggle}>
+				<ThemeToggle />
+			</div>
 
-				{error && (
-					<p className="mt-6 rounded-xl border border-red-400/30 bg-red-400/10 p-3 text-sm text-red-100">
-						{messages[error as keyof typeof messages] ?? error}
+			<section className={styles.story} aria-label="Aula">
+				<div className={styles.brand}>
+					<span className={styles.brandMark}>A</span>
+					<span>
+						<strong>AULA</strong>
+						<small>ESPACIO ACADÉMICO</small>
+					</span>
+				</div>
+
+				<div className={styles.storyCopy}>
+					<p className={styles.eyebrow}>
+						<span className={styles.pulse} /> Acceso institucional
 					</p>
-				)}
+					<h1>Tu curso empieza con una buena conexión.</h1>
+					<p className={styles.lead}>
+						Un espacio para organizar grupos, reconocer el esfuerzo
+						y mantener la actividad académica clara para todos.
+					</p>
+				</div>
+			</section>
 
-				<button
-					type="button"
-					onClick={signInWithGoogle}
-					disabled={loading}
-					className="mt-8 flex w-full items-center justify-center rounded-xl bg-white px-4 py-3 font-medium text-slate-900 transition hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-60"
-				>
-					{loading ? "Conectando…" : "Continuar con Google"}
-				</button>
+			<section className={styles.panel} aria-labelledby="login-title">
+				<div className={styles.card}>
+					<h2 id="login-title">Bienvenido de vuelta.</h2>
+					<p className={styles.cardCopy}>
+						Accede con tu cuenta institucional para consultar tus
+						cursos o gestionar tu actividad docente.
+					</p>
+					<LoginCard initialError={error} />
+				</div>
+				<p className={styles.panelNote}>
+					◉ Solo para cuentas autorizadas por la institución
+				</p>
 			</section>
 		</main>
 	);
