@@ -23,7 +23,10 @@ _Avoid_: Alumno registrado, usuario permitido.
 ## Estructura académica
 
 **Periodo académico**:
-Intervalo institucional que agrupa cursos de una edición académica. Se identifica por año y periodo (`0` para verano, `I` o `II`); su código, como `2025-0` o `2025-I`, se genera automáticamente.
+Intervalo institucional que agrupa cursos de una edición académica. Se identifica por año y periodo (`0` para verano, `I` o `II`); su código, como `2025-0` o `2025-I`, se genera automáticamente. Sus fechas son editables y su ciclo de vida define si admite operación académica.
+
+**Estado de periodo**:
+Ciclo de vida de un periodo académico: `draft`, `upcoming`, `current` o `closed`. Las fechas no determinan automáticamente el estado.
 _Avoid_: Semestre cuando se esté nombrando el periodo completo.
 
 **Curso**:
@@ -31,11 +34,11 @@ Espacio académico administrado por un docente dentro de un periodo académico q
 _Avoid_: Asignatura cuando no sea necesario reflejar terminología institucional.
 
 **Grupo**:
-Subdivisión opcional de un curso con nombre y capacidad máxima. Un alumno puede elegirlo durante la ventana de selección definida por el docente.
+Subdivisión opcional generada por el sistema para un curso a partir de la cantidad de alumnos autorizados y la capacidad definida por el docente. Se identifica por una posición visible, como `Grupo 1`, no por un nombre escrito manualmente.
 _Avoid_: Equipo cuando se trate de la organización administrativa del curso.
 
 **Ventana de selección de grupo**:
-Intervalo durante el cual un alumno matriculado puede elegir o cambiar su grupo. Fuera de ese intervalo, solo una operación del docente puede modificarlo.
+Intervalo con fecha, hora y zona horaria institucional durante el cual un alumno matriculado puede elegir o cambiar su grupo. Fuera de ese intervalo, solo una operación del docente puede modificarlo.
 
 **Matrícula**:
 Relación entre un alumno autenticado y un curso. Puede tener un grupo opcional y un estado de acceso.

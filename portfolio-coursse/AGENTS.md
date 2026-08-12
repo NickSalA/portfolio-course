@@ -59,6 +59,9 @@ No tratar el proyecto como la plantilla genérica de Next.js ni como un portafol
 
 - Un curso pertenece a un periodo académico compuesto por `academic_year` y `semester` (`0` para verano, `1` o `2`).
 - El código visible del periodo, como `2025-0` o `2025-I`, se genera desde esos valores y nunca se captura ni almacena como dato independiente.
+- Las fechas de un periodo son editables e informativas; el estado `draft`, `upcoming`, `current` o `closed` gobierna su ciclo de vida.
+- Solo periodos `upcoming` y `current` admiten cursos nuevos. Los periodos `closed` son históricos.
+- Solo puede existir un periodo `current`; al promover el siguiente, el anterior debe cerrarse.
 - No duplicar `period_id` en grupos, matrículas o movimientos: esas entidades heredan el periodo a través del curso.
 - Un curso puede funcionar con grupos o sin grupos.
 - `group_id` debe ser nullable cuando el curso no utilice grupos.
@@ -66,8 +69,12 @@ No tratar el proyecto como la plantilla genérica de Next.js ni como un portafol
 - `course_students` representa matrículas reales vinculadas a perfiles autenticados.
 - Un alumno no puede elegir cursos arbitrariamente.
 - La asignación del curso la controla el docente durante la importación; la selección del grupo puede hacerla el alumno durante una ventana definida por el docente.
+- El docente no nombra ni define manualmente la cantidad de grupos: configura la capacidad y el sistema genera los grupos necesarios desde los alumnos autorizados activos.
+- La generación nunca debe eliminar ni redistribuir automáticamente grupos que ya tengan alumnos; al crecer la matrícula solo puede añadir los grupos necesarios.
 - Fuera de la ventana de selección, el alumno no puede cambiar de grupo.
 - El docente puede corregir o cambiar el grupo mediante una operación administrativa.
+- La ventana de selección debe capturar fecha, hora y zona horaria institucional explícitamente.
+- La zona horaria institucional del proyecto es `America/Lima`.
 - Los límites de grupo deben validarse en PostgreSQL, no solo en la interfaz.
 - Las operaciones sensibles que puedan sufrir concurrencia deben implementarse mediante funciones SQL/RPC o transacciones seguras.
 - La importación CSV, la sincronización de autorizaciones y la asignación de grupos deben exponerse como operaciones de dominio idempotentes, no como una colección de inserciones desde la UI.

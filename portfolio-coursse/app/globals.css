@@ -1,44 +1,50 @@
 @import "tailwindcss";
 
 :root {
-	--background: #f5f7fb;
-	--foreground: #172033;
+	color-scheme: light;
+	--background: #edf2f7;
+	--glass: rgb(255 255 255 / 66%);
+	--glass-strong: rgb(255 255 255 / 84%);
+	--foreground: #1a2638;
 	--surface: #ffffff;
-	--surface-muted: #eef2f7;
-	--border: #dbe2ec;
-	--muted: #64748b;
-	--accent: #2563eb;
-	--accent-strong: #1d4ed8;
-	--accent-soft: #dbeafe;
+	--surface-muted: #e8eef5;
+	--border: #cad7e5;
+	--muted: #5f7187;
+	--accent: #3b65b9;
+	--accent-strong: #2d5197;
+	--accent-soft: #dce8fb;
 	--danger: #b42318;
 	--danger-soft: #fef3f2;
 }
 
 .dark {
-	--background: #0b1020;
-	--foreground: #f8fafc;
-	--surface: #121a2d;
-	--surface-muted: #18233a;
-	--border: #293750;
-	--muted: #94a3b8;
-	--accent: #8db4ff;
-	--accent-strong: #b6cdff;
-	--accent-soft: #1e3a68;
+	color-scheme: dark;
+	--background: #17212d;
+	--glass: rgb(31 44 60 / 68%);
+	--glass-strong: rgb(35 50 68 / 84%);
+	--foreground: #f1f5f9;
+	--surface: #223044;
+	--surface-muted: #2a3a50;
+	--border: #3b4e66;
+	--muted: #afbdcc;
+	--accent: #9ab6f0;
+	--accent-strong: #bdd0ff;
+	--accent-soft: rgb(154 182 240 / 16%);
 	--danger: #fda29b;
 	--danger-soft: #4c1d1d;
 }
 
 @media (prefers-color-scheme: dark) {
 	:root:not(.light) {
-		--background: #0b1020;
-		--foreground: #f8fafc;
-		--surface: #121a2d;
-		--surface-muted: #18233a;
-		--border: #293750;
-		--muted: #94a3b8;
-		--accent: #8db4ff;
-		--accent-strong: #b6cdff;
-		--accent-soft: #1e3a68;
+		--background: #17212d;
+		--foreground: #f1f5f9;
+		--surface: #223044;
+		--surface-muted: #2a3a50;
+		--border: #3b4e66;
+		--muted: #afbdcc;
+		--accent: #9ab6f0;
+		--accent-strong: #bdd0ff;
+		--accent-soft: rgb(154 182 240 / 16%);
 		--danger: #fda29b;
 		--danger-soft: #4c1d1d;
 	}
@@ -56,7 +62,8 @@
 	--color-accent-soft: var(--accent-soft);
 	--color-danger: var(--danger);
 	--color-danger-soft: var(--danger-soft);
-	--font-sans: var(--font-geist-sans);
+	--font-sans: var(--font-manrope);
+	--font-display: var(--font-space-grotesk);
 	--font-mono: var(--font-geist-mono);
 }
 
@@ -66,10 +73,50 @@
 
 body {
 	min-height: 100vh;
-	background: var(--background);
+	background:
+		radial-gradient(
+			circle at 8% 4%,
+			rgb(86 130 255 / 16%),
+			transparent 28rem
+		),
+		radial-gradient(
+			circle at 90% 88%,
+			rgb(70 194 255 / 11%),
+			transparent 30rem
+		),
+		var(--background);
+	background-attachment: fixed;
 	color: var(--foreground);
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: var(--font-manrope), Arial, sans-serif;
 	transition:
 		background-color 180ms ease,
 		color 180ms ease;
+}
+
+h1,
+h2,
+h3 {
+	font-family: var(--font-space-grotesk), Arial, sans-serif;
+}
+
+.glass {
+	background: var(--glass);
+	backdrop-filter: blur(20px) saturate(140%);
+	-webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+.glass-strong {
+	background: var(--glass-strong);
+	backdrop-filter: blur(24px) saturate(145%);
+	-webkit-backdrop-filter: blur(24px) saturate(145%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+	}
 }

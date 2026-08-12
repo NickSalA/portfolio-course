@@ -2,6 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import {
+	nextAcademicPeriod,
+	suggestedAcademicPeriods,
+} from "@/lib/academic/calendar";
 import { createClient } from "@/lib/supabase/server";
 
 function textValue(value: FormDataEntryValue | null): string {
@@ -28,6 +32,31 @@ export async function createPeriod(formData: FormData) {
 		redirect("/teacher/courses?error=period-data");
 	}
 
+	const { data: currentPeriod } = await supabase
+		.from("academic_periods")
+		.select("academic_year, semester")
+		.eq("status", "current")
+		.maybeSingle();
+	const allowedPeriods = currentPeriod
+		? [
+				{
+					academicYear: currentPeriod.academic_year,
+					semester: currentPeriod.semester as 0 | 1 | 2,
+				},
+				nextAcademicPeriod({
+					academicYear: currentPeriod.academic_year,
+					semester: currentPeriod.semester as 0 | 1 | 2,
+				}),
+			]
+		: suggestedAcademicPeriods(new Date());
+	const isAllowed = allowedPeriods.some(
+		(period) =>
+			period.academicYear === academicYear &&
+			period.semester === semester,
+	);
+
+	if (!isAllowed) redirect("/teacher/courses?error=period-not-available");
+
 	if (startsAt && endsAt && endsAt < startsAt) {
 		redirect("/teacher/courses?error=period-dates");
 	}
@@ -44,6 +73,38 @@ export async function createPeriod(formData: FormData) {
 			`/teacher/courses?error=${error.code === "23505" ? "period-duplicate" : "period-create"}`,
 		);
 	}
+
+	revalidatePath("/teacher/courses");
+	redirect("/teacher/courses");
+}
+
+export async function updatePeriodStatus(formData: FormData) {
+	const supabase = await createClient();
+	const periodId = Number(textValue(formData.get("period_id")));
+	const status = textValue(formData.get("status"));
+
+	if (
+		!Number.isInteger(periodId) ||
+		!["draft", "upcoming", "current", "closed"].includes(status)
+	) {
+		redirect("/teacher/courses?error=period-status");
+	}
+
+	if (status === "current") {
+		const { error: closeError } = await supabase
+			.from("academic_periods")
+			.update({ status: "closed" })
+			.eq("status", "current");
+
+		if (closeError) redirect("/teacher/courses?error=period-status");
+	}
+
+	const { error } = await supabase
+		.from("academic_periods")
+		.update({ status })
+		.eq("id", periodId);
+
+	if (error) redirect("/teacher/courses?error=period-status");
 
 	revalidatePath("/teacher/courses");
 	redirect("/teacher/courses");
