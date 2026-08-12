@@ -58,6 +58,11 @@ export function CoursePlanner({ period, courses }: CoursePlannerProps) {
 				className="mt-6 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]"
 			>
 				<input type="hidden" name="period_id" value={period.id} />
+				<input
+					type="hidden"
+					name="period_public_id"
+					value={period.public_id}
+				/>
 				<label className="sr-only" htmlFor="course-name">
 					Nombre del curso
 				</label>
@@ -84,7 +89,7 @@ export function CoursePlanner({ period, courses }: CoursePlannerProps) {
 				{periodCourses.map((course) => (
 					<Link
 						key={course.id}
-						href={`/teacher/courses/${course.public_id}`}
+						href={`/teacher/courses/${course.public_id}?period=${encodeURIComponent(period.public_id)}`}
 						className="group flex min-w-0 items-center justify-between gap-4 rounded-xl px-4 py-4 transition hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 					>
 						<div className="min-w-0">

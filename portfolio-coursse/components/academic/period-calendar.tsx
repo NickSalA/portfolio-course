@@ -1,5 +1,5 @@
 import type { AcademicPeriodKey } from "@/lib/academic/calendar";
-import { createPeriod } from "@/app/teacher/courses/actions";
+import { preparePeriod, setPeriodCurrent } from "@/app/teacher/periods/actions";
 import {
 	periodName,
 	type WorkspacePeriod,
@@ -8,8 +8,6 @@ import {
 type PeriodCalendarProps = {
 	periods: WorkspacePeriod[];
 	availableKeys: AcademicPeriodKey[];
-	selectedPeriodId: number | null;
-	onSelect: (periodId: number) => void;
 };
 
 function codeFor(key: AcademicPeriodKey) {
@@ -19,8 +17,6 @@ function codeFor(key: AcademicPeriodKey) {
 export function PeriodCalendar({
 	periods,
 	availableKeys,
-	selectedPeriodId,
-	onSelect,
 }: PeriodCalendarProps) {
 	return (
 		<section className="glass overflow-hidden rounded-3xl border border-white/25 shadow-[0_20px_55px_rgb(15_23_42/8%)]">
@@ -48,8 +44,7 @@ export function PeriodCalendar({
 					);
 					const label =
 						index === 0 ? "Periodo actual" : "Siguiente periodo";
-
-					if (!period) {
+					if (!period)
 						return (
 							<div key={code} className="p-6 sm:p-8">
 								<p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
@@ -62,7 +57,7 @@ export function PeriodCalendar({
 									{periodName(key.semester)} · Aún no
 									preparado
 								</p>
-								<form action={createPeriod} className="mt-6">
+								<form action={preparePeriod} className="mt-6">
 									<input
 										type="hidden"
 										name="academic_year"
@@ -79,16 +74,8 @@ export function PeriodCalendar({
 								</form>
 							</div>
 						);
-					}
-
-					const selected = period.id === selectedPeriodId;
 					return (
-						<button
-							key={period.id}
-							type="button"
-							onClick={() => onSelect(period.id)}
-							className={`group min-w-0 p-6 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent sm:p-8 ${selected ? "bg-accent-soft" : "hover:bg-surface-muted"}`}
-						>
+						<article key={period.id} className="p-6 sm:p-8">
 							<p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted">
 								{label}
 							</p>
@@ -107,10 +94,22 @@ export function PeriodCalendar({
 							<p className="mt-2 text-sm text-muted">
 								{periodName(period.semester)}
 							</p>
-							<p className="mt-6 text-sm font-medium text-accent opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
-								Gestionar cursos →
-							</p>
-						</button>
+							{period.status === "upcoming" && (
+								<form
+									action={setPeriodCurrent}
+									className="mt-6"
+								>
+									<input
+										type="hidden"
+										name="period_id"
+										value={period.id}
+									/>
+									<button className="text-sm font-semibold text-accent transition hover:text-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+										Marcar como periodo actual →
+									</button>
+								</form>
+							)}
+						</article>
 					);
 				})}
 			</div>

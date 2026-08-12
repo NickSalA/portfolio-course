@@ -1,0 +1,76 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { nextAcademicPeriod, suggestedAcademicPeriods } from "@/lib/academic/calendar";
+import { createClient } from "@/lib/supabase/server";
+
+function value(formData: FormData, name: string) {
+  const entry = formData.get(name);
+  return typeof entry === "string" ? entry.trim() : "";
+}
+
+function redirectWithError(error: string) {
+  redirect(`/teacher/periods?error=${error}`);
+}
+
+export async function preparePeriod(formData: FormData) {
+  const supabase = await createClient();
+  const academicYear = Number(value(formData, "academic_year"));
+  const semester = Number(value(formData, "semester"));
+
+  if (!Number.isInteger(academicYear) || ![0, 1, 2].includes(semester)) {
+    redirectWithError("period-data");
+  }
+
+  const { data: currentPeriod } = await supabase
+    .from("academic_periods")
+    .select("academic_year, semester")
+    .eq("status", "current")
+    .maybeSingle();
+
+  const allowed = currentPeriod
+    ? [
+        { academicYear: currentPeriod.academic_year, semester: currentPeriod.semester as 0 | 1 | 2 },
+        nextAcademicPeriod({ academicYear: currentPeriod.academic_year, semester: currentPeriod.semester as 0 | 1 | 2 }),
+      ]
+    : suggestedAcademicPeriods(new Date());
+
+  if (!allowed.some((period) => period.academicYear === academicYear && period.semester === semester)) {
+    redirectWithError("period-not-available");
+  }
+
+  const { error } = await supabase.from("academic_periods").insert({
+    academic_year: academicYear,
+    semester,
+  });
+
+  if (error) redirectWithError(error.code === "23505" ? "period-duplicate" : "period-create");
+
+  revalidatePath("/teacher/periods");
+  revalidatePath("/teacher/courses");
+  redirect("/teacher/periods");
+}
+
+export async function setPeriodCurrent(formData: FormData) {
+  const supabase = await createClient();
+  const periodId = Number(value(formData, "period_id"));
+  if (!Number.isInteger(periodId)) redirectWithError("period-status");
+
+  const { error: closeError } = await supabase
+    .from("academic_periods")
+    .update({ status: "closed" })
+    .eq("status", "current");
+  if (closeError) redirectWithError("period-status");
+
+  const { error } = await supabase
+    .from("academic_periods")
+    .update({ status: "current" })
+    .eq("id", periodId)
+    .eq("status", "upcoming");
+  if (error) redirectWithError("period-status");
+
+  revalidatePath("/teacher/periods");
+  revalidatePath("/teacher/courses");
+  redirect("/teacher/periods");
+}
