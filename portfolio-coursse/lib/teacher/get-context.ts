@@ -1,38 +1,75 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export async function getTeacherContext(requestedPeriodPublicId?: string) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+type ContextOptions = {
+	requestedPeriodPublicId?: string;
+	includeHistory?: boolean;
+};
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, full_name, role")
-    .eq("id", user.id)
-    .maybeSingle();
+// React cache is scoped to a server render. The layout and the route can reuse
+// the authenticated teacher and navigation periods without duplicate requests.
+export const getTeacherBaseContext = cache(async () => {
+	const supabase = await createClient();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+	if (!user) redirect("/login");
 
-  if (profile?.role !== "teacher") redirect("/dashboard?error=forbidden");
+	const [{ data: teacher }, { data: availablePeriods }] = await Promise.all([
+		supabase
+			.from("profiles")
+			.select("id, full_name, role")
+			.eq("id", user.id)
+			.maybeSingle(),
+		supabase
+			.from("academic_periods")
+			.select("id, public_id, code, academic_year, semester, status")
+			.in("status", ["current", "upcoming"])
+			.order("academic_year", { ascending: false })
+			.order("semester", { ascending: false }),
+	]);
 
-  const { data: periods } = await supabase
-    .from("academic_periods")
-    .select("id, public_id, code, academic_year, semester, status")
-    .order("academic_year", { ascending: false })
-    .order("semester", { ascending: false });
+	if (teacher?.role !== "teacher") redirect("/dashboard?error=forbidden");
 
-  const availablePeriods = periods?.filter(
-    (period) => period.status === "current" || period.status === "upcoming",
-  ) ?? [];
-  const selectedPeriod = requestedPeriodPublicId
-    ? availablePeriods.find((period) => period.public_id === requestedPeriodPublicId)
-    : availablePeriods.find((period) => period.status === "current") ?? availablePeriods[0];
+	return {
+		supabase,
+		user,
+		teacher,
+		availablePeriods: availablePeriods ?? [],
+	};
+});
 
-  return {
-    supabase,
-    user,
-    teacher: profile,
-    periods: periods ?? [],
-    availablePeriods,
-    selectedPeriod: selectedPeriod ?? null,
-  };
+export async function getTeacherContext({
+	requestedPeriodPublicId,
+	includeHistory = false,
+}: ContextOptions = {}) {
+	const base = await getTeacherBaseContext();
+	const selectedPeriod = requestedPeriodPublicId
+		? base.availablePeriods.find(
+				(period) => period.public_id === requestedPeriodPublicId,
+			)
+		: (base.availablePeriods.find(
+				(period) => period.status === "current",
+			) ?? base.availablePeriods[0]);
+
+	if (!includeHistory) {
+		return {
+			...base,
+			periods: base.availablePeriods,
+			selectedPeriod: selectedPeriod ?? null,
+		};
+	}
+
+	const { data: periods } = await base.supabase
+		.from("academic_periods")
+		.select("id, public_id, code, academic_year, semester, status")
+		.order("academic_year", { ascending: false })
+		.order("semester", { ascending: false });
+
+	return {
+		...base,
+		periods: periods ?? [],
+		selectedPeriod: selectedPeriod ?? null,
+	};
 }

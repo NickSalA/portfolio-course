@@ -15,8 +15,9 @@ export default async function TeacherCoursesPage({
 	searchParams: Promise<{ period?: string; error?: string }>;
 }) {
 	const { period: requestedPeriod, error: errorCode } = await searchParams;
-	const { supabase, user, selectedPeriod } =
-		await getTeacherContext(requestedPeriod);
+	const { supabase, user, selectedPeriod } = await getTeacherContext({
+		requestedPeriodPublicId: requestedPeriod,
+	});
 	const { data: courses } = selectedPeriod
 		? await supabase
 				.from("courses")

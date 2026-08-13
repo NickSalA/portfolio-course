@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createCourse } from "@/app/teacher/courses/actions";
+import { GlassPanel } from "@/components/ui/glass-panel";
 import {
 	periodForCourse,
 	type WorkspaceCourse,
@@ -14,7 +15,7 @@ type CoursePlannerProps = {
 export function CoursePlanner({ period, courses }: CoursePlannerProps) {
 	if (!period) {
 		return (
-			<section className="glass rounded-3xl border border-white/25 p-6 shadow-[0_20px_55px_rgb(15_23_42/8%)] sm:p-8">
+			<GlassPanel>
 				<p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
 					Cursos
 				</p>
@@ -25,7 +26,7 @@ export function CoursePlanner({ period, courses }: CoursePlannerProps) {
 					Cuando abras el periodo actual o el siguiente, podrás añadir
 					cursos aquí.
 				</p>
-			</section>
+			</GlassPanel>
 		);
 	}
 
@@ -34,14 +35,11 @@ export function CoursePlanner({ period, courses }: CoursePlannerProps) {
 	);
 
 	return (
-		<section className="glass rounded-3xl border border-white/25 p-6 shadow-[0_20px_55px_rgb(15_23_42/8%)] sm:p-8">
+		<GlassPanel>
 			<div className="flex flex-col justify-between gap-4 border-b border-border pb-6 sm:flex-row sm:items-end">
 				<div>
-					<p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-						Cursos · {period.code}
-					</p>
-					<h2 className="mt-2 text-2xl font-semibold tracking-tight">
-						Planifica este periodo
+					<h2 className="text-2xl font-semibold tracking-tight">
+						Cursos del periodo
 					</h2>
 					<p className="mt-2 text-sm text-muted">
 						Añade cursos ahora. Los grupos y alumnos se configuran
@@ -117,6 +115,6 @@ export function CoursePlanner({ period, courses }: CoursePlannerProps) {
 					</p>
 				)}
 			</div>
-		</section>
+		</GlassPanel>
 	);
 }

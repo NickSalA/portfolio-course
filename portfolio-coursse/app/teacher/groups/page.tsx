@@ -9,8 +9,9 @@ type GroupsPageProps = {
 
 export default async function GroupsPage({ searchParams }: GroupsPageProps) {
 	const { period: requestedPeriod } = await searchParams;
-	const { supabase, user, selectedPeriod } =
-		await getTeacherContext(requestedPeriod);
+	const { supabase, user, selectedPeriod } = await getTeacherContext({
+		requestedPeriodPublicId: requestedPeriod,
+	});
 
 	const { data: courses } = selectedPeriod
 		? await supabase

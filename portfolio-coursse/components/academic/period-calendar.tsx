@@ -1,5 +1,6 @@
 import type { AcademicPeriodKey } from "@/lib/academic/calendar";
 import { preparePeriod, setPeriodCurrent } from "@/app/teacher/periods/actions";
+import { GlassPanel } from "@/components/ui/glass-panel";
 import {
 	periodName,
 	type WorkspacePeriod,
@@ -19,7 +20,7 @@ export function PeriodCalendar({
 	availableKeys,
 }: PeriodCalendarProps) {
 	return (
-		<section className="glass overflow-hidden rounded-3xl border border-white/25 shadow-[0_20px_55px_rgb(15_23_42/8%)]">
+		<GlassPanel className="overflow-hidden p-0">
 			<div className="border-b border-border px-6 py-5 sm:px-8">
 				<p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
 					Calendario académico
@@ -113,6 +114,6 @@ export function PeriodCalendar({
 					);
 				})}
 			</div>
-		</section>
+		</GlassPanel>
 	);
 }
