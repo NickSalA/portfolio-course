@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-	saveSelectionWindow,
-	synchronizeGroups,
-} from "@/app/teacher/groups/actions";
+
+import { GroupCapacityForm } from "@/components/teacher/group-capacity-form";
+import { GroupSelectionWindowDialog } from "@/components/teacher/group-selection-window-dialog";
+import { ModuleHeader } from "@/components/teacher/module-header";
 import { createClient } from "@/lib/supabase/server";
 
 const errors: Record<string, string> = {
@@ -19,6 +19,27 @@ type CoursePageProps = {
 	searchParams: Promise<{ error?: string; period?: string }>;
 };
 
+function dateTimeForLima(value: string | null) {
+	if (!value) return { date: "", time: "" };
+
+	const parts = new Intl.DateTimeFormat("en-CA", {
+		timeZone: "America/Lima",
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+		hour: "2-digit",
+		minute: "2-digit",
+		hourCycle: "h23",
+	}).formatToParts(new Date(value));
+	const part = (type: Intl.DateTimeFormatPartTypes) =>
+		parts.find((item) => item.type === type)?.value ?? "";
+
+	return {
+		date: `${part("year")}-${part("month")}-${part("day")}`,
+		time: `${part("hour")}:${part("minute")}`,
+	};
+}
+
 export default async function CoursePage({
 	params,
 	searchParams,
@@ -26,7 +47,6 @@ export default async function CoursePage({
 	const { coursePublicId } = await params;
 	const { error: errorCode, period: selectedPeriod } = await searchParams;
 	const supabase = await createClient();
-
 	const { data: course } = await supabase
 		.from("courses")
 		.select(
@@ -34,7 +54,6 @@ export default async function CoursePage({
 		)
 		.eq("public_id", coursePublicId)
 		.maybeSingle();
-
 	if (!course) notFound();
 
 	const { data: groups } = await supabase
@@ -42,41 +61,51 @@ export default async function CoursePage({
 		.select("id, position, capacity, course_students(count)")
 		.eq("course_id", course.id)
 		.order("position");
-
 	const period = Array.isArray(course.academic_periods)
 		? course.academic_periods[0]
 		: course.academic_periods;
 	const authorized = Array.isArray(course.authorized_students)
 		? (course.authorized_students[0]?.count ?? 0)
 		: 0;
-	const required = course.group_capacity
-		? Math.ceil(authorized / course.group_capacity)
-		: null;
+
+	const assigned = (groups ?? []).reduce(
+		(total, group) =>
+			total +
+			(Array.isArray(group.course_students)
+				? (group.course_students[0]?.count ?? 0)
+				: 0),
+		0,
+	);
 	const error = errorCode ? errors[errorCode] : null;
+	const selectionOpens = dateTimeForLima(course.group_selection_opens_at);
+	const selectionCloses = dateTimeForLima(course.group_selection_closes_at);
 	const returnTo = `/teacher/courses/${course.public_id}${selectedPeriod ? `?period=${encodeURIComponent(selectedPeriod)}` : ""}`;
+	const coursesHref = `/teacher/courses${selectedPeriod ? `?period=${encodeURIComponent(selectedPeriod)}` : ""}`;
 
 	return (
 		<main className="px-5 py-8 sm:px-8 sm:py-10">
-			<div className="mx-auto max-w-5xl">
+			<div className="mx-auto max-w-6xl">
 				<Link
-					href={`/teacher/courses${selectedPeriod ? `?period=${encodeURIComponent(selectedPeriod)}` : ""}`}
+					href={coursesHref}
 					className="text-sm font-medium text-accent transition hover:text-accent-strong"
 				>
 					← Volver a cursos
 				</Link>
-				<header className="mt-7 border-b border-border pb-7">
-					<p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-						{period?.code}
-					</p>
-					<h1 className="mt-3 text-3xl font-semibold tracking-tight">
-						{course.name}
-					</h1>
-					{course.description && (
-						<p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-							{course.description}
-						</p>
-					)}
-				</header>
+				<div className="mt-6">
+					<ModuleHeader
+						eyebrow={period?.code ?? "Curso"}
+						title={course.name}
+						description={
+							course.description ??
+							"Configura los grupos y la ventana de selección de este curso."
+						}
+						aside={
+							<span className="rounded-full bg-accent-soft px-3 py-1.5 text-sm font-medium text-accent">
+								{groups?.length ?? 0} grupos
+							</span>
+						}
+					/>
+				</div>
 				{error && (
 					<p
 						role="alert"
@@ -86,155 +115,75 @@ export default async function CoursePage({
 					</p>
 				)}
 
-				<div className="mt-8 grid gap-6 lg:grid-cols-2">
-					<section className="glass rounded-3xl border border-white/25 p-6 shadow-[0_20px_55px_rgb(15_23_42/8%)]">
-						<p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
-							Distribución
-						</p>
-						<h2 className="mt-3 text-xl font-semibold">
-							Grupos automáticos
-						</h2>
-						<p className="mt-2 text-sm leading-6 text-muted">
-							Aula genera los grupos a partir de los alumnos
-							autorizados y la capacidad que definas.
-						</p>
-						<div className="mt-6 grid grid-cols-2 gap-3">
-							<div className="rounded-xl bg-surface-muted/70 p-4">
-								<p className="text-xs text-muted">
-									Alumnos autorizados
-								</p>
-								<p className="mt-1 text-2xl font-semibold">
-									{authorized}
-								</p>
-							</div>
-							<div className="rounded-xl bg-surface-muted/70 p-4">
-								<p className="text-xs text-muted">
-									Grupos necesarios
-								</p>
-								<p className="mt-1 text-2xl font-semibold">
-									{required ?? "—"}
-								</p>
-							</div>
+				<div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_42rem] lg:items-stretch">
+					<section className="grid grid-cols-2 overflow-hidden rounded-2xl border border-border bg-surface-muted/55">
+						<div className="row-span-2 flex flex-col justify-center p-5 sm:p-6">
+							<p className="text-xs text-muted">Autorizados</p>
+							<p className="mt-2 text-3xl font-semibold tabular-nums">
+								{authorized}
+							</p>
 						</div>
-						<form action={synchronizeGroups} className="mt-6">
-							<input
-								type="hidden"
-								name="course_public_id"
-								value={course.public_id}
-							/>
-							<input
-								type="hidden"
-								name="period"
-								value={selectedPeriod ?? ""}
-							/>
-							<input
-								type="hidden"
-								name="return_to"
-								value={returnTo}
-							/>
-							<label className="block text-sm font-medium">
-								Alumnos por grupo
-								<input
-									name="capacity"
-									type="number"
-									min="1"
-									defaultValue={course.group_capacity ?? ""}
-									required
-									placeholder="Ej. 5"
-									className="mt-2 w-full rounded-xl border border-border bg-surface-muted px-4 py-3 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent"
-								/>
-							</label>
-							<button className="mt-5 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
-								Generar distribución
-							</button>
-						</form>
+						<div className="border-b border-l border-border p-4 sm:p-5">
+							<p className="text-xs text-muted">En grupos</p>
+							<p className="mt-1 text-2xl font-semibold tabular-nums">
+								{assigned}
+							</p>
+						</div>
+						<div className="border-l border-border p-4 sm:p-5">
+							<p className="text-xs text-muted">Sin grupo</p>
+							<p className="mt-1 text-2xl font-semibold tabular-nums">
+								{Math.max(authorized - assigned, 0)}
+							</p>
+						</div>
 					</section>
 
-					<section className="glass rounded-3xl border border-white/25 p-6 shadow-[0_20px_55px_rgb(15_23_42/8%)]">
-						<p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
-							Selección
-						</p>
-						<h2 className="mt-3 text-xl font-semibold">
-							Ventana para alumnos
-						</h2>
-						<p className="mt-2 text-sm leading-6 text-muted">
-							Los alumnos pueden elegir o cambiar de grupo solo
-							dentro de este horario.
-						</p>
-						<form action={saveSelectionWindow} className="mt-6">
-							<input
-								type="hidden"
-								name="course_public_id"
-								value={course.public_id}
-							/>
-							<input
-								type="hidden"
-								name="period"
-								value={selectedPeriod ?? ""}
-							/>
-							<input
-								type="hidden"
-								name="return_to"
-								value={returnTo}
-							/>
-							<p className="mb-4 text-xs text-muted">
-								Hora institucional · Lima, Perú
-							</p>
-							<div className="grid grid-cols-2 gap-3">
-								<label className="text-sm text-muted">
-									Inicio
-									<input
-										name="opens_on"
-										type="date"
-										required
-										className="mt-2 w-full rounded-xl border border-border bg-surface-muted px-3 py-2 text-foreground"
-									/>
-								</label>
-								<label className="text-sm text-muted">
-									Hora
-									<input
-										name="opens_at"
-										type="time"
-										required
-										className="mt-2 w-full rounded-xl border border-border bg-surface-muted px-3 py-2 text-foreground"
-									/>
-								</label>
-								<label className="text-sm text-muted">
-									Cierre
-									<input
-										name="closes_on"
-										type="date"
-										required
-										className="mt-2 w-full rounded-xl border border-border bg-surface-muted px-3 py-2 text-foreground"
-									/>
-								</label>
-								<label className="text-sm text-muted">
-									Hora
-									<input
-										name="closes_at"
-										type="time"
-										required
-										className="mt-2 w-full rounded-xl border border-border bg-surface-muted px-3 py-2 text-foreground"
-									/>
-								</label>
-							</div>
-							<button className="mt-5 rounded-xl border border-border bg-surface-muted px-4 py-2.5 text-sm font-semibold text-foreground transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
-								Guardar ventana
-							</button>
-						</form>
-					</section>
+					<GroupCapacityForm
+						coursePublicId={course.public_id}
+						period={selectedPeriod ?? ""}
+						returnTo={returnTo}
+						authorized={authorized}
+						initialCapacity={course.group_capacity}
+						className="h-full max-w-none"
+					/>
 				</div>
 
-				<section className="glass mt-6 rounded-3xl border border-white/25 p-6 shadow-[0_20px_55px_rgb(15_23_42/8%)]">
-					<div className="flex items-center justify-between gap-3">
-						<h2 className="text-xl font-semibold">
-							Grupos generados
-						</h2>
+				{groups?.length ? (
+					<section className="mt-5 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
+						<div>
+							<p className="text-sm font-medium">
+								Ventana de selección
+							</p>
+							<p className="mt-1 text-sm text-muted">
+								Disponible ahora que los grupos ya existen.
+							</p>
+						</div>
+						<GroupSelectionWindowDialog
+							coursePublicId={course.public_id}
+							period={selectedPeriod ?? ""}
+							returnTo={returnTo}
+							opensDate={selectionOpens.date}
+							opensTime={selectionOpens.time}
+							closesDate={selectionCloses.date}
+							closesTime={selectionCloses.time}
+						/>
+					</section>
+				) : null}
+
+				<section className="mt-8">
+					<div className="flex items-end justify-between gap-4">
+						<div>
+							<p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+								Grupos
+							</p>
+							<h2 className="mt-2 text-xl font-semibold">
+								Distribución actual
+							</h2>
+						</div>
 						<p className="text-sm text-muted">
 							{groups?.length ?? 0} grupos
 						</p>
 					</div>
-					<div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+					<div className="mt-4 grid gap-2 sm:grid-cols-2 md:grid-cols-3">
 						{groups?.map((group) => {
 							const members = Array.isArray(group.course_students)
 								? (group.course_students[0]?.count ?? 0)
@@ -242,21 +191,31 @@ export default async function CoursePage({
 							return (
 								<article
 									key={group.id}
-									className="rounded-2xl border border-border bg-surface-muted/70 p-4"
+									className="rounded-2xl border border-border bg-surface-muted/55 p-4"
 								>
-									<h3 className="font-medium">
-										Grupo {group.position}
-									</h3>
-									<p className="mt-2 text-sm text-muted">
-										{members} / {group.capacity} alumnos
-									</p>
+									<div className="flex items-center justify-between">
+										<h3 className="font-medium">
+											Grupo {group.position}
+										</h3>
+										<span className="text-sm tabular-nums text-muted">
+											{members}/{group.capacity}
+										</span>
+									</div>
+									<div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface">
+										<div
+											className="h-full rounded-full bg-accent"
+											style={{
+												width: `${Math.min((members / group.capacity) * 100, 100)}%`,
+											}}
+										/>
+									</div>
 								</article>
 							);
 						})}
 						{!groups?.length && (
-							<p className="rounded-xl bg-surface-muted p-5 text-sm text-muted">
-								Configura la capacidad para generar los grupos
-								necesarios.
+							<p className="rounded-2xl border border-dashed border-border p-5 text-sm text-muted">
+								Define la capacidad para generar la
+								distribución.
 							</p>
 						)}
 					</div>

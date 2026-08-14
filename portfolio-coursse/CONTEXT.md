@@ -44,6 +44,9 @@ Intervalo con fecha, hora y zona horaria institucional durante el cual un alumno
 Relación entre un alumno autenticado y un curso. Puede tener un grupo opcional y un estado de acceso.
 _Avoid_: Inscripción cuando se hable de un registro persistente; inscripción puede usarse para la acción.
 
+**Código de matrícula**:
+Dato institucional opcional de referencia del alumno. No es su identidad de acceso ni la clave de autorización; el correo institucional identifica la autorización.
+
 **Estado de matrícula**:
 Estado que indica si una matrícula está pendiente, activa, inactiva o bloqueada.
 
@@ -60,7 +63,7 @@ _Avoid_: Puntos asignados cuando se necesite distinguir el total del historial.
 ## Importación
 
 **Carga de alumnos**:
-Proceso mediante el cual el docente importa un CSV y autoriza correos, datos personales, curso y grupo opcional.
+Proceso mediante el cual el docente importa un CSV dentro de un periodo y autoriza correos, datos personales y cursos. El CSV puede crear cursos que aún no existan en ese periodo.
 _Avoid_: Registro de alumnos cuando el proceso también actualiza autorizaciones existentes.
 
 **Autorización**:

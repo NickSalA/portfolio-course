@@ -1,0 +1,86 @@
+"use client";
+
+import { useState } from "react";
+import { synchronizeGroups } from "@/app/teacher/groups/actions";
+import { GlassPanel } from "@/components/ui/glass-panel";
+
+type GroupCapacityFormProps = {
+	coursePublicId: string;
+	period: string;
+	returnTo: string;
+	authorized: number;
+	initialCapacity: number | null;
+	className?: string;
+};
+
+export function GroupCapacityForm({
+	coursePublicId,
+	period,
+	returnTo,
+	authorized,
+	initialCapacity,
+	className = "mt-6 max-w-2xl",
+}: GroupCapacityFormProps) {
+	const [capacity, setCapacity] = useState(
+		initialCapacity ? String(initialCapacity) : "",
+	);
+	const capacityValue = Number(capacity);
+	const requiredGroups =
+		Number.isInteger(capacityValue) && capacityValue > 0
+			? Math.ceil(authorized / capacityValue)
+			: null;
+
+	return (
+		<GlassPanel size="compact" className={className}>
+			<form action={synchronizeGroups}>
+				<input
+					type="hidden"
+					name="course_public_id"
+					value={coursePublicId}
+				/>
+				<input type="hidden" name="period" value={period} />
+				<input type="hidden" name="return_to" value={returnTo} />
+
+				<p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+					Grupos
+				</p>
+				<h2 className="mt-2 text-xl font-semibold">Crear grupos</h2>
+				<p className="mt-1 text-sm text-muted">
+					Define cuántos alumnos caben en cada grupo.
+				</p>
+
+				<div className="mt-5 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center">
+					<label className="flex items-center gap-3 text-sm font-medium">
+						<span className="whitespace-nowrap">
+							Alumnos por grupo
+						</span>
+						<input
+							name="capacity"
+							type="number"
+							min="1"
+							value={capacity}
+							onChange={(event) =>
+								setCapacity(event.target.value)
+							}
+							required
+							autoComplete="off"
+							placeholder="Ej. 5"
+							className="w-28 rounded-xl border border-border bg-surface-muted px-3 py-2.5 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent"
+						/>
+					</label>
+					<button className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:ml-auto">
+						Crear grupos
+					</button>
+				</div>
+				{authorized > 0 && (
+					<p className="mt-4 text-sm text-muted">
+						<span className="font-semibold text-foreground tabular-nums">
+							{requiredGroups ?? "—"} grupos
+						</span>{" "}
+						se crearán para {authorized} alumnos autorizados.
+					</p>
+				)}
+			</form>
+		</GlassPanel>
+	);
+}
