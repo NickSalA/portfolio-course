@@ -30,12 +30,12 @@ export function PeriodCalendar({
 						Ahora y lo que sigue
 					</h2>
 					<p className="text-sm text-muted">
-						El sistema solo habilita el periodo actual y el
-						siguiente.
+						El verano es opcional; el periodo se promueve
+						manualmente.
 					</p>
 				</div>
 			</div>
-			<div className="grid divide-y divide-border md:grid-cols-2 md:divide-x md:divide-y-0">
+			<div className="grid divide-y divide-border md:grid-cols-2 md:divide-x md:divide-y-0 xl:grid-cols-3">
 				{availableKeys.map((key, index) => {
 					const code = codeFor(key);
 					const period = periods.find(
@@ -44,7 +44,11 @@ export function PeriodCalendar({
 							item.semester === key.semester,
 					);
 					const label =
-						index === 0 ? "Periodo actual" : "Siguiente periodo";
+						index === 0
+							? "Periodo actual"
+							: index === 1
+								? "Siguiente periodo"
+								: "Alternativa sin verano";
 					if (!period)
 						return (
 							<div key={code} className="p-6 sm:p-8">

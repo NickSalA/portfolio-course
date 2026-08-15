@@ -12,7 +12,7 @@ const modules = [
 	{ href: "/teacher/points", label: "Puntos", symbol: "+" },
 ];
 
-export function TeacherSidebar() {
+export function TeacherSidebar({ name }: { name: string }) {
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const query = searchParams.get("period")
@@ -23,14 +23,14 @@ export function TeacherSidebar() {
 		<aside className="glass flex w-full shrink-0 flex-col border-b border-white/20 shadow-[8px_0_30px_rgb(15_23_42/4%)] md:fixed md:inset-y-0 md:left-0 md:z-30 md:h-dvh md:w-60 md:border-b-0 md:border-r">
 			<div className="flex h-18 items-center gap-3 px-5">
 				<span className="grid size-9 place-items-center rounded-lg bg-accent text-sm font-bold text-white">
-					A
+					{name.slice(0, 1).toUpperCase()}
 				</span>
-				<span>
-					<strong className="block text-sm tracking-wide">
-						AULA
+				<span className="min-w-0">
+					<strong className="block truncate text-sm tracking-wide">
+						{name}
 					</strong>
 					<small className="block text-[10px] text-muted">
-						PANEL DOCENTE
+						Docente
 					</small>
 				</span>
 			</div>

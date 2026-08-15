@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
-	nextAcademicPeriod,
+	nextAcademicPeriods,
 	suggestedAcademicPeriods,
 } from "@/lib/academic/calendar";
 import { createClient } from "@/lib/supabase/server";
@@ -38,7 +38,7 @@ export async function preparePeriod(formData: FormData) {
 					academicYear: currentPeriod.academic_year,
 					semester: currentPeriod.semester as 0 | 1 | 2,
 				},
-				nextAcademicPeriod({
+				...nextAcademicPeriods({
 					academicYear: currentPeriod.academic_year,
 					semester: currentPeriod.semester as 0 | 1 | 2,
 				}),

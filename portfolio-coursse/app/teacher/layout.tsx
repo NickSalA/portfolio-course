@@ -18,15 +18,9 @@ export default async function TeacherLayout({
 			>
 				Saltar al contenido
 			</a>
-			<TeacherSidebar />
+			<TeacherSidebar name={teacher.full_name ?? user.email} />
 			<div className="min-w-0 flex-1">
-				<header className="glass sticky top-0 z-20 flex min-h-18 items-center justify-between gap-4 border-b border-white/20 px-5 py-3 shadow-[0_12px_32px_rgb(15_23_42/6%)] sm:px-8">
-					<div className="min-w-0">
-						<p className="truncate text-sm font-medium">
-							{teacher.full_name ?? user.email}
-						</p>
-						<p className="text-xs text-muted">Área docente</p>
-					</div>
+				<header className="glass sticky top-0 z-20 flex min-h-18 items-center justify-end gap-4 border-b border-white/20 px-5 py-3 shadow-[0_12px_32px_rgb(15_23_42/6%)] sm:px-8">
 					<div className="flex items-center gap-3">
 						<PeriodContextSwitcher
 							periods={availablePeriods.map((period) => ({

@@ -3,13 +3,16 @@ export type AcademicPeriodKey = {
 	semester: 0 | 1 | 2;
 };
 
-export function nextAcademicPeriod({
+export function nextAcademicPeriods({
 	academicYear,
 	semester,
-}: AcademicPeriodKey): AcademicPeriodKey {
-	if (semester === 0) return { academicYear, semester: 1 };
-	if (semester === 1) return { academicYear, semester: 2 };
-	return { academicYear: academicYear + 1, semester: 0 };
+}: AcademicPeriodKey): AcademicPeriodKey[] {
+	if (semester === 0) return [{ academicYear, semester: 1 }];
+	if (semester === 1) return [{ academicYear, semester: 2 }];
+	return [
+		{ academicYear: academicYear + 1, semester: 0 },
+		{ academicYear: academicYear + 1, semester: 1 },
+	];
 }
 
 export function periodCode({
@@ -21,9 +24,7 @@ export function periodCode({
 
 // Dates can shift slightly between cycles. This is only the initial suggestion
 // when no period has been marked as current; lifecycle status takes precedence.
-export function suggestedAcademicPeriods(
-	today: Date,
-): [AcademicPeriodKey, AcademicPeriodKey] {
+export function suggestedAcademicPeriods(today: Date): AcademicPeriodKey[] {
 	const academicYear = today.getFullYear();
 	const month = today.getMonth() + 1;
 	const current: AcademicPeriodKey =
@@ -33,5 +34,5 @@ export function suggestedAcademicPeriods(
 				? { academicYear, semester: 1 }
 				: { academicYear, semester: 2 };
 
-	return [current, nextAcademicPeriod(current)];
+	return [current, ...nextAcademicPeriods(current)];
 }

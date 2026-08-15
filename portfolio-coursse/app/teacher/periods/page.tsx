@@ -2,7 +2,7 @@ import { PeriodCalendar } from "@/components/academic/period-calendar";
 import { ModuleHeader } from "@/components/teacher/module-header";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import {
-	nextAcademicPeriod,
+	nextAcademicPeriods,
 	suggestedAcademicPeriods,
 } from "@/lib/academic/calendar";
 import { getTeacherContext } from "@/lib/teacher/get-context";
@@ -30,7 +30,7 @@ export default async function TeacherPeriodsPage({
 					academicYear: current.academic_year,
 					semester: current.semester as 0 | 1 | 2,
 				},
-				nextAcademicPeriod({
+				...nextAcademicPeriods({
 					academicYear: current.academic_year,
 					semester: current.semester as 0 | 1 | 2,
 				}),
