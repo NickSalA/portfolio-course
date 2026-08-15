@@ -1,3 +1,4 @@
+import { PeriodDatesDialog } from "@/components/academic/period-dates-dialog";
 import type { AcademicPeriodKey } from "@/lib/academic/calendar";
 import { preparePeriod, setPeriodCurrent } from "@/app/teacher/periods/actions";
 import { GlassPanel } from "@/components/ui/glass-panel";
@@ -97,8 +98,14 @@ export function PeriodCalendar({
 								</span>
 							</div>
 							<p className="mt-2 text-sm text-muted">
-								{periodName(period.semester)}
+								{periodName(period.semester)} ·{" "}
+								{period.starts_at && period.ends_at
+									? `${period.starts_at} — ${period.ends_at}`
+									: "Fechas por definir"}
 							</p>
+							{period.status !== "closed" && (
+								<PeriodDatesDialog period={period} />
+							)}
 							{period.status === "upcoming" && (
 								<form
 									action={setPeriodCurrent}

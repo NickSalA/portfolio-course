@@ -24,7 +24,9 @@ export const getTeacherBaseContext = cache(async () => {
 			.maybeSingle(),
 		supabase
 			.from("academic_periods")
-			.select("id, public_id, code, academic_year, semester, status")
+			.select(
+				"id, public_id, code, academic_year, semester, status, starts_at, ends_at",
+			)
 			.in("status", ["current", "upcoming"])
 			.order("academic_year", { ascending: false })
 			.order("semester", { ascending: false }),
@@ -63,7 +65,9 @@ export async function getTeacherContext({
 
 	const { data: periods } = await base.supabase
 		.from("academic_periods")
-		.select("id, public_id, code, academic_year, semester, status")
+		.select(
+			"id, public_id, code, academic_year, semester, status, starts_at, ends_at",
+		)
 		.order("academic_year", { ascending: false })
 		.order("semester", { ascending: false });
 

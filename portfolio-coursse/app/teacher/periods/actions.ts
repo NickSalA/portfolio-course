@@ -70,6 +70,29 @@ export async function preparePeriod(formData: FormData) {
 	redirect("/teacher/periods");
 }
 
+export async function updatePeriodDates(formData: FormData) {
+	const supabase = await createClient();
+	const periodId = Number(value(formData, "period_id"));
+	const startsAt = value(formData, "starts_at") || null;
+	const endsAt = value(formData, "ends_at") || null;
+	if (
+		!Number.isInteger(periodId) ||
+		(startsAt && endsAt && endsAt < startsAt)
+	) {
+		redirectWithError("period-data");
+	}
+
+	const { error } = await supabase
+		.from("academic_periods")
+		.update({ starts_at: startsAt, ends_at: endsAt })
+		.eq("id", periodId)
+		.in("status", ["upcoming", "current"]);
+	if (error) redirectWithError("period-status");
+
+	revalidatePath("/teacher/periods");
+	redirect("/teacher/periods");
+}
+
 export async function setPeriodCurrent(formData: FormData) {
 	const supabase = await createClient();
 	const periodId = Number(value(formData, "period_id"));

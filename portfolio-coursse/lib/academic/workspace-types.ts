@@ -7,6 +7,8 @@ export type WorkspacePeriod = {
 	academic_year: number;
 	semester: number;
 	status: AcademicPeriodStatus;
+	starts_at: string | null;
+	ends_at: string | null;
 };
 
 export type WorkspaceCourse = {

@@ -11,7 +11,12 @@ export async function registerPointTransaction(formData: FormData) {
 	const reason = String(formData.get("reason") ?? "").trim();
 	const path = `/teacher/points${course ? `?course=${encodeURIComponent(course)}` : ""}`;
 
-	if (!course || !Number.isInteger(authorizationId) || !Number.isInteger(points) || points === 0) {
+	if (
+		!course ||
+		!Number.isInteger(authorizationId) ||
+		!Number.isInteger(points) ||
+		points === 0
+	) {
 		redirect(`${path}${course ? "&" : "?"}error=transaction`);
 	}
 
