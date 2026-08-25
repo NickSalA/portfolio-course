@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { GroupCapacityForm } from "@/components/teacher/group-capacity-form";
+import { GroupMembersDialog } from "@/components/teacher/group-members-dialog";
 import { GroupSelectionWindowDialog } from "@/components/teacher/group-selection-window-dialog";
 import { ModuleHeader } from "@/components/teacher/module-header";
 import { createClient } from "@/lib/supabase/server";
@@ -58,7 +59,9 @@ export default async function CoursePage({
 
 	const { data: groups } = await supabase
 		.from("groups")
-		.select("id, position, capacity, course_students(count)")
+		.select(
+			"id, position, capacity, course_students(status, authorized_students(full_name, email))",
+		)
 		.eq("course_id", course.id)
 		.order("position");
 	const period = Array.isArray(course.academic_periods)
@@ -72,10 +75,15 @@ export default async function CoursePage({
 		(total, group) =>
 			total +
 			(Array.isArray(group.course_students)
-				? (group.course_students[0]?.count ?? 0)
+				? group.course_students.length
 				: 0),
 		0,
 	);
+	const emptyGroups = (groups ?? []).filter(
+		(group) =>
+			!Array.isArray(group.course_students) ||
+			group.course_students.length === 0,
+	).length;
 	const error = errorCode ? errors[errorCode] : null;
 	const selectionOpens = dateTimeForLima(course.group_selection_opens_at);
 	const selectionCloses = dateTimeForLima(course.group_selection_closes_at);
@@ -143,6 +151,8 @@ export default async function CoursePage({
 						returnTo={returnTo}
 						authorized={authorized}
 						initialCapacity={course.group_capacity}
+						existingGroups={groups?.length ?? 0}
+						emptyGroups={emptyGroups}
 						className="h-full max-w-none"
 					/>
 				</div>
@@ -185,31 +195,28 @@ export default async function CoursePage({
 					</div>
 					<div className="mt-4 grid gap-2 sm:grid-cols-2 md:grid-cols-3">
 						{groups?.map((group) => {
-							const members = Array.isArray(group.course_students)
-								? (group.course_students[0]?.count ?? 0)
-								: 0;
+							const enrollments = Array.isArray(
+								group.course_students,
+							)
+								? group.course_students
+								: [];
+							const members = enrollments.flatMap(
+								(enrollment) => {
+									const authorization = Array.isArray(
+										enrollment.authorized_students,
+									)
+										? enrollment.authorized_students[0]
+										: enrollment.authorized_students;
+									return authorization ? [authorization] : [];
+								},
+							);
 							return (
-								<article
+								<GroupMembersDialog
 									key={group.id}
-									className="rounded-2xl border border-border bg-surface-muted/55 p-4"
-								>
-									<div className="flex items-center justify-between">
-										<h3 className="font-medium">
-											Grupo {group.position}
-										</h3>
-										<span className="text-sm tabular-nums text-muted">
-											{members}/{group.capacity}
-										</span>
-									</div>
-									<div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface">
-										<div
-											className="h-full rounded-full bg-accent"
-											style={{
-												width: `${Math.min((members / group.capacity) * 100, 100)}%`,
-											}}
-										/>
-									</div>
-								</article>
+									groupName={`Grupo ${group.position}`}
+									capacity={group.capacity}
+									members={members}
+								/>
 							);
 						})}
 						{!groups?.length && (

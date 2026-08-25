@@ -1,4 +1,5 @@
 import { StudentImportForm } from "@/components/students/student-import-form";
+import { StudentList } from "@/components/students/student-list";
 import { CourseContextSwitcher } from "@/components/teacher/course-context-switcher";
 import { ModuleHeader } from "@/components/teacher/module-header";
 import { getTeacherContext } from "@/lib/teacher/get-context";
@@ -57,9 +58,7 @@ export default async function StudentsPage({
 	const { data: students } = selectedCourse
 		? await supabase
 				.from("authorized_students")
-				.select(
-					"id, full_name, email, student_number, status, course_students(status, groups(name, position))",
-				)
+				.select("id, full_name, email, status")
 				.eq("course_id", selectedCourse.id)
 				.order("full_name")
 		: { data: [] };
@@ -177,78 +176,7 @@ export default async function StudentsPage({
 							</div>
 						</section>
 						{selectedCourse ? (
-							<section className="glass mt-5 overflow-hidden rounded-3xl border border-white/25 shadow-[0_20px_55px_rgb(15_23_42/8%)]">
-								<div className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_8rem] gap-4 border-b border-border px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted sm:px-6">
-									<span>Alumno</span>
-									<span>Acceso y grupo</span>
-									<span className="text-right">
-										Matrícula
-									</span>
-								</div>
-								<div className="divide-y divide-border">
-									{students?.map((student) => {
-										const enrollment = Array.isArray(
-											student.course_students,
-										)
-											? student.course_students[0]
-											: student.course_students;
-										const groupValue = enrollment?.groups;
-										const group = Array.isArray(groupValue)
-											? groupValue[0]
-											: (groupValue ?? null);
-										const status =
-											enrollment?.status === "active"
-												? "Ingresó"
-												: "Aún no ingresó";
-										return (
-											<article
-												key={student.id}
-												className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_8rem] gap-4 px-5 py-4 sm:px-6"
-											>
-												<div className="min-w-0">
-													<p className="truncate font-medium">
-														{student.full_name ||
-															"Sin nombre"}
-													</p>
-													<p className="mt-1 truncate text-sm text-muted">
-														{student.email}
-													</p>
-												</div>
-												<div>
-													<p
-														className={
-															enrollment?.status ===
-															"active"
-																? "text-sm font-medium text-accent"
-																: "text-sm text-muted"
-														}
-													>
-														{status}
-													</p>
-													<p className="mt-1 text-sm text-muted">
-														{group
-															? `Grupo ${group.position}`
-															: enrollment?.status ===
-																  "active"
-																? "Sin grupo"
-																: "Aún no inicia sesión"}
-													</p>
-												</div>
-												<p className="self-center text-right text-sm text-muted">
-													{student.student_number ||
-														"—"}
-												</p>
-											</article>
-										);
-									})}
-									{!students?.length && (
-										<p className="px-5 py-8 text-sm text-muted sm:px-6">
-											Aún no hay alumnos autorizados para
-											este curso.
-										</p>
-									)}
-								</div>
-							</section>
+							<StudentList students={students ?? []} />
 						) : (
 							<>
 								<section className="mt-6">

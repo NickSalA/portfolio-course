@@ -1,4 +1,4 @@
-import { registerPointTransaction } from "@/app/teacher/points/actions";
+import { PointTransactionDialog } from "@/components/teacher/point-transaction-dialog";
 import { CourseContextSwitcher } from "@/components/teacher/course-context-switcher";
 import { ModuleHeader } from "@/components/teacher/module-header";
 import { getTeacherContext } from "@/lib/teacher/get-context";
@@ -91,7 +91,7 @@ export default async function PointsPage({
 						<div className="grid grid-cols-[minmax(0,1.2fr)_7rem_13rem] gap-4 border-b border-border px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted sm:px-6">
 							<span>Alumno</span>
 							<span className="text-right">Saldo</span>
-							<span>Registrar movimiento</span>
+							<span className="text-right">Movimientos</span>
 						</div>
 						<div className="divide-y divide-border">
 							{students?.map((student) => {
@@ -124,42 +124,22 @@ export default async function PointsPage({
 												? `+${balance}`
 												: balance}
 										</p>
-										<form
-											action={registerPointTransaction}
-											className="flex items-center gap-2"
-										>
-											<input
-												type="hidden"
-												name="course"
-												value={selectedCourse.public_id}
+										<div className="flex justify-end">
+											<PointTransactionDialog
+												course={
+													selectedCourse.public_id
+												}
+												student={{
+													id: student.id,
+													name:
+														student.full_name ||
+														"Sin nombre",
+													email: student.email,
+													balance,
+													transactions,
+												}}
 											/>
-											<input
-												type="hidden"
-												name="authorized_student_id"
-												value={student.id}
-											/>
-											<input
-												name="points"
-												type="number"
-												required
-												placeholder="±0"
-												autoComplete="off"
-												className="w-16 rounded-lg border border-border bg-surface-muted px-2 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-accent"
-											/>
-											<input
-												name="reason"
-												type="text"
-												placeholder="Motivo"
-												autoComplete="off"
-												className="min-w-0 flex-1 rounded-lg border border-border bg-surface-muted px-2 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-accent"
-											/>
-											<button
-												aria-label={`Registrar puntos para ${student.full_name || student.email}`}
-												className="rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-											>
-												Guardar
-											</button>
-										</form>
+										</div>
 									</article>
 								);
 							})}

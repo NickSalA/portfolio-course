@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import * as XLSX from "xlsx";
 
 type StudentRow = {
 	course_name: string;
@@ -13,67 +14,85 @@ type CsvImporterProps = {
 	onValidated: (students: StudentRow[]) => void;
 };
 
-const requiredHeaders = ["curso", "email"];
+type Cell = string | number | boolean | null | undefined;
 
-function parseCsv(text: string) {
-	const lines = text
-		.replace(/^\uFEFF/, "")
-		.split(/\r?\n/)
-		.filter((line) => line.trim());
-	if (lines.length < 2)
-		return {
-			students: [],
-			errors: ["El CSV debe incluir encabezados y al menos un alumno."],
-		};
+function headerKey(value: Cell) {
+	return String(value ?? "")
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.trim()
+		.toLowerCase();
+}
 
-	const headers = lines[0]
-		.split(",")
-		.map((header) => header.trim().toLowerCase());
-	const missingHeaders = requiredHeaders.filter(
-		(header) => !headers.includes(header),
-	);
-	if (missingHeaders.length)
-		return {
-			students: [],
-			errors: [`Faltan las columnas: ${missingHeaders.join(", ")}.`],
-		};
+function cell(row: Cell[], index: number | undefined) {
+	return index === undefined ? "" : String(row[index] ?? "").trim();
+}
 
-	const index = Object.fromEntries(
-		headers.map((header, position) => [header, position]),
-	);
-	const seenEmails = new Set<string>();
+function parseWorkbook(workbook: XLSX.WorkBook) {
 	const students: StudentRow[] = [];
 	const errors: string[] = [];
+	const seen = new Set<string>();
 
-	lines.slice(1).forEach((line, rowIndex) => {
-		const columns = line.split(",").map((value) => value.trim());
-		const courseName = columns[index.curso] ?? "";
-		const email = (columns[index.email] ?? "").toLowerCase();
-		const fullName =
-			index.nombre === undefined ? "" : (columns[index.nombre] ?? "");
-		const studentNumber =
-			index.matricula === undefined
-				? ""
-				: (columns[index.matricula] ?? "");
-		const row = rowIndex + 2;
+	workbook.SheetNames.forEach((sheetName) => {
+		const sheet = workbook.Sheets[sheetName];
+		const rows = XLSX.utils.sheet_to_json<Cell[]>(sheet, {
+			header: 1,
+			defval: "",
+			blankrows: false,
+		});
+		if (rows.length < 2) return;
 
-		if (!courseName) errors.push(`Fila ${row}: falta el curso.`);
-		else if (!email || !email.includes("@"))
-			errors.push(`Fila ${row}: el correo no es válido.`);
-		else if (seenEmails.has(`${courseName.toLowerCase()}::${email}`))
-			errors.push(`Fila ${row}: el correo está repetido para ese curso.`);
-		else {
-			seenEmails.add(`${courseName.toLowerCase()}::${email}`);
-			students.push({
-				course_name: courseName,
-				full_name: fullName,
-				email,
-				student_number: studentNumber,
-			});
+		const headers = rows[0].map(headerKey);
+		const index = Object.fromEntries(
+			headers.map((header, position) => [header, position]),
+		);
+		const courseIndex = index.curso;
+		const emailIndex = index.email ?? index["correo institucional"];
+		if (courseIndex === undefined || emailIndex === undefined) {
+			errors.push(
+				`${sheetName}: faltan las columnas Curso y Correo institucional.`,
+			);
+			return;
 		}
+
+		rows.slice(1).forEach((row, rowIndex) => {
+			const courseName = cell(row, courseIndex);
+			const email = cell(row, emailIndex).toLowerCase();
+			const directName = cell(row, index.nombre);
+			const paternalName = cell(row, index["apellido paterno"]);
+			const maternalName = cell(row, index["apellido materno"]);
+			const fullName = [directName, paternalName, maternalName]
+				.filter(Boolean)
+				.join(" ");
+			const studentNumber = cell(row, index.matricula);
+			const rowLabel = `${sheetName}, fila ${rowIndex + 2}`;
+
+			if (!courseName) errors.push(`${rowLabel}: falta el curso.`);
+			else if (!email || !email.includes("@"))
+				errors.push(`${rowLabel}: el correo no es válido.`);
+			else if (seen.has(`${courseName.toLowerCase()}::${email}`))
+				errors.push(
+					`${rowLabel}: el correo está repetido para ese curso.`,
+				);
+			else {
+				seen.add(`${courseName.toLowerCase()}::${email}`);
+				students.push({
+					course_name: courseName,
+					full_name: fullName,
+					email,
+					student_number: studentNumber,
+				});
+			}
+		});
 	});
 
-	return { students, errors };
+	return {
+		students,
+		errors:
+			students.length || errors.length
+				? errors
+				: ["El archivo no contiene alumnos."],
+	};
 }
 
 export function CsvImporter({ onValidated }: CsvImporterProps) {
@@ -84,49 +103,79 @@ export function CsvImporter({ onValidated }: CsvImporterProps) {
 	async function selectFile(file: File | undefined) {
 		setStudents([]);
 		setErrors([]);
+		onValidated([]);
 		setFileName(file?.name ?? "");
 		if (!file) return;
-		if (!file.name.toLowerCase().endsWith(".csv")) {
-			setErrors(["Selecciona un archivo CSV."]);
+		if (!/\.(csv|xlsx)$/i.test(file.name)) {
+			setErrors(["Selecciona un archivo CSV o XLSX."]);
 			return;
 		}
 
-		const result = parseCsv(await file.text());
-		setStudents(result.students);
-		setErrors(result.errors);
-		if (!result.errors.length) onValidated(result.students);
+		try {
+			const workbook = XLSX.read(await file.arrayBuffer(), {
+				type: "array",
+			});
+			const result = parseWorkbook(workbook);
+			setStudents(result.students);
+			setErrors(result.errors);
+			if (!result.errors.length) onValidated(result.students);
+		} catch {
+			setErrors([
+				"No se pudo leer el archivo. Verifica que sea un CSV o XLSX válido.",
+			]);
+		}
 	}
 
 	return (
 		<div>
-			<label
-				className="flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-surface-muted/45 px-5 py-7 text-center transition-[border-color,background-color] hover:border-accent hover:bg-accent-soft/35 focus-within:ring-2 focus-within:ring-accent"
-				onDragOver={(event) => event.preventDefault()}
-				onDrop={(event) => {
-					event.preventDefault();
-					void selectFile(event.dataTransfer.files[0]);
-				}}
-			>
-				<input
-					type="file"
-					accept=".csv,text/csv"
-					onChange={(event) => selectFile(event.target.files?.[0])}
-					className="sr-only"
-				/>
-				<span
-					aria-hidden="true"
-					className="grid size-12 place-items-center rounded-full bg-accent-soft text-xl text-accent"
+			{students.length > 0 && !errors.length ? (
+				<div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface-muted/45 px-4 py-3">
+					<p className="min-w-0 truncate text-sm font-medium">
+						{fileName}
+					</p>
+					<label className="shrink-0 cursor-pointer text-sm font-semibold text-accent transition hover:text-accent-strong">
+						Cambiar archivo
+						<input
+							type="file"
+							accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+							onChange={(event) =>
+								selectFile(event.target.files?.[0])
+							}
+							className="sr-only"
+						/>
+					</label>
+				</div>
+			) : (
+				<label
+					className="flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-surface-muted/45 px-5 py-7 text-center transition-[border-color,background-color] hover:border-accent hover:bg-accent-soft/35 focus-within:ring-2 focus-within:ring-accent"
+					onDragOver={(event) => event.preventDefault()}
+					onDrop={(event) => {
+						event.preventDefault();
+						void selectFile(event.dataTransfer.files[0]);
+					}}
 				>
-					↑
-				</span>
-				<span className="mt-4 text-sm font-semibold text-foreground">
-					Seleccionar archivo CSV
-				</span>
-				<span className="mt-1 text-xs leading-5 text-muted">
-					O arrastra un archivo aquí
-				</span>
-			</label>
-			{fileName && <p className="mt-4 text-sm text-muted">{fileName}</p>}
+					<input
+						type="file"
+						accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+						onChange={(event) =>
+							selectFile(event.target.files?.[0])
+						}
+						className="sr-only"
+					/>
+					<span
+						aria-hidden="true"
+						className="grid size-12 place-items-center rounded-full bg-accent-soft text-xl text-accent"
+					>
+						↑
+					</span>
+					<span className="mt-4 text-sm font-semibold text-foreground">
+						Seleccionar archivo CSV o XLSX
+					</span>
+					<span className="mt-1 text-xs leading-5 text-muted">
+						O arrastra un archivo aquí
+					</span>
+				</label>
+			)}
 			{errors.length > 0 && (
 				<ul
 					role="alert"

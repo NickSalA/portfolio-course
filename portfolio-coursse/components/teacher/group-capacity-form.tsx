@@ -10,6 +10,8 @@ type GroupCapacityFormProps = {
 	returnTo: string;
 	authorized: number;
 	initialCapacity: number | null;
+	existingGroups: number;
+	emptyGroups: number;
 	className?: string;
 };
 
@@ -19,6 +21,8 @@ export function GroupCapacityForm({
 	returnTo,
 	authorized,
 	initialCapacity,
+	existingGroups,
+	emptyGroups,
 	className = "mt-6 max-w-2xl",
 }: GroupCapacityFormProps) {
 	const [capacity, setCapacity] = useState(
@@ -29,6 +33,8 @@ export function GroupCapacityForm({
 		Number.isInteger(capacityValue) && capacityValue > 0
 			? Math.ceil(authorized / capacityValue)
 			: null;
+	const groupDifference =
+		requiredGroups === null ? null : requiredGroups - existingGroups;
 
 	return (
 		<GlassPanel size="compact" className={className}>
@@ -72,12 +78,37 @@ export function GroupCapacityForm({
 						Crear grupos
 					</button>
 				</div>
-				{authorized > 0 && (
+				{authorized > 0 && requiredGroups !== null && (
 					<p className="mt-4 text-sm text-muted">
-						<span className="font-semibold text-foreground tabular-nums">
-							{requiredGroups ?? "—"} grupos
-						</span>{" "}
-						se crearán para {authorized} alumnos autorizados.
+						{groupDifference && groupDifference > 0 ? (
+							<>
+								Se crearán{" "}
+								<span className="font-semibold text-foreground tabular-nums">
+									{groupDifference} grupos más
+								</span>{" "}
+								para completar los {requiredGroups} necesarios.
+							</>
+						) : groupDifference && groupDifference < 0 ? (
+							<>
+								Se eliminarán hasta{" "}
+								<span className="font-semibold text-foreground tabular-nums">
+									{Math.min(
+										Math.abs(groupDifference),
+										emptyGroups,
+									)}{" "}
+									grupos vacíos
+								</span>
+								; se necesitan {requiredGroups} grupos.
+							</>
+						) : (
+							<>
+								Ya hay{" "}
+								<span className="font-semibold text-foreground tabular-nums">
+									{existingGroups} grupos
+								</span>{" "}
+								para esta capacidad.
+							</>
+						)}
 					</p>
 				)}
 			</form>

@@ -44,7 +44,15 @@ export async function importStudents(formData: FormData) {
 		target_period_id: period.id,
 		students,
 	});
-	if (error) redirect(`${path}&error=import`);
+	if (error) {
+		console.error("Student import RPC failed", {
+			code: error.code,
+			message: error.message,
+			details: error.details,
+			hint: error.hint,
+		});
+		redirect(`${path}&error=import`);
+	}
 
 	const result = Array.isArray(data) ? data[0] : data;
 	revalidatePath("/teacher/students");
