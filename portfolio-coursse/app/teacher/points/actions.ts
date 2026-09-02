@@ -6,10 +6,14 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function registerPointTransaction(formData: FormData) {
 	const course = String(formData.get("course") ?? "").trim();
+	const period = String(formData.get("period") ?? "").trim();
 	const authorizationId = Number(formData.get("authorized_student_id"));
 	const points = Number(formData.get("points"));
 	const reason = String(formData.get("reason") ?? "").trim();
-	const path = `/teacher/points${course ? `?course=${encodeURIComponent(course)}` : ""}`;
+	const params = new URLSearchParams();
+	if (period) params.set("period", period);
+	if (course) params.set("course", course);
+	const path = `/teacher/points${params.size ? `?${params.toString()}` : ""}`;
 
 	if (
 		!course ||
@@ -30,8 +34,8 @@ export async function registerPointTransaction(formData: FormData) {
 		reason: reason || null,
 		created_by: userData.user.id,
 	});
-	if (error) redirect(`${path}${course ? "&" : "?"}error=transaction`);
+	if (error) redirect(`${path}${params.size ? "&" : "?"}error=transaction`);
 
 	revalidatePath("/teacher/points");
-	redirect(path);
+	redirect(`${path}${params.size ? "&" : "?"}refresh=1`);
 }

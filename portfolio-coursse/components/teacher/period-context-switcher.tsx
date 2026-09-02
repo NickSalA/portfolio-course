@@ -25,6 +25,7 @@ export function PeriodContextSwitcher({
 
 	function selectPeriod(publicId: string) {
 		const params = new URLSearchParams(searchParams.toString());
+		params.delete("refresh");
 		params.set("period", publicId);
 		router.push(`${pathname}?${params.toString()}`);
 	}

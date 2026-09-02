@@ -6,8 +6,10 @@ type CourseOption = { publicId: string; name: string };
 
 export function CourseContextSwitcher({
 	courses,
+	clientNavigation = false,
 }: {
 	courses: CourseOption[];
+	clientNavigation?: boolean;
 }) {
 	const pathname = usePathname();
 	const router = useRouter();
@@ -16,16 +18,19 @@ export function CourseContextSwitcher({
 
 	function selectCourse(coursePublicId: string) {
 		const params = new URLSearchParams(searchParams.toString());
+		params.delete("refresh");
 		if (coursePublicId) params.set("course", coursePublicId);
 		else params.delete("course");
-		router.push(`${pathname}?${params.toString()}`);
+		const href = `${pathname}?${params.toString()}`;
+		if (clientNavigation) window.history.pushState(null, "", href);
+		else router.push(href);
 	}
 
 	return (
 		<label className="flex items-center gap-2 text-sm text-muted">
 			<span>Curso</span>
 			<select
-				defaultValue={selectedCourse}
+				value={selectedCourse}
 				onChange={(event) => selectCourse(event.target.value)}
 				className="max-w-60 rounded-lg border border-border bg-surface-muted px-3 py-2 font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent"
 			>
