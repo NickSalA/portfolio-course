@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { createCourse } from "@/app/teacher/courses/actions";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import {
@@ -13,6 +16,7 @@ type CoursePlannerProps = {
 };
 
 export function CoursePlanner({ period, courses }: CoursePlannerProps) {
+	const pathname = usePathname();
 	if (!period) {
 		return (
 			<GlassPanel>
@@ -55,6 +59,11 @@ export function CoursePlanner({ period, courses }: CoursePlannerProps) {
 				action={createCourse}
 				className="mt-6 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]"
 			>
+				<input
+					type="hidden"
+					name="workspace"
+					value={pathname === "/teacher" ? "1" : "0"}
+				/>
 				<input type="hidden" name="period_id" value={period.id} />
 				<input
 					type="hidden"

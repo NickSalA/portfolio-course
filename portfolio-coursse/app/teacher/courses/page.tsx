@@ -2,19 +2,12 @@ import { CoursePlanner } from "@/components/academic/course-planner";
 import { ModuleHeader } from "@/components/teacher/module-header";
 import { getTeacherContext } from "@/lib/teacher/get-context";
 
-const errors: Record<string, string> = {
-	"course-data":
-		"Escribe el nombre del curso y selecciona un periodo disponible.",
-	"course-duplicate": "Ya existe un curso con ese nombre en este periodo.",
-	"course-create": "No se pudo añadir el curso. Inténtalo de nuevo.",
-};
-
 export default async function TeacherCoursesPage({
 	searchParams,
 }: {
-	searchParams: Promise<{ period?: string; error?: string }>;
+	searchParams: Promise<{ period?: string }>;
 }) {
-	const { period: requestedPeriod, error: errorCode } = await searchParams;
+	const { period: requestedPeriod } = await searchParams;
 	const { supabase, user, selectedPeriod } = await getTeacherContext({
 		requestedPeriodPublicId: requestedPeriod,
 	});
@@ -28,8 +21,6 @@ export default async function TeacherCoursesPage({
 				.eq("period_id", selectedPeriod.id)
 				.order("created_at", { ascending: false })
 		: { data: [] };
-	const error = errorCode ? errors[errorCode] : null;
-
 	return (
 		<main className="px-5 py-8 sm:px-8 sm:py-10">
 			<div className="mx-auto max-w-6xl">
@@ -55,14 +46,6 @@ export default async function TeacherCoursesPage({
 						)
 					}
 				/>
-				{error && (
-					<p
-						role="alert"
-						className="mt-6 rounded-xl border border-danger/30 bg-danger-soft px-4 py-3 text-sm text-danger"
-					>
-						{error}
-					</p>
-				)}
 				<div className="mt-8">
 					<CoursePlanner
 						period={selectedPeriod}

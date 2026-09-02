@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+
 import { registerPointTransaction } from "@/app/teacher/points/actions";
 
 type Transaction = {
@@ -33,6 +34,7 @@ export function PointTransactionDialog({
 	};
 }) {
 	const dialogRef = useRef<HTMLDialogElement>(null);
+
 	return (
 		<>
 			<button
@@ -52,6 +54,7 @@ export function PointTransactionDialog({
 				>
 					<input type="hidden" name="course" value={course} />
 					<input type="hidden" name="period" value={period} />
+
 					<input
 						type="hidden"
 						name="authorized_student_id"

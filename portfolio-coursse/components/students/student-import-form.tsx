@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { CsvImporter } from "@/components/students/csv-importer";
 import { importStudents } from "@/app/teacher/students/actions";
 
@@ -17,6 +18,7 @@ export function StudentImportForm({
 	periodPublicId: string;
 }) {
 	const dialogRef = useRef<HTMLDialogElement>(null);
+	const pathname = usePathname();
 	const [students, setStudents] = useState<Student[]>([]);
 	const [courseNames, setCourseNames] = useState<Record<string, string>>({});
 	const [previewPage, setPreviewPage] = useState(0);
@@ -93,6 +95,11 @@ export function StudentImportForm({
 					action={importStudents}
 					className="glass-strong rounded-3xl p-6 sm:p-8"
 				>
+					<input
+						type="hidden"
+						name="workspace"
+						value={pathname === "/teacher" ? "1" : "0"}
+					/>
 					<input
 						type="hidden"
 						name="period_public_id"

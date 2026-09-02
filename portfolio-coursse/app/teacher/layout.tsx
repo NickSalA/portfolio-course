@@ -1,5 +1,5 @@
 import { PeriodContextSwitcher } from "@/components/teacher/period-context-switcher";
-import { TeacherDataProvider } from "@/components/teacher/teacher-data-provider";
+
 import { TeacherSidebar } from "@/components/teacher/teacher-sidebar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getTeacherBaseContext } from "@/lib/teacher/get-context";
@@ -20,26 +20,24 @@ export default async function TeacherLayout({
 				Saltar al contenido
 			</a>
 			<TeacherSidebar name={teacher.full_name ?? user.email} />
-			<TeacherDataProvider>
-				<div className="min-w-0 flex-1">
-					<header className="glass sticky top-0 z-20 flex min-h-18 items-center justify-end gap-4 border-b border-white/20 px-5 py-3 shadow-[0_12px_32px_rgb(15_23_42/6%)] sm:px-8">
-						<div className="flex items-center gap-3">
-							<PeriodContextSwitcher
-								periods={availablePeriods.map((period) => ({
-									publicId: period.public_id,
-									code: period.code,
-									semester: period.semester,
-									status: period.status,
-								}))}
-							/>
-							<ThemeToggle />
-						</div>
-					</header>
-					<div id="teacher-content" className="min-w-0">
-						{children}
+			<div className="min-w-0 flex-1">
+				<header className="glass sticky top-0 z-20 flex min-h-18 items-center justify-end gap-4 border-b border-white/20 px-5 py-3 shadow-[0_12px_32px_rgb(15_23_42/6%)] sm:px-8">
+					<div className="flex items-center gap-3">
+						<PeriodContextSwitcher
+							periods={availablePeriods.map((period) => ({
+								publicId: period.public_id,
+								code: period.code,
+								semester: period.semester,
+								status: period.status,
+							}))}
+						/>
+						<ThemeToggle />
 					</div>
+				</header>
+				<div id="teacher-content" className="min-w-0">
+					{children}
 				</div>
-			</TeacherDataProvider>
+			</div>
 		</div>
 	);
 }

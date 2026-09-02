@@ -10,6 +10,7 @@ export async function registerPointTransaction(formData: FormData) {
 	const authorizationId = Number(formData.get("authorized_student_id"));
 	const points = Number(formData.get("points"));
 	const reason = String(formData.get("reason") ?? "").trim();
+
 	const params = new URLSearchParams();
 	if (period) params.set("period", period);
 	if (course) params.set("course", course);

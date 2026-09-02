@@ -21,7 +21,10 @@ export async function createCourse(formData: FormData) {
 	const description = value(formData, "description") || null;
 	const periodId = Number(value(formData, "period_id"));
 	const periodPublicId = value(formData, "period_public_id");
-	const path = coursePath(periodPublicId);
+	const workspace = value(formData, "workspace") === "1";
+	const path = workspace
+		? `/teacher?module=courses&period=${encodeURIComponent(periodPublicId)}`
+		: coursePath(periodPublicId);
 
 	if (!name || !Number.isInteger(periodId) || periodId <= 0) {
 		redirect(`${path}${path.includes("?") ? "&" : "?"}error=course-data`);
@@ -47,5 +50,5 @@ export async function createCourse(formData: FormData) {
 
 	revalidatePath("/teacher/courses");
 	revalidatePath("/teacher/groups");
-	redirect(path);
+	redirect(`${path}${path.includes("?") ? "&" : "?"}refresh=1`);
 }

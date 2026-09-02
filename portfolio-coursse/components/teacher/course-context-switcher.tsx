@@ -7,9 +7,11 @@ type CourseOption = { publicId: string; name: string };
 export function CourseContextSwitcher({
 	courses,
 	clientNavigation = false,
+	onSelectCourse,
 }: {
 	courses: CourseOption[];
 	clientNavigation?: boolean;
+	onSelectCourse?: (coursePublicId: string) => void;
 }) {
 	const pathname = usePathname();
 	const router = useRouter();
@@ -17,6 +19,10 @@ export function CourseContextSwitcher({
 	const selectedCourse = searchParams.get("course") ?? "";
 
 	function selectCourse(coursePublicId: string) {
+		if (onSelectCourse) {
+			onSelectCourse(coursePublicId);
+			return;
+		}
 		const params = new URLSearchParams(searchParams.toString());
 		params.delete("refresh");
 		if (coursePublicId) params.set("course", coursePublicId);

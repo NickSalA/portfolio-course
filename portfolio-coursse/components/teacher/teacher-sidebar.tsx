@@ -18,7 +18,6 @@ export function TeacherSidebar({ name }: { name: string }) {
 	const query = searchParams.get("period")
 		? `?period=${searchParams.get("period")}`
 		: "";
-
 	return (
 		<aside className="glass flex w-full shrink-0 flex-col border-b border-white/20 shadow-[8px_0_30px_rgb(15_23_42/4%)] md:fixed md:inset-y-0 md:left-0 md:z-30 md:h-dvh md:w-60 md:border-b-0 md:border-r">
 			<div className="flex h-18 items-center gap-3 px-5">
@@ -38,24 +37,24 @@ export function TeacherSidebar({ name }: { name: string }) {
 				aria-label="Panel docente"
 				className="flex gap-1 overflow-x-auto border-t border-border px-3 py-3 md:flex-col md:overflow-visible"
 			>
-				{modules.map((module) => {
+				{modules.map((item) => {
 					const active =
-						module.href === "/teacher"
-							? pathname === module.href
-							: pathname.startsWith(module.href);
+						item.href === "/teacher"
+							? pathname === item.href
+							: pathname.startsWith(item.href);
 					return (
 						<Link
-							key={module.href}
-							href={`${module.href}${query}`}
+							key={item.href}
+							href={`${item.href}${query}`}
 							className={`flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-[background-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${active ? "border border-white/30 bg-white/20 font-medium text-accent shadow-sm" : "text-muted hover:bg-white/15 hover:text-foreground"}`}
 						>
 							<span
 								aria-hidden="true"
 								className="grid size-5 place-items-center font-semibold"
 							>
-								{module.symbol}
+								{item.symbol}
 							</span>
-							{module.label}
+							{item.label}
 						</Link>
 					);
 				})}

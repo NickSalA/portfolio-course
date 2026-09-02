@@ -65,7 +65,7 @@ export async function synchronizeGroups(formData: FormData) {
 	}
 
 	revalidatePath("/teacher/groups");
-	redirect(path);
+	redirect(`${path}${path.includes("?") ? "&" : "?"}refresh=1`);
 }
 
 export async function saveSelectionWindow(formData: FormData) {
@@ -96,5 +96,5 @@ export async function saveSelectionWindow(formData: FormData) {
 	if (error) redirect(withError(path, "window"));
 
 	revalidatePath("/teacher/groups");
-	redirect(path);
+	redirect(`${path}${path.includes("?") ? "&" : "?"}refresh=1`);
 }

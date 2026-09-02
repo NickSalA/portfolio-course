@@ -20,7 +20,10 @@ export async function importStudents(formData: FormData) {
 	const supabase = await createClient();
 	const periodPublicId = value(formData, "period_public_id");
 	const payload = value(formData, "students");
-	const path = `/teacher/students?period=${encodeURIComponent(periodPublicId)}`;
+	const workspace = value(formData, "workspace") === "1";
+	const path = workspace
+		? `/teacher?module=students&period=${encodeURIComponent(periodPublicId)}`
+		: `/teacher/students?period=${encodeURIComponent(periodPublicId)}`;
 
 	let students: StudentImport[];
 	try {
@@ -59,6 +62,6 @@ export async function importStudents(formData: FormData) {
 	revalidatePath("/teacher/courses");
 	revalidatePath("/teacher/groups");
 	redirect(
-		`${path}&imported=${result?.imported_students ?? students.length}&courses=${result?.created_courses ?? 0}`,
+		`${path}&imported=${result?.imported_students ?? students.length}&courses=${result?.created_courses ?? 0}&refresh=1`,
 	);
 }

@@ -17,6 +17,7 @@ export function PeriodContextSwitcher({
 	const pathname = usePathname();
 	const router = useRouter();
 	const searchParams = useSearchParams();
+
 	const selectedPublicId =
 		searchParams.get("period") ??
 		periods.find((period) => period.status === "current")?.publicId ??
