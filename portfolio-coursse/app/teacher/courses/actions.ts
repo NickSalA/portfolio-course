@@ -11,8 +11,8 @@ function value(formData: FormData, name: string) {
 
 function coursePath(period: string) {
 	return period
-		? `/teacher/courses?period=${encodeURIComponent(period)}`
-		: "/teacher/courses";
+		? `/teacher?period=${encodeURIComponent(period)}`
+		: "/teacher";
 }
 
 export async function renameCourse(formData: FormData) {
@@ -38,8 +38,7 @@ export async function renameCourse(formData: FormData) {
 		redirect(`${path}${path.includes("?") ? "&" : "?"}error=${code}`);
 	}
 	revalidatePath("/teacher");
-	revalidatePath("/teacher/courses");
-	revalidatePath("/teacher/groups");
+	revalidatePath(`/teacher/courses/${coursePublicId}`);
 	revalidatePath("/teacher/students");
 	revalidatePath("/teacher/points");
 	redirect(path);
@@ -65,8 +64,6 @@ export async function archiveCourse(formData: FormData) {
 			`${path}${path.includes("?") ? "&" : "?"}error=course-archive`,
 		);
 	revalidatePath("/teacher");
-	revalidatePath("/teacher/courses");
-	revalidatePath("/teacher/groups");
 	revalidatePath("/teacher/students");
 	revalidatePath("/teacher/points");
 	redirect(path);
@@ -125,7 +122,6 @@ export async function createCourse(formData: FormData) {
 		redirect(`${path}${path.includes("?") ? "&" : "?"}error=${code}`);
 	}
 
-	revalidatePath("/teacher/courses");
-	revalidatePath("/teacher/groups");
+	revalidatePath("/teacher");
 	redirect(`${path}${path.includes("?") ? "&" : "?"}refresh=1`);
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PointTransactionDialog } from "@/components/teacher/point-transaction-dialog";
+import { PointTransactionDialog } from "@/components/teacher/points/point-transaction-dialog";
 
 type Transaction = {
 	id: number;

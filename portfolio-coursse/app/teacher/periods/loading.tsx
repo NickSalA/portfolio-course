@@ -1,5 +1,5 @@
-import { ModuleLoading } from "@/components/teacher/module-loading";
+import { ModuleLoading } from "@/components/teacher/shared/module-loading";
 
 export default function PeriodsLoading() {
-  return <ModuleLoading cards={2} showForm={false} />;
+	return <ModuleLoading cards={2} showForm={false} />;
 }

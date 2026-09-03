@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 
 import { registerPointTransaction } from "@/app/teacher/points/actions";
-import { VoidPointTransactionButton } from "@/components/teacher/void-point-transaction-button";
+import { VoidPointTransactionButton } from "@/components/teacher/points/void-point-transaction-button";
 
 type Transaction = {
 	id: number;

@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
-import { CourseDetailActions } from "@/components/teacher/course-detail-actions";
-import { EditCourseNameDialog } from "@/components/teacher/edit-course-name-dialog";
-import { GroupCapacityForm } from "@/components/teacher/group-capacity-form";
-import { GroupMembersDialog } from "@/components/teacher/group-members-dialog";
-import { GroupSelectionWindowDialog } from "@/components/teacher/group-selection-window-dialog";
-import { ModuleHeader } from "@/components/teacher/module-header";
+import { CourseDetailActions } from "@/components/teacher/courses/course-detail-actions";
+import { EditCourseNameDialog } from "@/components/teacher/courses/edit-course-name-dialog";
+import { GroupCapacityForm } from "@/components/teacher/groups/group-capacity-form";
+import { GroupMembersDialog } from "@/components/teacher/groups/group-members-dialog";
+import { GroupSelectionWindowDialog } from "@/components/teacher/groups/group-selection-window-dialog";
+import { ModuleHeader } from "@/components/teacher/shared/module-header";
 import { createClient } from "@/lib/supabase/server";
 
 function dateTimeForLima(value: string | null) {

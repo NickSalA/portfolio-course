@@ -11,8 +11,8 @@ function value(formData: FormData, name: string) {
 
 function groupsPath(period: string) {
 	return period
-		? `/teacher/groups?period=${encodeURIComponent(period)}`
-		: "/teacher/groups";
+		? `/teacher?period=${encodeURIComponent(period)}`
+		: "/teacher";
 }
 
 function withError(path: string, error: string) {
@@ -64,7 +64,8 @@ export async function synchronizeGroups(formData: FormData) {
 		redirect(withError(path, code));
 	}
 
-	revalidatePath("/teacher/groups");
+	revalidatePath("/teacher");
+	revalidatePath(`/teacher/courses/${coursePublicId}`);
 	redirect(`${path}${path.includes("?") ? "&" : "?"}refresh=1`);
 }
 
@@ -95,6 +96,7 @@ export async function saveSelectionWindow(formData: FormData) {
 
 	if (error) redirect(withError(path, "window"));
 
-	revalidatePath("/teacher/groups");
+	revalidatePath("/teacher");
+	revalidatePath(`/teacher/courses/${coursePublicId}`);
 	redirect(`${path}${path.includes("?") ? "&" : "?"}refresh=1`);
 }

@@ -1,6 +1,6 @@
-import { PeriodContextSwitcher } from "@/components/teacher/period-context-switcher";
+import { PeriodContextSwitcher } from "@/components/teacher/shell/period-context-switcher";
 
-import { TeacherSidebar } from "@/components/teacher/teacher-sidebar";
+import { TeacherSidebar } from "@/components/teacher/shell/teacher-sidebar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getTeacherBaseContext } from "@/lib/teacher/get-context";
 

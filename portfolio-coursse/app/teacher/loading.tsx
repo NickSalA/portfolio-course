@@ -1,5 +1,5 @@
-import { ModuleLoading } from "@/components/teacher/module-loading";
+import { ModuleLoading } from "@/components/teacher/shared/module-loading";
 
 export default function TeacherLoading() {
-  return <ModuleLoading />;
+	return <ModuleLoading />;
 }

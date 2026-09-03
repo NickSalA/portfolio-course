@@ -1,5 +1,5 @@
 import { PeriodCalendar } from "@/components/academic/period-calendar";
-import { ModuleHeader } from "@/components/teacher/module-header";
+import { ModuleHeader } from "@/components/teacher/shared/module-header";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import {
 	nextAcademicPeriods,

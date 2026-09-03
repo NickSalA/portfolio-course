@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { synchronizeGroups } from "@/app/teacher/groups/actions";
+import { synchronizeGroups } from "@/app/teacher/courses/[coursePublicId]/group-actions";
 import { GlassPanel } from "@/components/ui/glass-panel";
 
 type GroupCapacityFormProps = {

@@ -100,9 +100,8 @@ export async function importStudents(formData: FormData) {
 	}
 
 	const result = Array.isArray(data) ? data[0] : data;
+	revalidatePath("/teacher");
 	revalidatePath("/teacher/students");
-	revalidatePath("/teacher/courses");
-	revalidatePath("/teacher/groups");
 	redirect(
 		`${path}&imported=${result?.imported_students ?? students.length}&courses=${result?.created_courses ?? 0}&refresh=1`,
 	);

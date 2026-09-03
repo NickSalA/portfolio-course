@@ -65,8 +65,8 @@ export async function preparePeriod(formData: FormData) {
 			error.code === "23505" ? "period-duplicate" : "period-create",
 		);
 
+	revalidatePath("/teacher");
 	revalidatePath("/teacher/periods");
-	revalidatePath("/teacher/courses");
 	redirect("/teacher/periods");
 }
 
@@ -103,7 +103,7 @@ export async function setPeriodCurrent(formData: FormData) {
 	});
 	if (error) redirectWithError("period-status");
 
+	revalidatePath("/teacher");
 	revalidatePath("/teacher/periods");
-	revalidatePath("/teacher/courses");
 	redirect("/teacher/periods");
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { StudentImportForm } from "@/components/students/student-import-form";
-import { ModuleHeader } from "@/components/teacher/module-header";
+import { ModuleHeader } from "@/components/teacher/shared/module-header";
 import { getTeacherContext } from "@/lib/teacher/get-context";
 
 export default async function TeacherPage({
