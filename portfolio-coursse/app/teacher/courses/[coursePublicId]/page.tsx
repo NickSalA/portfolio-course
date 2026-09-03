@@ -1,8 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { archiveCourse } from "@/app/teacher/courses/actions";
+import { CourseDetailActions } from "@/components/teacher/course-detail-actions";
 import { EditCourseNameDialog } from "@/components/teacher/edit-course-name-dialog";
-import { CourseStudentImportForm } from "@/components/students/course-student-import-form";
 import { GroupCapacityForm } from "@/components/teacher/group-capacity-form";
 import { GroupMembersDialog } from "@/components/teacher/group-members-dialog";
 import { GroupSelectionWindowDialog } from "@/components/teacher/group-selection-window-dialog";
@@ -75,16 +73,20 @@ export default async function CoursePage({
 	return (
 		<main className="px-5 py-8 sm:px-8 sm:py-10">
 			<div className="mx-auto max-w-6xl">
-				<Link
-					href={`/teacher${selectedPeriod ? `?period=${encodeURIComponent(selectedPeriod)}` : ""}`}
-					className="text-sm font-medium text-accent"
-				>
-					← Volver al inicio
-				</Link>
-				<div className="mt-6">
+				<div>
 					<ModuleHeader
 						eyebrow="Curso"
-						title={course.name}
+						title={
+							<span className="inline-flex items-center">
+								{course.name}
+								<EditCourseNameDialog
+									coursePublicId={course.public_id}
+									periodPublicId={selectedPeriod ?? ""}
+									initialName={course.name}
+									compact
+								/>
+							</span>
+						}
 						description={
 							course.description ??
 							"Configura los grupos y la ventana de selección de este curso."
@@ -119,33 +121,12 @@ export default async function CoursePage({
 						}
 					/>
 				</div>
-				<div className="mt-4 flex justify-end gap-3">
-					<EditCourseNameDialog
+				<div className="mt-5 flex justify-end">
+					<CourseDetailActions
 						coursePublicId={course.public_id}
+						courseName={course.name}
 						periodPublicId={selectedPeriod ?? ""}
-						initialName={course.name}
 					/>
-					{selectedPeriod && (
-						<CourseStudentImportForm
-							periodPublicId={selectedPeriod}
-							courseName={course.name}
-						/>
-					)}
-					<form action={archiveCourse}>
-						<input
-							type="hidden"
-							name="course_public_id"
-							value={course.public_id}
-						/>
-						<input
-							type="hidden"
-							name="period_public_id"
-							value={selectedPeriod ?? ""}
-						/>
-						<button className="rounded-xl border border-danger/40 px-3 py-2 text-sm font-semibold text-danger transition hover:bg-danger-soft">
-							Ocultar curso
-						</button>
-					</form>
 				</div>
 				<div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,.72fr)] lg:items-stretch">
 					<GroupCapacityForm

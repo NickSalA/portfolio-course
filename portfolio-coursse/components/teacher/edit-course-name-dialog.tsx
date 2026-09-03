@@ -7,10 +7,12 @@ export function EditCourseNameDialog({
 	coursePublicId,
 	periodPublicId,
 	initialName,
+	compact = false,
 }: {
 	coursePublicId: string;
 	periodPublicId: string;
 	initialName: string;
+	compact?: boolean;
 }) {
 	const dialogRef = useRef<HTMLDialogElement>(null);
 	return (
@@ -18,9 +20,31 @@ export function EditCourseNameDialog({
 			<button
 				type="button"
 				onClick={() => dialogRef.current?.showModal()}
-				className="rounded-xl border border-border px-3 py-2 text-sm font-semibold text-foreground transition hover:border-accent"
+				aria-label="Editar nombre del curso"
+				title="Editar nombre"
+				className={
+					compact
+						? "ml-2 inline-grid size-7 place-items-center rounded-lg border border-border text-sm text-muted transition hover:border-accent hover:text-foreground"
+						: "rounded-xl border border-border px-3 py-2 text-sm font-semibold text-foreground transition hover:border-accent"
+				}
 			>
-				Editar nombre
+				{compact ? (
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						className="size-4"
+						aria-hidden="true"
+					>
+						<path d="M12 20h9" />
+						<path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+					</svg>
+				) : (
+					"Editar nombre"
+				)}
 			</button>
 			<dialog
 				ref={dialogRef}

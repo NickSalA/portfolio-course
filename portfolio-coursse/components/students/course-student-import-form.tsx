@@ -29,7 +29,7 @@ export function CourseStudentImportForm({
 			<button
 				type="button"
 				onClick={() => dialogRef.current?.showModal()}
-				className="rounded-xl border border-border px-3 py-2 text-sm font-semibold text-foreground transition hover:border-accent"
+				className="rounded-xl border border-border bg-surface-muted px-3 py-2 text-sm font-semibold text-foreground transition-[background-color,border-color,color,transform] hover:-translate-y-0.5 hover:border-accent hover:bg-accent-soft hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 			>
 				Importar alumnos
 			</button>
