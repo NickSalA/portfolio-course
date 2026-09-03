@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { deactivateStudentAuthorization } from "@/app/teacher/students/actions";
 
 type Student = {
 	id: number;
@@ -9,7 +10,15 @@ type Student = {
 	status: string;
 };
 
-export function StudentList({ students }: { students: Student[] }) {
+export function StudentList({
+	students,
+	period,
+	course,
+}: {
+	students: Student[];
+	period: string;
+	course: string;
+}) {
 	const pageSize = 10;
 	const [page, setPage] = useState(0);
 	const pages = Math.ceil(students.length / pageSize);
@@ -35,11 +44,35 @@ export function StudentList({ students }: { students: Student[] }) {
 								{student.email}
 							</p>
 						</div>
-						<div>
-							<p className="text-sm text-muted">Aún no ingresó</p>
-							<p className="mt-1 text-sm text-muted">
-								Autorizado para este curso
-							</p>
+						<div className="flex items-start justify-between gap-3">
+							<div>
+								<p className="text-sm text-muted">
+									Autorizado para este curso
+								</p>
+								<p className="mt-1 text-sm text-muted">
+									Sin grupo o acceso según su sesión
+								</p>
+							</div>
+							<form action={deactivateStudentAuthorization}>
+								<input
+									type="hidden"
+									name="authorization_id"
+									value={student.id}
+								/>
+								<input
+									type="hidden"
+									name="period"
+									value={period}
+								/>
+								<input
+									type="hidden"
+									name="course"
+									value={course}
+								/>
+								<button className="rounded-lg border border-danger/40 px-2.5 py-1.5 text-xs font-semibold text-danger hover:bg-danger-soft">
+									Desactivar
+								</button>
+							</form>
 						</div>
 					</article>
 				))}

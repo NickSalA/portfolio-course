@@ -16,6 +16,27 @@ function value(formData: FormData, name: string) {
 	return typeof entry === "string" ? entry.trim() : "";
 }
 
+export async function deactivateStudentAuthorization(formData: FormData) {
+	const supabase = await createClient();
+	const authorizationId = Number(value(formData, "authorization_id"));
+	const period = value(formData, "period");
+	const course = value(formData, "course");
+	const path = `/teacher/students?period=${encodeURIComponent(period)}&course=${encodeURIComponent(course)}`;
+	if (!Number.isInteger(authorizationId)) redirect(path);
+	const { error } = await supabase
+		.from("authorized_students")
+		.update({ status: "inactive" })
+		.eq("id", authorizationId);
+	if (error) redirect(`${path}&error=deactivate`);
+	await supabase
+		.from("course_students")
+		.update({ status: "inactive" })
+		.eq("authorized_student_id", authorizationId);
+	revalidatePath("/teacher/students");
+	revalidatePath("/dashboard");
+	redirect(path);
+}
+
 export async function importStudents(formData: FormData) {
 	const supabase = await createClient();
 	const periodPublicId = value(formData, "period_public_id");

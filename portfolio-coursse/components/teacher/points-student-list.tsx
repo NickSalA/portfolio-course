@@ -4,6 +4,8 @@ import { useState } from "react";
 import { PointTransactionDialog } from "@/components/teacher/point-transaction-dialog";
 
 type Transaction = {
+	id: number;
+	is_voided: boolean;
 	points: number;
 	reason: string | null;
 	created_at: string;
@@ -63,7 +65,9 @@ export function PointsStudentList({
 				</div>
 				<div className="divide-y divide-border">
 					{visibleStudents.map((student) => {
-						const transactions = student.point_transactions ?? [];
+						const transactions = (
+							student.point_transactions ?? []
+						).filter((transaction) => !transaction.is_voided);
 						const balance = transactions.reduce(
 							(total, transaction) => total + transaction.points,
 							0,

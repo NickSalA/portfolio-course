@@ -52,7 +52,7 @@ export default async function DashboardPage({
 	const { data: enrollments, error: enrollmentsError } = await supabase
 		.from("course_students")
 		.select(
-			"id, status, group_id, groups(name, position), courses(name, description, group_selection_opens_at, group_selection_closes_at, academic_periods(code)), authorized_students(point_transactions(points, reason, created_at))",
+			"id, status, group_id, groups(name, position), courses(name, description, group_selection_opens_at, group_selection_closes_at, academic_periods(code)), authorized_students(point_transactions(id, points, reason, created_at, is_voided))",
 		)
 		.eq("student_id", user.id)
 		.eq("status", "active");
@@ -142,7 +142,10 @@ export default async function DashboardPage({
 								const transactions = Array.isArray(
 									authorizedStudent?.point_transactions,
 								)
-									? authorizedStudent.point_transactions
+									? authorizedStudent.point_transactions.filter(
+											(transaction) =>
+												!transaction.is_voided,
+										)
 									: [];
 								const balance = transactions.reduce(
 									(total, transaction) =>

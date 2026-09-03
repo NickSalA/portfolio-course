@@ -34,6 +34,7 @@ export default async function StudentsPage({
 				.from("authorized_students")
 				.select("id, full_name, email, status")
 				.eq("course_id", selectedCourse.id)
+				.eq("status", "active")
 				.order("full_name")
 		: { data: [] };
 	return (
@@ -71,7 +72,11 @@ export default async function StudentsPage({
 							)}
 						</div>
 						{selectedCourse ? (
-							<StudentList students={students ?? []} />
+							<StudentList
+								students={students ?? []}
+								period={selectedPeriod.public_id}
+								course={selectedCourse.public_id}
+							/>
 						) : (
 							<div className="mt-6 grid gap-3 md:grid-cols-2">
 								{(courses ?? []).map((course) => (

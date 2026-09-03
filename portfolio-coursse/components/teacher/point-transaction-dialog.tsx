@@ -1,10 +1,13 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import { registerPointTransaction } from "@/app/teacher/points/actions";
+import { VoidPointTransactionButton } from "@/components/teacher/void-point-transaction-button";
 
 type Transaction = {
+	id: number;
+	is_voided: boolean;
 	points: number;
 	reason: string | null;
 	created_at: string;
@@ -34,6 +37,9 @@ export function PointTransactionDialog({
 	};
 }) {
 	const dialogRef = useRef<HTMLDialogElement>(null);
+	const submittingRef = useRef(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [transactionPublicId] = useState(() => crypto.randomUUID());
 
 	return (
 		<>
@@ -50,10 +56,23 @@ export function PointTransactionDialog({
 			>
 				<form
 					action={registerPointTransaction}
+					onSubmit={(event) => {
+						if (submittingRef.current) {
+							event.preventDefault();
+							return;
+						}
+						submittingRef.current = true;
+						setIsSubmitting(true);
+					}}
 					className="glass-strong rounded-3xl p-6 sm:p-8"
 				>
 					<input type="hidden" name="course" value={course} />
 					<input type="hidden" name="period" value={period} />
+					<input
+						type="hidden"
+						name="transaction_public_id"
+						value={transactionPublicId}
+					/>
 
 					<input
 						type="hidden"
@@ -117,7 +136,10 @@ export function PointTransactionDialog({
 									<option>Otro</option>
 								</select>
 							</label>
-							<button className="self-end rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white">
+							<button
+								disabled={isSubmitting}
+								className="self-end rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white disabled:cursor-wait disabled:opacity-60"
+							>
 								Registrar
 							</button>
 						</div>
@@ -147,17 +169,24 @@ export function PointTransactionDialog({
 											)}
 										</p>
 									</div>
-									<p
-										className={
-											transaction.points > 0
-												? "font-semibold tabular-nums text-accent"
-												: "font-semibold tabular-nums text-danger"
-										}
-									>
-										{transaction.points > 0
-											? `+${transaction.points}`
-											: transaction.points}
-									</p>
+									<div className="flex items-center gap-3">
+										<VoidPointTransactionButton
+											transactionId={transaction.id}
+											course={course}
+											period={period}
+										/>
+										<p
+											className={
+												transaction.points > 0
+													? "font-semibold tabular-nums text-accent"
+													: "font-semibold tabular-nums text-danger"
+											}
+										>
+											{transaction.points > 0
+												? `+${transaction.points}`
+												: transaction.points}
+										</p>
+									</div>
 								</div>
 							))}
 							{!student.transactions.length && (

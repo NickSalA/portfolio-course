@@ -15,6 +15,36 @@ function coursePath(period: string) {
 		: "/teacher/courses";
 }
 
+export async function renameCourse(formData: FormData) {
+	const supabase = await createClient();
+	const coursePublicId = value(formData, "course_public_id");
+	const periodPublicId = value(formData, "period_public_id");
+	const name = value(formData, "name");
+	const path = `/teacher/courses/${encodeURIComponent(coursePublicId)}${periodPublicId ? `?period=${encodeURIComponent(periodPublicId)}` : ""}`;
+	if (!coursePublicId || !name)
+		redirect(`${path}${path.includes("?") ? "&" : "?"}error=course-name`);
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+	if (!user) redirect("/login");
+	const { error } = await supabase
+		.from("courses")
+		.update({ name })
+		.eq("public_id", coursePublicId)
+		.eq("teacher_id", user.id);
+	if (error) {
+		const code =
+			error.code === "23505" ? "course-duplicate" : "course-name";
+		redirect(`${path}${path.includes("?") ? "&" : "?"}error=${code}`);
+	}
+	revalidatePath("/teacher");
+	revalidatePath("/teacher/courses");
+	revalidatePath("/teacher/groups");
+	revalidatePath("/teacher/students");
+	revalidatePath("/teacher/points");
+	redirect(path);
+}
+
 export async function archiveCourse(formData: FormData) {
 	const supabase = await createClient();
 	const coursePublicId = value(formData, "course_public_id");

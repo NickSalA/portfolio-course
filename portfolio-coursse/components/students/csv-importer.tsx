@@ -12,6 +12,7 @@ type StudentRow = {
 
 type CsvImporterProps = {
 	onValidated: (students: StudentRow[]) => void;
+	fixedCourseName?: string;
 };
 
 type Cell = string | number | boolean | null | undefined;
@@ -28,7 +29,7 @@ function cell(row: Cell[], index: number | undefined) {
 	return index === undefined ? "" : String(row[index] ?? "").trim();
 }
 
-function parseWorkbook(workbook: XLSX.WorkBook) {
+function parseWorkbook(workbook: XLSX.WorkBook, fixedCourseName?: string) {
 	const students: StudentRow[] = [];
 	const errors: string[] = [];
 	const seen = new Set<string>();
@@ -48,15 +49,18 @@ function parseWorkbook(workbook: XLSX.WorkBook) {
 		);
 		const courseIndex = index.curso;
 		const emailIndex = index.email ?? index["correo institucional"];
-		if (courseIndex === undefined || emailIndex === undefined) {
+		if (
+			emailIndex === undefined ||
+			(!fixedCourseName && courseIndex === undefined)
+		) {
 			errors.push(
-				`${sheetName}: faltan las columnas Curso y Correo institucional.`,
+				`${sheetName}: falta la columna Correo institucional${fixedCourseName ? "." : " o Curso."}`,
 			);
 			return;
 		}
 
 		rows.slice(1).forEach((row, rowIndex) => {
-			const courseName = cell(row, courseIndex);
+			const courseName = fixedCourseName ?? cell(row, courseIndex);
 			const email = cell(row, emailIndex).toLowerCase();
 			const directName = cell(row, index.nombre);
 			const paternalName = cell(row, index["apellido paterno"]);
@@ -95,7 +99,10 @@ function parseWorkbook(workbook: XLSX.WorkBook) {
 	};
 }
 
-export function CsvImporter({ onValidated }: CsvImporterProps) {
+export function CsvImporter({
+	onValidated,
+	fixedCourseName,
+}: CsvImporterProps) {
 	const [students, setStudents] = useState<StudentRow[]>([]);
 	const [errors, setErrors] = useState<string[]>([]);
 	const [fileName, setFileName] = useState("");
@@ -115,7 +122,7 @@ export function CsvImporter({ onValidated }: CsvImporterProps) {
 			const workbook = XLSX.read(await file.arrayBuffer(), {
 				type: "array",
 			});
-			const result = parseWorkbook(workbook);
+			const result = parseWorkbook(workbook, fixedCourseName);
 			setStudents(result.students);
 			setErrors(result.errors);
 			if (!result.errors.length) onValidated(result.students);

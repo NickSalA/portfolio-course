@@ -6,8 +6,7 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 
 const modules = [
 	{ href: "/teacher", label: "Inicio", symbol: "◫" },
-	{ href: "/teacher/courses", label: "Cursos", symbol: "▤" },
-	{ href: "/teacher/groups", label: "Grupos", symbol: "◉" },
+
 	{ href: "/teacher/students", label: "Alumnos", symbol: "◌" },
 	{ href: "/teacher/points", label: "Puntos", symbol: "+" },
 ];

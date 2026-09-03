@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { createCourse } from "@/app/teacher/courses/actions";
+import { StudentImportForm } from "@/components/students/student-import-form";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import {
 	periodForCourse,
@@ -16,7 +15,6 @@ type CoursePlannerProps = {
 };
 
 export function CoursePlanner({ period, courses }: CoursePlannerProps) {
-	const pathname = usePathname();
 	if (!period) {
 		return (
 			<GlassPanel>
@@ -46,52 +44,19 @@ export function CoursePlanner({ period, courses }: CoursePlannerProps) {
 						Cursos del periodo
 					</h2>
 					<p className="mt-2 text-sm text-muted">
-						Añade cursos ahora. Los grupos y alumnos se configuran
-						dentro de cada curso.
+						Importa una lista para crear o actualizar cursos y
+						alumnos del periodo.
 					</p>
 				</div>
-				<span className="text-sm text-muted">
-					{periodCourses.length}{" "}
-					{periodCourses.length === 1 ? "curso" : "cursos"}
-				</span>
+				<div className="flex items-center gap-4">
+					<span className="text-sm text-muted">
+						{periodCourses.length}{" "}
+						{periodCourses.length === 1 ? "curso" : "cursos"}
+					</span>
+					<StudentImportForm periodPublicId={period.public_id} />
+				</div>
 			</div>
-			<form
-				action={createCourse}
-				className="mt-6 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]"
-			>
-				<input
-					type="hidden"
-					name="workspace"
-					value={pathname === "/teacher" ? "1" : "0"}
-				/>
-				<input type="hidden" name="period_id" value={period.id} />
-				<input
-					type="hidden"
-					name="period_public_id"
-					value={period.public_id}
-				/>
-				<label className="sr-only" htmlFor="course-name">
-					Nombre del curso
-				</label>
-				<input
-					id="course-name"
-					name="name"
-					required
-					placeholder="Nombre del curso…"
-					className="min-w-0 rounded-xl border border-border bg-surface-muted px-4 py-3 text-foreground outline-none transition focus-visible:ring-2 focus-visible:ring-accent"
-				/>
-				<button className="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
-					Añadir curso
-				</button>
-				<label className="md:col-span-2 text-sm text-muted">
-					Descripción <span className="text-xs">opcional</span>
-					<textarea
-						name="description"
-						rows={2}
-						className="mt-2 w-full rounded-xl border border-border bg-surface-muted px-4 py-3 text-foreground outline-none transition focus-visible:ring-2 focus-visible:ring-accent"
-					/>
-				</label>
-			</form>
+
 			<div className="mt-8 grid gap-2 border-t border-border pt-6">
 				{periodCourses.map((course) => (
 					<Link
@@ -119,8 +84,8 @@ export function CoursePlanner({ period, courses }: CoursePlannerProps) {
 				))}
 				{!periodCourses.length && (
 					<p className="rounded-xl bg-surface-muted px-4 py-5 text-sm text-muted">
-						Aún no hay cursos en {period.code}. Añade el primero
-						arriba.
+						Aún no hay cursos en {period.code}. Importa una lista
+						para crear el primero.
 					</p>
 				)}
 			</div>

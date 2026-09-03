@@ -31,7 +31,7 @@ export default async function PointsPage({
 		? await supabase
 				.from("authorized_students")
 				.select(
-					"id, full_name, email, point_transactions(points, reason, created_at)",
+					"id, full_name, email, point_transactions(id, points, reason, created_at, is_voided)",
 				)
 				.eq("course_id", selectedCourse.id)
 				.eq("status", "active")

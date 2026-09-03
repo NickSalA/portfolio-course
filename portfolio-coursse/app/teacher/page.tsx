@@ -85,7 +85,7 @@ export default async function TeacherPage({
 							<div className="flex items-end justify-between gap-4">
 								<div>
 									<p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-										Actividad
+										Cursos del periodo
 									</p>
 									<h2 className="mt-2 text-xl font-semibold">
 										Tus cursos
@@ -97,12 +97,6 @@ export default async function TeacherPage({
 											selectedPeriod.public_id
 										}
 									/>
-									<Link
-										href={`/teacher/courses?period=${selectedPeriod.public_id}`}
-										className="text-sm font-semibold text-accent hover:text-accent-strong"
-									>
-										Ver cursos →
-									</Link>
 								</div>
 							</div>
 							<div className="mt-4 grid gap-3 md:grid-cols-2">
