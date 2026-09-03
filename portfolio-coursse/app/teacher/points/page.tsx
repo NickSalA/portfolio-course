@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { CourseContextSwitcher } from "@/components/teacher/course-context-switcher";
-import { ModuleHeader } from "@/components/teacher/module-header";
-import { PointsStudentList } from "@/components/teacher/points-student-list";
+import { CourseContextSwitcher } from "@/components/teacher/courses/course-context-switcher";
+import { ModuleHeader } from "@/components/teacher/shared/module-header";
+import { PointsStudentList } from "@/components/teacher/points/points-student-list";
 import { getTeacherContext } from "@/lib/teacher/get-context";
 
 export default async function PointsPage({

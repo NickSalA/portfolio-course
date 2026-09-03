@@ -1,7 +1,7 @@
 import { StudentImportForm } from "@/components/students/student-import-form";
 import { StudentList } from "@/components/students/student-list";
-import { CourseContextSwitcher } from "@/components/teacher/course-context-switcher";
-import { ModuleHeader } from "@/components/teacher/module-header";
+import { CourseContextSwitcher } from "@/components/teacher/courses/course-context-switcher";
+import { ModuleHeader } from "@/components/teacher/shared/module-header";
 import { getTeacherContext } from "@/lib/teacher/get-context";
 
 export default async function StudentsPage({
