@@ -22,6 +22,7 @@ export default async function StudentsPage({
 				)
 				.eq("teacher_id", user.id)
 				.eq("period_id", selectedPeriod.id)
+				.eq("active", true)
 				.order("name")
 		: { data: [] };
 	const selectedCourse =

@@ -20,6 +20,7 @@ export default async function PointsPage({
 				.select("id, public_id, name")
 				.eq("teacher_id", user.id)
 				.eq("period_id", selectedPeriod.id)
+				.eq("active", true)
 				.order("name")
 		: { data: [] };
 	const selectedCourse =

@@ -47,10 +47,7 @@ export function GroupCapacityForm({
 				<input type="hidden" name="period" value={period} />
 				<input type="hidden" name="return_to" value={returnTo} />
 
-				<p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-					Grupos
-				</p>
-				<h2 className="mt-2 text-xl font-semibold">Crear grupos</h2>
+				<h2 className="text-xl font-semibold">Crear grupos</h2>
 				<p className="mt-1 text-sm text-muted">
 					Define cuántos alumnos caben en cada grupo.
 				</p>

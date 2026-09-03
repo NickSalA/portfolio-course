@@ -19,6 +19,7 @@ export default async function GroupsPage({
 				)
 				.eq("teacher_id", user.id)
 				.eq("period_id", selectedPeriod.id)
+				.eq("active", true)
 				.order("name")
 		: { data: [] };
 	return (

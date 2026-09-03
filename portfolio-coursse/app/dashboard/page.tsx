@@ -1,9 +1,31 @@
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { GroupSelection } from "@/components/student/group-selection";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function DashboardPage() {
+const groupMessages: Record<string, string> = {
+	group: "No se pudo seleccionar ese grupo. Inténtalo nuevamente.",
+	"group-full": "Ese grupo acaba de llenarse. Elige otro disponible.",
+	"group-closed": "La ventana de selección de grupos está cerrada.",
+};
+
+function movementDate(value: string) {
+	return new Intl.DateTimeFormat("es-PE", {
+		dateStyle: "medium",
+		timeStyle: "short",
+		timeZone: "America/Lima",
+	}).format(new Date(value));
+}
+
+export default async function DashboardPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ error?: string; "selected-group"?: string }>;
+}) {
+	const { error: errorCode, "selected-group": selectedGroup } =
+		await searchParams;
+	const groupMessage = errorCode ? groupMessages[errorCode] : null;
 	const supabase = await createClient();
 	const {
 		data: { user },
@@ -17,13 +39,29 @@ export default async function DashboardPage() {
 		.maybeSingle();
 	if (profile?.role === "teacher") redirect("/teacher");
 
-	const { data: enrollments } = await supabase
+	const { data: enrollmentSynced, error: enrollmentSyncError } =
+		await supabase.rpc("sync_authorized_student");
+	if (enrollmentSyncError || !enrollmentSynced) {
+		console.error("Student enrollment sync failed", {
+			email: user.email,
+			synced: enrollmentSynced,
+			error: enrollmentSyncError,
+		});
+	}
+
+	const { data: enrollments, error: enrollmentsError } = await supabase
 		.from("course_students")
 		.select(
-			"id, status, groups(name, position), courses(name, description, academic_periods(code)), point_transactions(points, reason, created_at)",
+			"id, status, group_id, groups(name, position), courses(name, description, group_selection_opens_at, group_selection_closes_at, academic_periods(code)), authorized_students(point_transactions(points, reason, created_at))",
 		)
 		.eq("student_id", user.id)
 		.eq("status", "active");
+	if (enrollmentsError) {
+		console.error("Student enrollment query failed", {
+			email: user.email,
+			error: enrollmentsError,
+		});
+	}
 
 	return (
 		<div className="min-h-dvh bg-background text-foreground">
@@ -56,6 +94,22 @@ export default async function DashboardPage() {
 						Consulta tus cursos, grupos y movimientos de puntos
 						cuando lo necesites.
 					</p>
+					{groupMessage && (
+						<p
+							role="alert"
+							className="mt-4 rounded-xl border border-danger/30 bg-danger-soft px-4 py-3 text-sm text-danger"
+						>
+							{groupMessage}
+						</p>
+					)}
+					{selectedGroup && (
+						<p
+							role="status"
+							className="mt-4 rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-sm text-accent"
+						>
+							Tu grupo fue actualizado.
+						</p>
+					)}
 					{enrollments?.length ? (
 						<section className="mt-8 grid gap-4 md:grid-cols-2">
 							{enrollments.map((enrollment) => {
@@ -65,6 +119,10 @@ export default async function DashboardPage() {
 								const group = Array.isArray(enrollment.groups)
 									? enrollment.groups[0]
 									: enrollment.groups;
+								const courseWithWindow = course as {
+									group_selection_opens_at?: string | null;
+									group_selection_closes_at?: string | null;
+								} | null;
 								const periodData = (
 									course as {
 										academic_periods?:
@@ -76,10 +134,15 @@ export default async function DashboardPage() {
 								const periodCode = Array.isArray(periodData)
 									? periodData[0]?.code
 									: periodData?.code;
-								const transactions = Array.isArray(
-									enrollment.point_transactions,
+								const authorizedStudent = Array.isArray(
+									enrollment.authorized_students,
 								)
-									? enrollment.point_transactions
+									? enrollment.authorized_students[0]
+									: enrollment.authorized_students;
+								const transactions = Array.isArray(
+									authorizedStudent?.point_transactions,
+								)
+									? authorizedStudent.point_transactions
 									: [];
 								const balance = transactions.reduce(
 									(total, transaction) =>
@@ -130,6 +193,65 @@ export default async function DashboardPage() {
 												</p>
 											</div>
 										</div>
+										<GroupSelection
+											enrollmentId={enrollment.id}
+											currentGroupId={enrollment.group_id}
+											opensAt={
+												courseWithWindow?.group_selection_opens_at ??
+												null
+											}
+											closesAt={
+												courseWithWindow?.group_selection_closes_at ??
+												null
+											}
+										/>
+										<details className="mt-5 border-t border-border pt-4">
+											<summary className="cursor-pointer text-sm font-medium text-accent">
+												Ver historial de puntos (
+												{transactions.length})
+											</summary>
+											<div className="mt-3 divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface-muted/45">
+												{transactions.map(
+													(transaction, index) => (
+														<div
+															key={`${transaction.created_at}-${index}`}
+															className="flex items-start justify-between gap-4 px-4 py-3"
+														>
+															<div>
+																<p className="text-sm">
+																	{transaction.reason ||
+																		"Sin motivo"}
+																</p>
+																<p className="mt-1 text-xs text-muted">
+																	{movementDate(
+																		transaction.created_at,
+																	)}
+																</p>
+															</div>
+															<p
+																className={
+																	transaction.points >
+																	0
+																		? "font-semibold tabular-nums text-accent"
+																		: "font-semibold tabular-nums text-danger"
+																}
+															>
+																{transaction.points >
+																0
+																	? `+${transaction.points}`
+																	: transaction.points}
+															</p>
+														</div>
+													),
+												)}
+												{!transactions.length && (
+													<p className="px-4 py-5 text-sm text-muted">
+														Aún no hay movimientos
+														registrados.
+													</p>
+												)}
+											</div>
+										</details>
 									</article>
 								);
 							})}

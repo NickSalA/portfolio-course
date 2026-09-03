@@ -19,6 +19,7 @@ export default async function TeacherCoursesPage({
 				)
 				.eq("teacher_id", user.id)
 				.eq("period_id", selectedPeriod.id)
+				.eq("active", true)
 				.order("created_at", { ascending: false })
 		: { data: [] };
 	return (

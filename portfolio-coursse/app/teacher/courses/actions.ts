@@ -15,6 +15,33 @@ function coursePath(period: string) {
 		: "/teacher/courses";
 }
 
+export async function archiveCourse(formData: FormData) {
+	const supabase = await createClient();
+	const coursePublicId = value(formData, "course_public_id");
+	const periodPublicId = value(formData, "period_public_id");
+	const path = coursePath(periodPublicId);
+	if (!coursePublicId) redirect(path);
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+	if (!user) redirect("/login");
+	const { error } = await supabase
+		.from("courses")
+		.update({ active: false })
+		.eq("public_id", coursePublicId)
+		.eq("teacher_id", user.id);
+	if (error)
+		redirect(
+			`${path}${path.includes("?") ? "&" : "?"}error=course-archive`,
+		);
+	revalidatePath("/teacher");
+	revalidatePath("/teacher/courses");
+	revalidatePath("/teacher/groups");
+	revalidatePath("/teacher/students");
+	revalidatePath("/teacher/points");
+	redirect(path);
+}
+
 export async function createCourse(formData: FormData) {
 	const supabase = await createClient();
 	const name = value(formData, "name");
