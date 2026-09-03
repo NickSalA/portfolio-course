@@ -33,7 +33,7 @@ export async function deactivateStudentAuthorization(formData: FormData) {
 		.update({ status: "inactive" })
 		.eq("authorized_student_id", authorizationId);
 	revalidatePath("/teacher/students");
-	revalidatePath("/dashboard");
+	revalidatePath("/student");
 	redirect(path);
 }
 
@@ -54,7 +54,7 @@ export async function reactivateStudentAuthorization(formData: FormData) {
 		.eq("authorized_student_id", authorizationId);
 	revalidatePath("/teacher/students");
 	revalidatePath("/teacher/settings");
-	revalidatePath("/dashboard");
+	revalidatePath("/student");
 	redirect(path);
 }
 

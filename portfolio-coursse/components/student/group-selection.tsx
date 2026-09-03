@@ -1,4 +1,4 @@
-import { selectStudentGroup } from "@/app/dashboard/actions";
+import { selectStudentGroup } from "@/app/student/actions";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {

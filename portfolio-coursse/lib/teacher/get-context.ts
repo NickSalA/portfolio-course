@@ -32,7 +32,7 @@ export const getTeacherBaseContext = cache(async () => {
 			.order("semester", { ascending: false }),
 	]);
 
-	if (teacher?.role !== "teacher") redirect("/dashboard?error=forbidden");
+	if (teacher?.role !== "teacher") redirect("/student?error=forbidden");
 
 	return {
 		supabase,

@@ -25,7 +25,7 @@ export async function voidPointTransaction(formData: FormData) {
 		redirect(`${path}${params.size ? "&" : "?"}error=transaction`);
 	}
 	revalidatePath("/teacher/points");
-	revalidatePath("/dashboard");
+	revalidatePath("/student");
 	redirect(`${path}${params.size ? "&" : "?"}refresh=1`);
 }
 

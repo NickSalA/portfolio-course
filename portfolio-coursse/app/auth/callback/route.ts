@@ -9,7 +9,7 @@ export async function GET(request: Request) {
 	const next =
 		requestedNext?.startsWith("/") && !requestedNext.startsWith("//")
 			? requestedNext
-			: "/dashboard";
+			: "/student";
 
 	if (!code) {
 		return NextResponse.redirect(
