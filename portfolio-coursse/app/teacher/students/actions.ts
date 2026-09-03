@@ -37,6 +37,27 @@ export async function deactivateStudentAuthorization(formData: FormData) {
 	redirect(path);
 }
 
+export async function reactivateStudentAuthorization(formData: FormData) {
+	const supabase = await createClient();
+	const authorizationId = Number(value(formData, "authorization_id"));
+	const period = value(formData, "period");
+	const path = `/teacher/settings?period=${encodeURIComponent(period)}`;
+	if (!Number.isInteger(authorizationId)) redirect(path);
+	const { error } = await supabase
+		.from("authorized_students")
+		.update({ status: "active" })
+		.eq("id", authorizationId);
+	if (error) redirect(`${path}&error=restore-student`);
+	await supabase
+		.from("course_students")
+		.update({ status: "active" })
+		.eq("authorized_student_id", authorizationId);
+	revalidatePath("/teacher/students");
+	revalidatePath("/teacher/settings");
+	revalidatePath("/dashboard");
+	redirect(path);
+}
+
 export async function importStudents(formData: FormData) {
 	const supabase = await createClient();
 	const periodPublicId = value(formData, "period_public_id");

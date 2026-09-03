@@ -72,6 +72,26 @@ export async function archiveCourse(formData: FormData) {
 	redirect(path);
 }
 
+export async function restoreCourse(formData: FormData) {
+	const supabase = await createClient();
+	const coursePublicId = value(formData, "course_public_id");
+	const periodPublicId = value(formData, "period_public_id");
+	const path = `/teacher/settings?period=${encodeURIComponent(periodPublicId)}`;
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+	if (!user) redirect("/login");
+	const { error } = await supabase
+		.from("courses")
+		.update({ active: true })
+		.eq("public_id", coursePublicId)
+		.eq("teacher_id", user.id);
+	if (error) redirect(`${path}&error=restore-course`);
+	revalidatePath("/teacher");
+	revalidatePath("/teacher/settings");
+	redirect(path);
+}
+
 export async function createCourse(formData: FormData) {
 	const supabase = await createClient();
 	const name = value(formData, "name");
