@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { saveSelectionWindow } from "@/app/teacher/courses/[coursePublicId]/group-actions";
+import { saveSelectionWindow } from "@/app/teacher/courses/group-actions";
 
 type GroupSelectionWindowDialogProps = {
 	coursePublicId: string;

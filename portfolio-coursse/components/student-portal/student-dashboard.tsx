@@ -1,5 +1,5 @@
 import { SignOutButton } from "@/components/auth/sign-out-button";
-import { StudentCourseCard } from "@/components/student/student-course-card";
+import { StudentCourseCard } from "@/components/student-portal/student-course-card";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import type { StudentEnrollmentSummary } from "@/lib/student/get-dashboard";
 

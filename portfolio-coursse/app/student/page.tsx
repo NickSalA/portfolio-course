@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { StudentDashboard } from "@/components/student/student-dashboard";
+import { StudentDashboard } from "@/components/student-portal/student-dashboard";
 import { getStudentDashboard } from "@/lib/student/get-dashboard";
 import { createClient } from "@/lib/supabase/server";
 

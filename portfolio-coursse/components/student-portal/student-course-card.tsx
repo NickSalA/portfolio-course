@@ -1,4 +1,4 @@
-import { GroupSelection } from "@/components/student/group-selection";
+import { GroupSelection } from "@/components/student-portal/group-selection";
 import type { StudentEnrollmentSummary } from "@/lib/student/get-dashboard";
 
 function movementDate(value: string) {
