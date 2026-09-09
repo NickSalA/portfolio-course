@@ -1,5 +1,5 @@
-import { StudentImportForm } from "@/components/student-management/student-import-form";
-import { StudentList } from "@/components/student-management/student-list";
+import { StudentImportForm } from "@/components/teacher/students/student-import-form";
+import { StudentList } from "@/components/teacher/students/student-list";
 import { CourseContextSwitcher } from "@/components/teacher/courses/course-context-switcher";
 import { ModuleHeader } from "@/components/teacher/shared/module-header";
 import { getTeacherContext } from "@/lib/teacher/get-context";

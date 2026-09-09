@@ -1,7 +1,7 @@
 "use client";
 
 import { archiveCourse } from "@/app/teacher/courses/actions";
-import { CourseStudentImportForm } from "@/components/student-management/course-student-import-form";
+import { CourseStudentImportForm } from "@/components/teacher/students/course-student-import-form";
 
 export function CourseDetailActions({
 	coursePublicId,

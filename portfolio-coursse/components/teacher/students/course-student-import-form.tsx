@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { importStudents } from "@/app/teacher/students/actions";
-import { CsvImporter } from "@/components/student-management/csv-importer";
+import { CsvImporter } from "@/components/teacher/students/csv-importer";
 
 type Student = {
 	course_name: string;

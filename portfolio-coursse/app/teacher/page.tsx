@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { StudentImportForm } from "@/components/student-management/student-import-form";
+import { StudentImportForm } from "@/components/teacher/students/student-import-form";
 import { ModuleHeader } from "@/components/teacher/shared/module-header";
 import { getTeacherContext } from "@/lib/teacher/get-context";
 
