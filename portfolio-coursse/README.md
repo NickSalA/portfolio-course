@@ -46,12 +46,18 @@ La app estará disponible en `http://localhost:3000` y Supabase Studio local nor
 
 ```bash
 pnpm lint
-pnpm exec next typegen
-pnpm exec tsc --noEmit
+pnpm typecheck
+pnpm test
+pnpm test:db
+pnpm test:e2e
 pnpm build
 ```
 
-GitHub Actions ejecuta estas comprobaciones para PR hacia `main`; el build de CI usa valores públicos ficticios y no necesita secretos de Supabase. Los detalles del flujo de revisión, Conventional Commits y semantic-release están en [`../CONTRIBUTING.md`](../CONTRIBUTING.md). La documentación general del proyecto y del trabajo final está en [`../docs/README.md`](../docs/README.md).
+`pnpm test:db` y `pnpm test:e2e` son pruebas de integración: requieren Supabase local iniciado y restablecido con las migraciones actuales. La configuración de Playwright rechaza cualquier `NEXT_PUBLIC_SUPABASE_URL` cuyo host no sea `localhost` o `127.0.0.1`; no se deben ejecutar pruebas destructivas contra producción. La instalación inicial de Playwright puede requerir `pnpm exec playwright install chromium`.
+
+Para cada ejecución del proceso académico, registra en `../docs/automatizaciones/gestion-evaluacion-grupal/evaluacion.md` la fecha, versión o PR, entorno local, fixture sintético, resultado esperado y observado, y referencias seguras a errores o señales. No copies claves, correos reales, nombres reales ni calificaciones en logs o evidencia pública. Un check aprobado demuestra únicamente el comportamiento que ejecutó; no prueba por sí solo producción, monitoreo, respaldos o mejora frente al proceso manual.
+
+GitHub Actions ejecuta las comprobaciones configuradas para PR; el build de CI usa valores públicos ficticios y no necesita secretos de Supabase. Los detalles del flujo de revisión, Conventional Commits y semantic-release están en [`../CONTRIBUTING.md`](../CONTRIBUTING.md). La documentación general del proyecto y del trabajo final está en [`../docs/README.md`](../docs/README.md).
 
 ## Base de datos
 

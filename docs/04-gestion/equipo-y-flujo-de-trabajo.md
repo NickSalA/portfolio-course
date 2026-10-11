@@ -11,7 +11,7 @@ anteriores permanecen en [`portfolio-coursse/docs/`](../../portfolio-coursse/doc
 `docs/` conserva el contexto global y, al terminar una automatización, su evaluación; no sustituye
 los artefactos por funcionalidad generados por Spec Kit.
 
-**Aún por definir con el grupo:** miembros, roles, aprobadores, calendario y responsables de
-informes, pruebas y operación. No se creó una asignación de roles, registro de reuniones o
-registro de IA porque no hay datos confirmados. La definición de estos acuerdos debe hacerse con
-el equipo antes de tratarlos como hechos del proyecto.
+El equipo está compuesto por cinco personas. La distribución propuesta de responsabilidades, los
+campos del Project, los criterios de preparación/cierre y la ceremonia mínima están en
+[Backlog y responsabilidades](backlog-y-responsabilidades.md). Los nombres, asignaciones concretas,
+calendario y responsables definitivos aún deben acordarse con el grupo antes de tratarlos como hechos.
