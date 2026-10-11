@@ -6,9 +6,9 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 
 const modules = [
 	{ href: "/teacher", label: "Inicio", symbol: "◫" },
-
 	{ href: "/teacher/students", label: "Alumnos", symbol: "◌" },
 	{ href: "/teacher/points", label: "Puntos", symbol: "+" },
+	{ href: "/teacher/grades", label: "Notas", symbol: "★" },
 ];
 
 export function TeacherSidebar({ name }: { name: string }) {

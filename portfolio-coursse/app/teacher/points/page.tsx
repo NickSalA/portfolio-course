@@ -73,6 +73,7 @@ export default async function PointsPage({
 				{selectedCourse ? (
 					<PointsStudentList
 						course={selectedCourse.public_id}
+						courseName={selectedCourse.name}
 						period={selectedPeriod?.public_id ?? ""}
 						students={students ?? []}
 					/>

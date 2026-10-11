@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { PointTransactionDialog } from "@/components/teacher/points/point-transaction-dialog";
+import { ExportPointsButton } from "@/components/teacher/points/export-points-button";
 
 type Transaction = {
 	id: number;
@@ -19,10 +20,12 @@ type Student = {
 
 export function PointsStudentList({
 	course,
+	courseName,
 	period,
 	students,
 }: {
 	course: string;
+	courseName?: string;
 	period: string;
 	students: Student[];
 }) {
@@ -47,16 +50,24 @@ export function PointsStudentList({
 
 	return (
 		<>
-			<label className="mt-6 block max-w-xl text-sm text-muted">
-				Filtrar por nombre
-				<input
-					value={filter}
-					onChange={(event) => updateFilter(event.target.value)}
-					placeholder="Escribe un nombre…"
-					autoComplete="off"
-					className="mt-2 w-full rounded-xl border border-border bg-surface-muted px-3 py-2.5 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent"
-				/>
-			</label>
+			<div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+				<label className="block w-full max-w-xl text-sm text-muted">
+					Filtrar por nombre
+					<input
+						value={filter}
+						onChange={(event) => updateFilter(event.target.value)}
+						placeholder="Escribe un nombre…"
+						autoComplete="off"
+						className="mt-2 w-full rounded-xl border border-border bg-surface-muted px-3 py-2.5 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent"
+					/>
+				</label>
+				<div className="shrink-0">
+					<ExportPointsButton
+						students={students}
+						courseName={courseName ?? course}
+					/>
+				</div>
+			</div>
 			<section className="glass mt-5 overflow-hidden rounded-3xl border border-white/25 shadow-[0_20px_55px_rgb(15_23_42/8%)]">
 				<div className="grid grid-cols-[minmax(0,1fr)_7rem_9rem] gap-4 border-b border-border px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted sm:px-6">
 					<span>Alumno</span>
