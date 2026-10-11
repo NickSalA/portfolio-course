@@ -46,6 +46,7 @@ La app estará disponible en `http://localhost:3000` y Supabase Studio local nor
 
 ```bash
 pnpm lint
+pnpm exec next typegen
 pnpm exec tsc --noEmit
 pnpm build
 ```
