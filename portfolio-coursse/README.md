@@ -1,39 +1,58 @@
-# Plataforma académica y portafolio
+# Aplicación académica y portafolio
 
 Aplicación Next.js para un portafolio público y una plataforma académica privada para docentes y alumnos.
 
 ## Modelo de acceso
 
-- Los docentes gestionan cursos, grupos y alumnos.
-- Los alumnos no tienen registro público.
-- El alumno inicia sesión mediante Google OAuth de Supabase.
-- Iniciar sesión no concede acceso por sí solo: el correo debe haber sido cargado previamente por un docente y tener una matrícula activa.
-- Los alumnos pueden consultar su curso, su grupo si aplica y su historial de puntos en modo de solo lectura.
+- Los docentes gestionan cursos, grupos, alumnos y evaluaciones según su autorización.
+- Los alumnos no tienen registro público y acceden con Google OAuth mediante Supabase.
+- Autenticarse no concede acceso académico por sí solo: los alumnos deben estar autorizados y tener matrícula activa; los docentes requieren el rol `teacher` en su perfil.
 - Los cursos pueden funcionar con grupos o sin grupos.
+- Las políticas RLS y las comprobaciones del servidor protegen el acceso; no se debe confiar solo en validaciones del navegador.
 
-## Supabase
+## Requisitos
 
-La primera migración se encuentra en:
+- Node.js 22 o compatible con Next.js 16.
+- pnpm `11.20.0` (indicado en `packageManager`).
+- Docker y Supabase CLI para ejecutar el backend local.
 
-```text
-supabase/migrations/0001_academic_platform.sql
-```
+## Desarrollo local
 
-Incluye perfiles, cursos, grupos opcionales, alumnos autorizados por CSV, matrículas, movimientos de puntos, creación automática de perfiles al autenticarse y políticas RLS iniciales. Al iniciar sesión por primera vez, el correo del alumno autorizado se vincula automáticamente con sus matrículas activas. Las tablas académicas usan claves numéricas internas y un `public_id` UUID separado para referencias externas; los IDs internos no deben exponerse en la interfaz.
-
-El campo `reason` de los movimientos de puntos es opcional: el docente puede asignar puntos con o sin una explicación.
-
-Copia `.env.example` como `.env.local` y completa las credenciales del proyecto Supabase:
-
-```bash
-cp .env.example .env.local
-```
-
-Configura Google como proveedor OAuth en Supabase. La aplicación deberá validar además que el correo esté presente en `course_students`; pertenecer al dominio institucional no es suficiente.
-
-## Desarrollo
+Desde este directorio:
 
 ```bash
 pnpm install
+supabase start
+supabase status
+```
+
+Crea `.env.local` (no está versionado) y configura la URL y la clave **publicable locales** que muestra `supabase status`:
+
+```dotenv
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<clave-publicable-local>
+```
+
+Aplica las migraciones locales y ejecuta Next.js:
+
+```bash
+supabase db reset
 pnpm dev
 ```
+
+La app estará disponible en `http://localhost:3000` y Supabase Studio local normalmente en `http://127.0.0.1:54323`. Comprueba que la configuración de OAuth local usa el callback `http://127.0.0.1:54321/auth/v1/callback`. No uses credenciales de producción para las pruebas locales ni compartas secretos.
+
+## Comprobaciones
+
+```bash
+pnpm lint
+pnpm exec next typegen
+pnpm exec tsc --noEmit
+pnpm build
+```
+
+GitHub Actions ejecuta estas comprobaciones para PR hacia `main`; el build de CI usa valores públicos ficticios y no necesita secretos de Supabase. Los detalles del flujo de revisión, Conventional Commits y semantic-release están en [`../CONTRIBUTING.md`](../CONTRIBUTING.md). La documentación general del proyecto y del trabajo final está en [`../docs/README.md`](../docs/README.md).
+
+## Base de datos
+
+Las migraciones versionadas están en `supabase/migrations/`. Toda modificación de esquema, función, índice o política debe añadirse en una migración nueva; no edites migraciones ya aplicadas. Consulta la documentación del repositorio para conocer el modelo de datos, las políticas y el estado comprobado de las pruebas y controles operativos.

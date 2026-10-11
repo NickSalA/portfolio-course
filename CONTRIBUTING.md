@@ -9,6 +9,7 @@
 
     ```bash
     pnpm lint
+    pnpm exec next typegen
     pnpm exec tsc --noEmit
     pnpm build
     ```

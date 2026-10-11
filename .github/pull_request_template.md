@@ -24,7 +24,7 @@
 ## Validación y evidencia
 
 - [ ] `pnpm lint`
-- [ ] `pnpm exec tsc --noEmit`
+- [ ] `pnpm exec next typegen && pnpm exec tsc --noEmit`
 - [ ] `pnpm build`
 - [ ] Probé los casos válidos, inválidos y excepcionales relevantes (si aplica)
 - [ ] Registré resultado, fecha, entorno y evidencia reproducible (si aplica)
