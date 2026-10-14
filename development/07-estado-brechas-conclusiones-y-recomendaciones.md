@@ -1,45 +1,49 @@
-# 7. Estado actual, brechas, conclusiones y recomendaciones
+# 7. Productos de Parte I, asuntos abiertos y conclusiones
 
-## 7.1 Estado inicial comprobado
+## 7.1 Productos documentales disponibles
 
-El repositorio contiene la aplicación Next.js/Supabase, migraciones SQL `0001`–`0029`, interfaces docentes y entidades para evaluaciones y notas grupales. Las migraciones indicadas se aplicaron en una instancia local y la prueba `group_grades_rls.sql` aprobó con identidades sintéticas: negó la lectura estudiantil, aisló cursos de docentes distintos, permitió la modificación del responsable y rechazó inserciones entre cursos.
+| Producto de análisis y diseño          | Artefacto identificable | Límite                                                          |
+| -------------------------------------- | ----------------------- | --------------------------------------------------------------- |
+| Caracterización y diagnóstico          | 01 y anexo A de 09      | Basado en relato documental, no observación de campo            |
+| Objetivos, alcance y requisitos        | 02 y 04                 | No equivalen a funciones construidas                            |
+| Arquitectura, modelo y controles       | 05 y anexos B–C de 09   | Consistencia de diseño, no seguridad verificada                 |
+| Prototipo documental de baja fidelidad | P-01, anexo D de 09     | Representación estática; no software ni validación con usuarios |
+| Plan de pruebas e indicadores          | 06 y anexos E–F de 09   | Sin ejecuciones ni valores observados                           |
+| Material para informe y presentación   | 10 y guion en 06        | Requiere maquetación y elaboración del PowerPoint               |
 
-Esta evidencia es local. No prueba despliegue remoto ni aplicación de las migraciones en producción. La migración `0029` está versionada para retirar el acceso estudiantil a notas, pero debe aplicarse y verificarse en cada entorno antes de afirmar ese comportamiento fuera del local.
+Estos son los únicos tipos de «resultados» que se atribuyen a la semana 8. No se incluyen inventarios de migraciones, CI, despliegues o pruebas locales como resultados académicos.
 
-## 7.2 Capacidades presentes pero no concluyentes
+## 7.2 Decisiones y datos que deben confirmarse
 
-Existen flujos candidatos de autenticación, periodos, cursos, importación, matrícula, grupos, puntos y notas. Su presencia no demuestra aceptación integral. El inventario inicial clasifica varias capacidades como `present-unverified` y debe citarse como diagnóstico, no como evaluación final.
+| Asunto                                  | Fuente y situación                                                                                   | Efecto sobre diseño y evaluación                                                                                               |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Diagnóstico del proceso manual          | Caso interno reportado; sin entrevistas o mediciones del equipo                                      | Confirmar actividades, dificultades reales y línea base antes de cuantificar beneficios                                        |
+| Fecha, hora y zona horaria              | Caso habla del día de actividad; especificación propone instantes                                    | Acordar precisión y desempate cuando actividad y traslado coinciden                                                            |
+| Traslados retroactivos                  | Regla de traslado existe; límites de retroactividad no están cerrados                                | Definir quién revisa impactos y qué historia puede corregirse                                                                  |
+| Nota vacía y precisión                  | Código de referencia admite vacío; especificación exige nota numérica válida                         | Se propone vacío como pendiente; confirmar decimales, redondeo y corrección concurrente                                        |
+| Grupos esperados y excepciones          | Diseño técnico permite conciliar con excepciones                                                     | Acordar grupos vacíos, alumnos sin grupo, grupos desactivados y autoridad para aceptar una excepción; evitar ocultar faltantes |
+| Identidad y padrón                      | Fuente histórica habla de acceso institucional; autorización se vincula por correo                   | Confirmar dominios admitidos, cambios de correo y campos reales del XLSX sin difundir datos personales                         |
+| Incorporación inicial por periodo/curso | Material técnico incluye importación por periodo y formularios por curso                             | Definir destino y coincidencias para evitar asociaciones al curso incorrecto                                                   |
+| Exportación                             | Documentación la describe como posterior; componente `group-grades-table.tsx` contiene descarga XLSX | No equiparar descarga técnica con exportación oficial ni incorporarla como obligación del trabajo                              |
+| CI y pruebas del repositorio            | Documentos de operación dicen que faltan; README y configuración técnica describen comprobaciones    | Son fuentes con actualización desigual; no trasladar su estado a resultados de Parte I ni afirmar su inexistencia              |
+| Excepción individual                    | Caso la prevé para después y especificación la excluye de Parte II                                   | Mantenerla fuera de esta propuesta; reconsiderar solo con cambio de alcance explícito                                          |
+| Criterio arquitectónico del curso       | Guía valora aplicar una tendencia arquitectónica                                                     | Confirmar si la aplicación full-stack con separación lógica satisface la expectativa de evaluación                             |
+| Fidelidad del prototipo                 | Guía titula Parte I «Diseño y prototipo» sin detallar formato                                        | Confirmar si P-01 es suficiente o se exige maqueta visual/interactiva; no afirmar cumplimiento definitivo                      |
+| Metas, calendario y equipo              | Valores técnicos candidatos, cinco áreas y semanas intermedias tentativas                            | Acordar volumen, umbrales, nombres, fechas y responsables antes de comprometerlos                                              |
 
-## 7.3 Brechas principales
+La especificación externa presenta requisitos como definidos y su checklist no contiene aclaraciones abiertas; eso no demuestra confirmación académica de estos puntos. Se conservan explícitamente como asuntos por validar y no se modifica la especificación.
 
-- No existe todavía una historia temporal completa de pertenencia a grupos.
-- Las evaluaciones actuales no disponen del instante académico requerido para atribución histórica.
-- Las correcciones de notas sobrescriben el valor sin auditoría completa.
-- El reintento no posee aún un contrato integral de idempotencia y resultado incierto.
-- La conciliación de grupos esperados y calificados no está implementada.
-- No existe batería automatizada integral ni CI versionada en el estado documentado.
-- No hay mediciones de tiempo, completitud, rendimiento o mejora frente al método manual.
-- Monitoreo, alertas, respaldos, restauración y configuración productiva no fueron verificados.
+## 7.3 Conclusiones de análisis y diseño
 
-## 7.4 Conclusiones de Parte I
+1. El caso documentado permite delimitar un proceso susceptible de automatización: registro, corrección y conciliación de evaluaciones grupales. La plataforma completa aporta contexto, pero no constituye el objeto íntegro del experimento.
+2. La pertenencia histórica y la fecha de actividad son necesarias en el modelo para explicar la atribución de notas ante traslados; consultar solo el grupo actual sería conceptualmente insuficiente.
+3. La separación de puntos, notas, autorizaciones y matrículas evita mezclar conceptos académicos con permisos e identidades. Esa separación fundamenta los requisitos, no demuestra una mejora ya conseguida.
+4. La arquitectura propuesta distribuye responsabilidades entre presentación, servidor y datos sin justificar un servicio adicional. Su adecuación operativa, seguridad y rendimiento deberán comprobarse en Parte II.
+5. El diseño de estados, controles, correcciones y reintentos aborda riesgos identificados y permite formular casos de prueba. No prueba que esos riesgos estén eliminados.
+6. La Parte I aporta documentos y una representación estática identificable. No establece eficacia medida, aceptación de usuarios, funcionamiento productivo ni cumplimiento definitivo del formato de prototipo requerido por el docente.
 
-1. El caso es apto para automatización porque contiene tareas repetitivas, reglas verificables, actores definidos y excepciones observables.
-2. La dificultad central no es la captura de la nota, sino conservar el contexto temporal y explicar el resultado cuando cambian grupos o se corrigen calificaciones.
-3. La arquitectura existente es suficiente si sus límites se profundizan: la interfaz guía, el servidor orquesta y PostgreSQL protege invariantes, historia y acceso.
-4. La combinación de autorización de servidor, RLS, restricciones y transacciones ofrece defensa en profundidad; ninguna capa aislada garantiza toda la seguridad.
-5. La idempotencia y la conciliación convierten el registro en un proceso recuperable y controlable, en lugar de una simple escritura de datos.
-6. La evidencia disponible es parcial y local. Parte I entrega alcance y diseño; las afirmaciones de mejora requieren implementación y medición en Parte II.
-7. El backlog por historias y cinco áreas permite trabajo paralelo con contratos definidos, siempre que los cambios de base precedan a las interfaces dependientes.
+## 7.4 Recomendaciones
 
-## 7.5 Recomendaciones
+Confirmar primero las reglas temporales, la definición de grupos esperados y el tratamiento de excepciones. Revisar el prototipo con el docente y registrar futuras observaciones sin inventar aprobaciones. Antes de implementar, precisar contratos y criterios de aceptación; antes de medir, fijar el protocolo y las entradas equivalentes. Usar datos sintéticos, entorno aislado y evidencia con fecha, versión y limitaciones. En Parte II, reportar tanto fallos como aciertos y no confundir metas, checks de calidad o despliegues con mejoras del proceso.
 
-1. Confirmar antes de implementar la zona horaria institucional, formato sintético de importación, volumen de prueba y protocolo de línea base.
-2. Priorizar idempotencia e historia de grupos antes de ampliar la interfaz de notas.
-3. Conservar migraciones aditivas y no inventar historia para registros legados; marcar casos ambiguos para revisión docente.
-4. Ejecutar pruebas directas de RLS y restricciones, no solo recorridos de interfaz.
-5. Preparar desde el inicio plantillas de evidencia con fecha, versión/PR, entorno, fixture, esperado, observado y limitaciones.
-6. Separar auditoría académica de logs operativos y evitar datos personales o notas en señales compartidas.
-7. Configurar CI después de estabilizar los comandos locales, sin confundir checks verdes con ejecución correcta del proceso académico.
-8. Verificar respaldos, retención y restauración con el proveedor antes de prometer recuperación productiva.
-9. Revisar accesibilidad por teclado y formularios durante cada historia, no únicamente al cierre.
-10. Actualizar el informe de Parte II solo desde evidencia ejecutada y mantener visibles las capacidades fallidas o pendientes.
+Completar carátula, nombres y referencias pendientes; maquetar el informe y elaborar el PowerPoint exigido por la guía. Ninguno de estos archivos de trabajo sustituye por sí solo esos entregables finales.

@@ -1,38 +1,43 @@
 # 1. Introducción y planteamiento del problema
 
-## Introducción
+## 1.1 Introducción y perspectiva de la entrega
 
-La gestión de evaluaciones grupales en educación superior combina tareas administrativas y académicas que requieren exactitud, autorización y trazabilidad. En el caso estudiado, un docente de la Universidad Nacional Mayor de San Marcos recibe al inicio del curso un archivo XLSX del SUM con la relación de alumnos. Este archivo sirve para incorporar alumnado, pero no contiene ni importa calificaciones. Antes de la plataforma, las notas se registraban en una hoja XLSX mientras la composición de grupos y los puntos individuales se controlaban por separado.
+La gestión académica relaciona identidad, acceso autorizado, periodos, cursos, incorporación de alumnos, matrículas, grupos, puntos individuales y evaluaciones grupales. Dentro de esa visión, este trabajo selecciona un solo proceso principal: la gestión y control de evaluaciones grupales para el docente responsable del curso. Los demás módulos aportan contexto, entradas o dependencias; no se propone construir ni evaluar un LMS completo.
 
-La dispersión de registros incrementa el esfuerzo de conciliación y dificulta explicar qué grupo correspondía a un alumno cuando hubo traslados. También hace necesario controlar manualmente omisiones, valores inválidos, duplicados y correcciones. La automatización propuesta no se limita a reemplazar una hoja por una pantalla: modela estados, reglas, eventos, permisos, errores, reintentos y evidencia de ejecución.
+Esta Parte I se sitúa en la semana 8 del curso Automatización y Control de Software 2026-2. La guía distingue la entrega de diseño y prototipo, orientada a analizar el problema y diseñar la solución, de la Parte II de semana 16, destinada a implementar, probar y evaluar. Aquí se presentan diagnóstico documental, requisitos, diseño y una representación de baja fidelidad; no una solución operativa.
 
-La Parte I presenta el análisis y diseño de una solución que conserva la aplicación existente basada en Next.js, Supabase y PostgreSQL. El alcance comprende la preparación del curso, incorporación y matrícula del alumnado, organización temporal de grupos, definición de evaluaciones, registro y corrección de notas grupales y conciliación docente. La implementación completa, las pruebas integrales y la comparación cuantitativa con el proceso manual corresponden a la Parte II.
+Se examinó documentación, especificaciones, aplicación y modelo de datos del repositorio para comprender el caso y formular la propuesta. Ese material técnico no se atribuye como implementación o evaluación de este trabajo. Tampoco se afirma que el repositorio carezca de código. No se realizaron entrevistas, observaciones de campo, pruebas de la solución académica ni mediciones para esta entrega.
 
-## Problema central
+## 1.2 Situación problemática reportada
 
-El proceso manual mantiene información relacionada en registros separados y no ofrece por sí mismo controles confiables para:
+Según el caso registrado en `docs/01-definicion/caso-evaluacion-grupal.md`, un docente de la UNMSM llevaba notas en una hoja XLSX y registraba por separado grupos y puntos individuales. Durante las primeras semanas recibe del SUM una relación de alumnos en XLSX para su incorporación inicial. Este archivo no contiene notas para importar. La descripción es una fuente interna del caso, no un estudio empírico independiente.
 
-- validar que la nota se encuentre entre 0 y 20;
-- asegurar que grupo y evaluación pertenezcan al mismo curso;
-- restringir la modificación al docente responsable;
-- preservar la pertenencia histórica cuando un alumno cambia de grupo;
-- evitar duplicaciones ante reintentos o respuestas perdidas;
-- conservar el historial de correcciones;
-- distinguir evaluaciones completas, faltantes y excepcionales;
-- producir evidencia reproducible sin exponer datos personales.
+La separación de registros plantea necesidades de conciliación: relacionar curso, actividad, grupos y notas; reconocer faltantes; y explicar qué calificación corresponde a un alumno cuando cambia de grupo. Se identifican riesgos de omisiones, duplicados, valores inválidos y atribuciones equivocadas. No se conoce su frecuencia ni su costo real: esos aspectos requieren levantamiento y medición posteriores.
 
-La dificultad principal aparece cuando una actividad y un cambio de grupo ocurren en momentos distintos. La regla académica establece que la calificación corresponde al grupo al que el alumno pertenecía en el instante de la actividad, no al grupo vigente al guardar o corregir la nota. El modelo actual solo conserva el grupo presente, de modo que esa atribución histórica aún no puede demostrarse de forma íntegra.
+## 1.3 Problema central y diagnóstico
 
-## Pregunta orientadora
+El problema consiste en gestionar y explicar las notas grupales con información relacionada que se registra por separado, especialmente ante traslados y correcciones. La regla documentada establece que cuenta el grupo al que pertenecía el alumno al realizarse la actividad, no el grupo vigente al guardar o corregir la nota. Una lista del grupo actual no basta como representación de esa historia.
 
-¿Cómo diseñar una automatización controlada para la evaluación grupal que reduzca registros dispersos, aplique reglas académicas y de autorización, preserve la historia de grupos y correcciones, y produzca evidencia verificable sin introducir complejidad arquitectónica innecesaria?
+| Aspecto reportado o requerido                 | Riesgo o necesidad inferida                       | Respuesta que se propone diseñar                       |
+| --------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------ |
+| Notas, grupos y puntos en registros separados | Conciliación manual y posible confusión semántica | Información relacionada, sin convertir puntos en notas |
+| Cambios de grupo durante el curso             | Atribución retrospectiva incorrecta               | Pertenencias temporales y fecha de actividad           |
+| Registro y corrección docente                 | Valores inválidos o cambios inexplicables         | Validaciones y conservación de correcciones            |
+| Posibles fallos de guardado                   | Incertidumbre y repetición de cambios             | Estados explícitos y reintento seguro                  |
+| Cierre de una evaluación                      | Faltantes que podrían pasar inadvertidos          | Conciliación de grupos, notas y excepciones            |
 
-## Delimitación
+Los riesgos son hipótesis de análisis, no incidentes observados o cuantificados por el equipo.
 
-La entrada es el alumnado autorizado y los grupos del curso; la importación inicial incorpora alumnos, pero nunca notas. La operación central es la definición de la evaluación y el registro o corrección de una nota por grupo. La salida prevista es una evaluación conciliada, visible para el docente, con todos los grupos esperados calificados o con una excepción explícita.
+## 1.4 Pregunta orientadora
 
-No forman parte de esta entrega la exportación oficial de actas, las correcciones individuales, las notificaciones, un panel administrativo separado, nuevos tipos de nota, funciones generales de LMS ni pruebas destructivas en producción.
+¿Cómo diseñar una solución de automatización y control para la gestión de evaluaciones grupales que articule las entradas académicas del curso, preserve la pertenencia histórica de sus alumnos y permita registrar, corregir y conciliar notas con reglas, permisos y excepciones explícitos?
 
-## Fuente interna principal
+## 1.5 Frontera del trabajo
 
-Esta sección deriva de `docs/01-definicion/caso-evaluacion-grupal.md` y del alcance fijado en `specs/001-manage-group-evaluation/spec.md`.
+La entrada del proceso principal es un curso bajo responsabilidad docente con alumnado autorizado, matrículas y grupos identificados. Se diseña la definición de actividades, el registro y la corrección de notas grupales y la conciliación de sus resultados. La preparación del padrón y la selección de grupos se describen como dependencias, no como procesos adicionales de evaluación de eficacia.
+
+La salida esperada es una evaluación revisada por el docente, con grupos calificados o excepciones identificadas y sin faltantes inexplicados. La validez de cerrar con excepciones debe acordarse antes de implementar. La exportación oficial, la corrección individual excepcional, los nuevos tipos de notas y las funciones generales de LMS quedan fuera de la propuesta.
+
+## 1.6 Fuentes y límites del diagnóstico
+
+Se contrastaron `README.md`, `docs/`, `specs/001-manage-group-evaluation/` y las fuentes pertinentes de `portfolio-coursse/`. Su alcance técnico no se traslada automáticamente al compromiso académico. Las diferencias y decisiones por confirmar se registran en 07; las fuentes externas y su grado de verificación figuran en 08.
