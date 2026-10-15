@@ -1,180 +1,157 @@
-# 9. Anexos de análisis, diseño y prototipo
+# 9. Anexos: procesos, prototipo e instrumentos
 
-Estos anexos contienen artefactos documentales de semana 8 e instrumentos previstos para semana 16. Ningún ejemplo sintético corresponde a un alumno, nota real, ejecución o validación con usuarios.
-
-## Anexo A. Modelos del proceso
-
-### Proceso reportado — reconstrucción documental
+## Anexo A. Proceso actual descrito en el caso
 
 ```mermaid
 flowchart TB
-    A[Recibir padrón de alumnos del SUM] --> B[Preparar registros del curso]
-    B --> C[Organizar grupos en registro separado]
-    C --> D[Realizar actividad grupal]
-    D --> E[Anotar nota grupal en XLSX]
-    E --> F[Conciliar grupos y notas manualmente]
-    P[Puntos individuales en registro separado] -. No son notas .-> F
-    T[Cambios de grupo o correcciones] --> F
+    A[Recibir padrón del SUM] --> B[Preparar plantilla de notas en XLSX]
+    C[Estudiantes forman sus grupos] --> D[Docente revisa trabajo e identifica integrantes]
+    B --> D
+    D --> E[Buscar a cada integrante en el archivo]
+    E --> F[Anotar individualmente la misma nota]
+    F --> G{Quedan integrantes}
+    G -->|Sí| E
+    G -->|No| H[Continuar con otra evaluación]
 ```
 
-El orden es una reconstrucción de análisis que debe confirmarse con el docente; no se observó una ejecución de campo.
+El diagrama sintetiza el relato transmitido por el responsable del proyecto. La información de puntos permanecía en el registro docente, sin un medio individual de consulta durante el ciclo. No se dispone de una medición del tiempo de este recorrido.
 
-### Flujo propuesto
+## Anexo B. Registro y seguimiento propuestos
 
 ```mermaid
 flowchart TB
-    A[Curso y alumnado autorizados] --> B[Pertenencias de grupo identificadas]
-    B --> C[Definir actividad y fecha]
-    C --> D[Resolver grupos históricos aplicables]
-    D --> E[Ingresar nota grupal]
-    E --> F{Permiso, curso y nota válidos}
-    F -->|No| G[Explicar rechazo sin cambio]
+    A[Curso y alumnado incorporados] --> B[Docente configura grupos y ventana]
+    B --> C[Alumnos eligen grupo con cupo]
+    C --> D[Docente identifica actividad y participantes]
+    D --> E[Registra una nota por grupo]
+    E --> F{Registro válido}
+    F -->|No| G[Explicar qué debe corregirse]
     G --> E
-    F -->|Sí| H[Confirmar registro y conservar evidencia]
-    H --> I{Respuesta confirmada}
-    I -->|No| J[Consultar resultado o reintentar misma intención]
-    J --> H
-    I -->|Sí| K[Revisar notas y faltantes]
-    K --> L{Todos atendidos o excepción aceptada}
-    L -->|No| E
-    L -->|Sí| M[Registrar conciliación docente]
+    F -->|Sí| H[Mostrar nota a sus participantes]
+    H --> I[Alumno consulta su resultado]
+    I --> J{Solicita revisión}
+    J -->|Sí| K[Registrar reclamo único y avisar al docente]
+    K --> L[Docente revisa y responde]
+    L --> M[Participantes consultan respuesta final]
+    J -->|No| N[Continuar seguimiento]
 ```
 
-## Anexo B. Trazabilidad de la propuesta
+Los puntos individuales siguen un recorrido de registro, consulta y reclamo privado. El docente puede exportar el curso sin que la descarga modifique los registros originales.
 
-| Necesidad                         | Requisito de 04 | Diseño                                            | Caso futuro | Objetivo |
-| --------------------------------- | --------------- | ------------------------------------------------- | ----------- | -------- |
-| Acceso solo a curso autorizado    | R1–R2           | Responsabilidad docente, autorización y matrícula | C01–C02     | OE2–OE4  |
-| Atribución correcta ante traslado | R3–R4           | Intervalos e instante de actividad                | C05–C07     | OE3–OE4  |
-| Registro y corrección coherentes  | R5, R7          | Nota única e historia de cambios                  | C03–C05     | OE3–OE4  |
-| Recuperación sin duplicar         | R6              | Identificador de intención y estados              | C08–C09     | OE4      |
-| Revisión completa                 | R8              | Conteos y excepciones explícitas                  | C10         | OE3–OE4  |
-| Puntos distintos de notas         | R9              | Entidades y consultas separadas                   | C02, C11    | OE2–OE3  |
-| Evaluación reproducible posterior | R10             | Protocolo y ficha futura                          | C01–C12     | OE5      |
+## Anexo C. Prototipo documental P-01
 
-El diagnóstico y modelo manual sustentan OE1; esta matriz conecta sus necesidades con los demás entregables. Los FR de `specs/` sirven de referencia técnica más amplia, no de listado de logros.
+**Formato:** representación textual estática de baja fidelidad. **Propósito:** mostrar los recorridos de registro, consulta, reclamo y exportación. Las pantallas siguientes son el artefacto disponible, no capturas de una plataforma operativa ni evidencia de validación con usuarios.
 
-## Anexo C. Modelo conceptual y secuencia de reintento
-
-```mermaid
-erDiagram
-    PERIODO ||--o{ CURSO : organiza
-    DOCENTE ||--o{ CURSO : responde
-    CURSO ||--o{ AUTORIZACION : habilita
-    AUTORIZACION ||--o| MATRICULA : vincula
-    ALUMNO ||--o{ MATRICULA : posee
-    AUTORIZACION ||--o{ MOVIMIENTO_PUNTOS : registra
-    CURSO ||--o{ GRUPO : organiza
-    MATRICULA ||--o{ PERTENENCIA : conserva
-    GRUPO o|--o{ PERTENENCIA : identifica
-    CURSO ||--o{ EVALUACION : define
-    EVALUACION ||--o{ NOTA_GRUPAL : recibe
-    GRUPO ||--o{ NOTA_GRUPAL : obtiene
-    NOTA_GRUPAL ||--o{ CORRECCION : conserva
-    EVALUACION ||--o{ CONCILIACION : revisa
-    EVALUACION ||--o{ EXCEPCION : explica
-```
-
-El diagrama expresa relaciones propuestas, no tablas construidas; las restricciones adicionales están en 05.
-
-```mermaid
-sequenceDiagram
-    actor D as Docente
-    participant P as Presentación propuesta
-    participant S as Servidor propuesto
-    participant B as Datos propuestos
-    D->>P: Solicitar guardar nota
-    P->>S: Identificador de intención y datos
-    S->>B: Validar y confirmar operación
-    B-->>S: Resultado estable
-    S--xP: Confirmación perdida en escenario hipotético
-    D->>P: Reintentar
-    P->>S: Mismo identificador y contenido
-    S->>B: Recuperar o repetir de forma segura
-    B-->>S: Resultado sin segundo efecto
-    S-->>P: Mostrar resultado definitivo
-```
-
-## Anexo D. P-01 — Prototipo documental de baja fidelidad
-
-**Artefacto identificable:** este anexo, pantallas textuales P1–P4 y recorrido guiado. **Formato:** representación estática, no clicable. **Finalidad:** comunicar distribución de información, decisiones y estados del recorrido docente. No se ejecuta código, no se conecta a datos, no implementa permisos ni se ha validado con usuarios. Su suficiencia como prototipo de semana 8 debe confirmarse con el docente.
-
-### P1. Contexto y definición de actividad
+### P1. Registro docente
 
 ```text
-EVALUACIONES GRUPALES — REPRESENTACIÓN, NO APLICACIÓN
-Periodo: [periodo de ejemplo]   Curso: [curso de ejemplo]
-Actividad: [Actividad A]       Realización: [fecha, hora y zona]
-[Revisar grupos históricos]    [Continuar a registro]
-Aviso: una fecha modificada requiere revisar atribuciones afectadas.
+CURSO: [curso de ejemplo]      PERIODO: [periodo]
+Evaluación: [Trabajo 1]        Realización: [fecha de actividad]
+Grupo de la actividad | Participantes | Nota base | Estado
+Grupo A               | [lista]       | [18]      | Registrada
+Grupo B               | [lista]       | [  ]      | Pendiente
+[Guardar nota] [Revisar correcciones]
+Una nota guardada queda visible para sus participantes.
+Una celda vacía no equivale a cero.
 ```
 
-### P2. Matriz docente de registro
+### P2. Consulta del alumno
 
 ```text
-Actividad A | Instante académico: [por definir]
-Grupo histórico | Participantes en esa actividad | Nota | Estado
-Grupo A         | [conteo]                       | [ ]  | Pendiente
-Grupo B         | [conteo]                       | [ ]  | Pendiente
-[Guardar intención]  [Consultar correcciones]  [Revisar faltantes]
-Ayuda: valor de 0 a 20; vacío no es cero. Los puntos no se muestran aquí.
+MIS RESULTADOS — [curso]
+Actividad | Grupo en la actividad | Nota base | Revisión
+Trabajo 1 | Grupo A               | 18        | [Presentar reclamo]
+Trabajo 2 | Grupo B               | Pendiente | —
+MIS PUNTOS
+Movimiento | Puntos | Descripción | Revisión
+[registro] | 2      | [motivo]    | [Presentar reclamo]
+Solo se muestran resultados que corresponden a este alumno.
 ```
 
-### P3. Error, incertidumbre y corrección
+### P3. Presentación y seguimiento del reclamo
 
 ```text
-Rechazo: «La nota debe ser un número entre 0 y 20». [Volver al campo]
-Incertidumbre: «No se recibió confirmación». [Consultar] [Reintentar]
-Corrección: valor anterior [ ] → valor propuesto [ ]
-Participantes: los del grupo en la actividad, no los miembros actuales.
-[Confirmar corrección]  [Cancelar]
+SOLICITAR REVISIÓN
+Registro: [Trabajo 1, Grupo A / movimiento propio de puntos]
+Descripción del desacuerdo: [texto del alumno]
+[Enviar reclamo]
+
+SEGUIMIENTO
+Presentado por: [alumno]     Estado: Pendiente / En revisión / Respondido
+Respuesta del docente: [decisión y motivo]
 ```
 
-Los mensajes representan estados alternativos, no una pantalla que los mostraría simultáneamente. El reintento conservaría la intención; la corrección sería una intención nueva.
+Los estados representan momentos distintos del recorrido. Un reclamo grupal es compartido por los participantes de aquella actividad; uno de puntos es privado entre el alumno y el docente. El caso existente se consulta en lugar de abrir otro. Tras la respuesta final no hay réplica ni reapertura.
 
-### P4. Conciliación
+### P4. Bandeja docente
 
 ```text
-Grupos esperados [ ] | Con nota [ ] | Faltantes [ ] | Excepciones [ ]
-Detalle de faltantes: [grupo y motivo pendiente]
-Excepción: [categoría y justificación con acceso restringido]
-[Volver a registrar] [Solicitar conciliación]
-Aviso: no se declara conciliada con faltantes inexplicados.
+RECLAMOS DEL CURSO
+Registro cuestionado | Tipo   | Presentado por | Estado
+Trabajo 1, Grupo A   | Grupal | [alumno]       | Pendiente
+[Movimiento]         | Puntos | [alumno]       | En revisión
+[Revisar]
+Decisión y fundamento: [respuesta docente]
+[Marcar en revisión] [Responder]
+La corrección del registro, si corresponde, se realiza expresamente.
 ```
 
-### Recorrido ilustrativo, no ejecutado
+### P5. Preparación de la exportación
 
-Con identidades ficticias, se plantea un alumno en Grupo A durante Actividad A y trasladado después al Grupo B. P1 fija el instante de la actividad; P2 representa su participación histórica en A; P3 muestra cómo se explicaría una corrección tardía de A; P4 representa la revisión final. También se recorre conceptualmente un rechazo de rango y una confirmación perdida. No se asignan resultados observados a estos escenarios.
+```text
+EXPORTAR CURSO — [curso]
+Alumno | T1 base | T2 base | T3 base | Promedio base | Puntos
+[alumno] | 20    | 18      | 17      | 18,33         | 2
+Puntos aplicados: 2 | Excedente: 0 | Promedio ajustado: 19,00
+[Descargar XLSX]
+Las notas pendientes permanecen vacías.
+Descargar no consume puntos ni cambia las notas base.
+```
 
-El prototipo no representa toda la plataforma, la importación, el panel estudiantil, exportaciones ni excepciones individuales. No prueba usabilidad, accesibilidad, seguridad o rendimiento; permite discutir el diseño y detectar preguntas antes de construir.
+Las columnas son una propuesta de presentación, no un formato definitivo. El cálculo usa la regla de puntos adoptada como supuesto del equipo; no muestra una nota final del curso. El ejemplo es ficticio y sus operaciones son ilustrativas.
 
-## Anexo E. Matriz de pruebas futuras — sin ejecutar
+### Recorrido ilustrativo
 
-| Caso | Condición que se probaría en Parte II                                | Resultado esperado, no observado                                        |
-| ---- | -------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| C01  | Docente ajeno o sesión ausente                                       | Denegación sin datos del curso                                          |
-| C02  | Alumno autorizado consulta sus datos e intenta leer notas            | Solo curso, grupo y puntos propios; sin notas                           |
-| C03  | Nota 0, 20, vacía, negativa, mayor que 20 o no numérica              | Aceptar límites; no confirmar inválidas ni vacío como nota              |
-| C04  | Grupo y actividad de cursos distintos                                | Rechazo sin cambios                                                     |
-| C05  | Traslado posterior y corrección tardía                               | Mantener participantes históricos y conservar corrección                |
-| C06  | Actividad y traslado del mismo día                                   | Aplicar regla temporal acordada                                         |
-| C07  | Fecha modificada o historia insuficiente                             | Revisar impacto o solicitar revisión, sin inferencias silenciosas       |
-| C08  | Respuesta perdida y mismo reintento                                  | Un solo efecto y resultado recuperable                                  |
-| C09  | Identificador repetido con otro contenido o correcciones simultáneas | Rechazo de reutilización y conflicto controlado sin pérdida de historia |
-| C10  | Faltantes y excepciones en conciliación                              | Conteos explicables; no cierre con faltantes inexplicados               |
-| C11  | Puntos asignados o anulados                                          | No alterar notas ni borrar movimiento original                          |
-| C12  | Selección fuera de ventana o concurrencia por último cupo            | Rechazo controlado sin exceder capacidad                                |
+El docente registra 18 para el grupo A en Trabajo 1. Un participante consulta la nota y presenta un reclamo en nombre de ese grupo. El docente recibe el aviso, revisa el caso y responde. Si el alumno se trasladó después al grupo B, mantiene la consulta del Trabajo 1 y del reclamo con los participantes originales de A. La exportación reúne las notas correspondientes a cada actividad, no las del grupo vigente para todos los trabajos.
 
-Añadir en Parte II resultados observados, pasos, datos sintéticos y referencias de evidencia, no rellenar esas columnas en semana 8.
+## Anexo D. Trazabilidad de necesidades y objetivos
 
-## Anexo F. Instrumentos previstos
+| Necesidad                                   | Requisitos de 4 | Representación o instrumento         | Objetivos relacionados |
+| ------------------------------------------- | --------------- | ------------------------------------ | ---------------------- |
+| Evitar búsqueda y anotación repetitiva      | R05–R06         | Proceso actual, flujo propuesto y P1 | OE1, OE2, OE3, OE4     |
+| Incorporar alumnos y organizar grupos       | R01–R04         | Descripción de preparación en 5      | OE1, OE2, OE3          |
+| Consultar resultados propios                | R07–R08         | P2 y casos C02–C03                   | OE2, OE3, OE4          |
+| Atender desacuerdos con privacidad y estado | R09–R13         | P3–P4 y casos C04–C08                | OE2, OE3, OE4          |
+| Obtener información del curso               | R14             | P5 y casos C09–C12                   | OE2, OE3, OE4          |
 
-**Ficha futura por ejecución:** caso; fecha; versión; entorno aislado; datos sintéticos; zona horaria; pasos; esperado; observado; tiempos; discrepancias; operación correlacionada; señales restringidas; limitaciones; responsable. Todos los campos de observación están por recoger.
+## Anexo E. Casos de comprobación previstos
 
-**Ficha comparativa:** método manual/plataforma; actividad; grupos esperados; orden y repetición; inicio/fin de registro; inicio/fin de conciliación; notas válidas; faltantes; excepciones; errores de registro; correcciones académicas; duplicados; casos de reintento; limitaciones. Fórmulas en 06.
+| Caso | Situación                                              | Resultado esperado                                                           |
+| ---- | ------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| C01  | Registro de una nota válida y de valores fuera de 0–20 | Confirmar solo valores válidos y explicar rechazos                           |
+| C02  | Nota o puntos recién registrados                       | Consulta inmediata solo por sus destinatarios                                |
+| C03  | Nota vacía frente a nota cero                          | Distinguir pendiente de calificación cero                                    |
+| C04  | Reclamo grupal después de un cambio de grupo           | Acceso de participantes de la actividad, no de nuevos integrantes            |
+| C05  | Reclamo sobre movimiento de puntos                     | Privacidad entre alumno titular y docente                                    |
+| C06  | Segundo reclamo por el mismo registro                  | Mostrar el caso existente, incluso si ya fue respondido                      |
+| C07  | Revisión y respuesta docente                           | Recorrido acordado, sin réplica ni corrección automática                     |
+| C08  | Nuevo reclamo y aviso por correo                       | Aviso al docente con enlace y sin información académica ni texto del reclamo |
+| C09  | Notas 20, 18 y 17; dos puntos                          | Promedio ajustado 19,00; notas base y saldo sin cambios                      |
+| C10  | Notas 20, 20 y 20; dos puntos                          | Promedio 20,00; dos puntos excedentes sin efecto                             |
+| C11  | Alguna nota pendiente y exportación repetida           | Campo vacío, promedio de cierre pendiente y ausencia de consumo de puntos    |
+| C12  | Notas 18, 16 y 17; un punto                            | Promedio ajustado 17,33, sin redondeos intermedios                           |
+| C13  | Cambio de grupo con ventana abierta y cupo             | Cambio permitido; resultados anteriores conservados                          |
+| C14  | Grupo lleno o ventana cerrada                          | Cambio impedido con explicación; reapertura aplicable a todo el curso        |
+| C15  | Archivo de alumnos con datos incompletos o repetidos   | Identificar lo que requiere revisión y evitar duplicados                     |
 
-**Revisión futura transversal:** teclado, foco, etiquetas y errores; separación de puntos/notas; ausencia de información personal o secretos en evidencia compartida; aislamiento del entorno; alcance de señales y recuperación. No es un checklist aprobado.
+Esta matriz describe resultados esperados para la evaluación; no contiene resultados observados.
 
-## Anexo G. Fuentes y preparación de entrega
+## Anexo F. Instrumentos para la evaluación
 
-Bibliografía, fuentes internas y estado de comprobación: 08. Asuntos por validar: 07. Material integrado: 10. Guion para elaborar PowerPoint: 06. Los inventarios técnicos y pruebas del repositorio no se adjuntan como resultados académicos de Parte I.
+**Ficha de registro:** caso; fecha; escenario; actor; pasos; resultado esperado; resultado observado; discrepancias; evidencia sin información personal; responsable.
+
+**Ficha de tiempo de registro:** procedimiento manual simulado o plataforma; conjunto de grupos e integrantes; notas de entrada; preparación previa; inicio; fin; duración; errores detectados; repetición; limitaciones. No se compararán tiempos de recepción o evaluación del contenido de trabajos.
+
+**Ficha de seguimiento:** resultado consultado; destinatarios permitidos; reclamo presentado; estados; respuesta; aviso al docente; comprobación de privacidad y duplicados. La ausencia de un medio anterior equivalente no se convertirá en una tasa histórica inventada.
+
+**Lista de revisión de claridad:** etiquetas comprensibles, estados con texto, navegación por teclado, diferencia entre pendiente y cero y acceso restringido a los resultados y reclamos correspondientes.

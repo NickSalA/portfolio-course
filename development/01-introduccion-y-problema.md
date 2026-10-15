@@ -1,43 +1,43 @@
 # 1. Introducción y planteamiento del problema
 
-## 1.1 Introducción y perspectiva de la entrega
+## 1.1 Introducción
 
-La gestión académica relaciona identidad, acceso autorizado, periodos, cursos, incorporación de alumnos, matrículas, grupos, puntos individuales y evaluaciones grupales. Dentro de esa visión, este trabajo selecciona un solo proceso principal: la gestión y control de evaluaciones grupales para el docente responsable del curso. Los demás módulos aportan contexto, entradas o dependencias; no se propone construir ni evaluar un LMS completo.
+La gestión de evaluaciones grupales requiere relacionar los trabajos evaluados con sus participantes, registrar calificaciones y permitir su revisión. Este proyecto plantea desarrollar una plataforma de gestión académica que reúna el registro y el seguimiento de las evaluaciones en los cursos del docente del caso de estudio, situado en la Universidad Nacional Mayor de San Marcos.
 
-Esta Parte I se sitúa en la semana 8 del curso Automatización y Control de Software 2026-2. La guía distingue la entrega de diseño y prototipo, orientada a analizar el problema y diseñar la solución, de la Parte II de semana 16, destinada a implementar, probar y evaluar. Aquí se presentan diagnóstico documental, requisitos, diseño y una representación de baja fidelidad; no una solución operativa.
+La plataforma contempla acceso docente y estudiantil, periodos, cursos, incorporación del padrón, matrícula, organización de grupos y puntos individuales. Dentro de ese contexto se seleccionan dos etapas relacionadas: el registro de evaluaciones grupales y el seguimiento mediante consulta de resultados y atención de reclamos. El docente conserva la responsabilidad de evaluar los trabajos y decidir sus calificaciones.
 
-Se examinó documentación, especificaciones, aplicación y modelo de datos del repositorio para comprender el caso y formular la propuesta. Ese material técnico no se atribuye como implementación o evaluación de este trabajo. Tampoco se afirma que el repositorio carezca de código. No se realizaron entrevistas, observaciones de campo, pruebas de la solución académica ni mediciones para esta entrega.
+## 1.2 Realidad problemática
 
-## 1.2 Situación problemática reportada
+De acuerdo con el relato del responsable del proyecto sobre la situación comunicada por el profesor, este trabajaba con varios archivos XLSX. El SUM le proporcionaba la relación de alumnos, pero debía elaborar su propia plantilla para registrar notas. Los estudiantes formaban sus grupos por su cuenta.
 
-Según el caso registrado en `docs/01-definicion/caso-evaluacion-grupal.md`, un docente de la UNMSM llevaba notas en una hoja XLSX y registraba por separado grupos y puntos individuales. Durante las primeras semanas recibe del SUM una relación de alumnos en XLSX para su incorporación inicial. Este archivo no contiene notas para importar. La descripción es una fuente interna del caso, no un estudio empírico independiente.
+Para registrar la calificación de un trabajo, el docente debía consultar o revisar el entregable, identificar si correspondía a un grupo y reconocer a sus integrantes. Después buscaba a cada alumno en su archivo de notas y anotaba individualmente la calificación. La evaluación de un solo trabajo grupal daba lugar, por tanto, a búsquedas y anotaciones repetidas.
 
-La separación de registros plantea necesidades de conciliación: relacionar curso, actividad, grupos y notas; reconocer faltantes; y explicar qué calificación corresponde a un alumno cuando cambia de grupo. Se identifican riesgos de omisiones, duplicados, valores inválidos y atribuciones equivocadas. No se conoce su frecuencia ni su costo real: esos aspectos requieren levantamiento y medición posteriores.
+Los alumnos tampoco disponían de un medio individual de consulta de sus puntos durante el ciclo, salvo sus propias anotaciones. El registro permanecía en poder del docente y su efecto se conocía al cierre del curso. Compartir el registro general planteaba una preocupación por la exposición de información de otros alumnos. La necesidad expresada incluía facilitar la revisión durante el ciclo y la comunicación oportuna de desacuerdos, en lugar de descubrir diferencias al finalizar.
 
-## 1.3 Problema central y diagnóstico
+El esfuerzo de búsqueda y anotación está descrito en el relato. Su incidencia sobre el tiempo es una interpretación del responsable del proyecto que deberá evaluarse; no se dispone de tiempos medidos ni de una frecuencia documentada de errores. Las aclaraciones del caso proceden de ese relato y de los acuerdos del equipo, no de entrevistas o mediciones realizadas para este informe.
 
-El problema consiste en gestionar y explicar las notas grupales con información relacionada que se registra por separado, especialmente ante traslados y correcciones. La regla documentada establece que cuenta el grupo al que pertenecía el alumno al realizarse la actividad, no el grupo vigente al guardar o corregir la nota. Una lista del grupo actual no basta como representación de esa historia.
+## 1.3 Problema central
 
-| Aspecto reportado o requerido                 | Riesgo o necesidad inferida                       | Respuesta que se propone diseñar                       |
-| --------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------ |
-| Notas, grupos y puntos en registros separados | Conciliación manual y posible confusión semántica | Información relacionada, sin convertir puntos en notas |
-| Cambios de grupo durante el curso             | Atribución retrospectiva incorrecta               | Pertenencias temporales y fecha de actividad           |
-| Registro y corrección docente                 | Valores inválidos o cambios inexplicables         | Validaciones y conservación de correcciones            |
-| Posibles fallos de guardado                   | Incertidumbre y repetición de cambios             | Estados explícitos y reintento seguro                  |
-| Cierre de una evaluación                      | Faltantes que podrían pasar inadvertidos          | Conciliación de grupos, notas y excepciones            |
+El registro de las evaluaciones grupales requiere identificar a los participantes de cada trabajo, buscarlos individualmente y repetir la anotación de una misma calificación en archivos separados. A esta gestión manual se suma la falta de un medio individual de consulta de puntos durante el ciclo que facilite la revisión de la información y el seguimiento de desacuerdos.
 
-Los riesgos son hipótesis de análisis, no incidentes observados o cuantificados por el equipo.
+El problema no es el uso de hojas de cálculo en sí mismo, sino la separación entre la organización de los estudiantes, el registro de resultados y su revisión. Los cambios de grupo son una situación que debe contemplarse para conservar la correspondencia de cada evaluación, pero no constituyen el motivo principal del proyecto.
 
-## 1.4 Pregunta orientadora
+## 1.4 Formulación del problema
 
-¿Cómo diseñar una solución de automatización y control para la gestión de evaluaciones grupales que articule las entradas académicas del curso, preserve la pertenencia histórica de sus alumnos y permita registrar, corregir y conciliar notas con reglas, permisos y excepciones explícitos?
+¿En qué medida el uso de una plataforma de gestión académica contribuye a mejorar el registro y seguimiento de las evaluaciones grupales en los cursos del docente del caso de estudio?
 
-## 1.5 Frontera del trabajo
+En esta pregunta, **registro** comprende la asociación de calificaciones con grupos y participantes, su revisión y corrección. **Seguimiento** comprende la consulta individual de resultados y la atención de reclamos. No se refiere al seguimiento del aprendizaje en todas sus dimensiones.
 
-La entrada del proceso principal es un curso bajo responsabilidad docente con alumnado autorizado, matrículas y grupos identificados. Se diseña la definición de actividades, el registro y la corrección de notas grupales y la conciliación de sus resultados. La preparación del padrón y la selección de grupos se describen como dependencias, no como procesos adicionales de evaluación de eficacia.
+## 1.5 Justificación
 
-La salida esperada es una evaluación revisada por el docente, con grupos calificados o excepciones identificadas y sin faltantes inexplicados. La validez de cerrar con excepciones debe acordarse antes de implementar. La exportación oficial, la corrección individual excepcional, los nuevos tipos de notas y las funciones generales de LMS quedan fuera de la propuesta.
+El proyecto busca sustituir la búsqueda y anotación repetitiva por un registro de calificación por grupo, relacionado con los participantes de cada actividad. También propone un medio de consulta en el que cada estudiante acceda únicamente a sus puntos y notas grupales correspondientes, sin compartir el archivo general del docente.
 
-## 1.6 Fuentes y límites del diagnóstico
+La atención de reclamos permite complementar la consulta con un recorrido identificable de presentación, revisión y respuesta. La visibilidad de notas grupales y los reclamos dentro de la plataforma son decisiones adoptadas al delimitar la solución, no hechos que se atribuyan retrospectivamente a una petición inicial literal del profesor.
 
-Se contrastaron `README.md`, `docs/`, `specs/001-manage-group-evaluation/` y las fuentes pertinentes de `portfolio-coursse/`. Su alcance técnico no se traslada automáticamente al compromiso académico. Las diferencias y decisiones por confirmar se registran en 07; las fuentes externas y su grado de verificación figuran en 08.
+Se espera facilitar el trabajo de registro y la revisión oportuna de resultados. La magnitud de esa contribución se analizará mediante pruebas y criterios de evaluación. Su pertinencia para el curso radica en combinar actividades repetitivas, validaciones, eventos, estados, detección de situaciones excepcionales y seguimiento de solicitudes dentro de un proceso académico delimitado.
+
+## 1.6 Delimitación general
+
+El proyecto comprende el registro de notas grupales, consulta de resultados propios, reclamos, revisión docente y exportación XLSX por curso. La carga del padrón, el acceso autorizado y la selección de grupos son funciones de apoyo. La consulta y los reclamos de puntos individuales complementan el recorrido estudiantil; su aplicación en el cálculo de exportación se establece como supuesto de trabajo en la sección 5.
+
+La plataforma no recibe trabajos ni administra sus plazos de entrega, no evalúa automáticamente su contenido y no se integra con el SUM para publicar calificaciones oficiales.

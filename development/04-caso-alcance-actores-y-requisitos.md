@@ -1,69 +1,73 @@
-# 4. Caso de aplicación, alcance, actores y requisitos
+# 4. Caso de aplicación, alcance y requisitos
 
-## 4.1 Visión de plataforma y frontera de automatización
+## 4.1 Visión general de la plataforma
 
-| Elemento                      | Relación con el caso                                                              | Frontera académica                                              |
-| ----------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Acceso docente y estudiantil  | Identifica a la persona                                                           | Dependencia; autenticación no equivale a autorización           |
-| Autorización                  | Determina rol y acceso al curso                                                   | Regla transversal del diseño                                    |
-| Periodos y cursos             | Un periodo organiza cursos; cada curso tiene un responsable                       | Contexto organizativo, no gestión institucional completa        |
-| Incorporación y matrícula     | El XLSX del SUM prepara autorizaciones; la cuenta coincidente se vincula al curso | Entrada; no importa notas ni supone matrícula oficial en el SUM |
-| Grupos y selección            | Organización por curso, cupo y ventana; traslado por docente                      | Dependencia temporal indispensable para atribuir notas          |
-| Puntos individuales           | Movimientos asociados al alumno autorizado                                        | Contexto separado; no son notas ni intervienen en su cálculo    |
-| Evaluaciones y notas grupales | Actividad fechada y nota por grupo                                                | Núcleo del proceso a automatizar y evaluar                      |
-| Conciliación                  | Revisión docente de grupos esperados, notas y excepciones                         | Cierre controlado propuesto                                     |
+La plataforma organiza los cursos del docente por periodo académico. A partir del padrón institucional se habilita el acceso de los alumnos y su vinculación al curso. Estos pueden elegir grupo durante la ventana establecida y consultar sus resultados. El docente registra notas grupales y puntos individuales, revisa reclamos y descarga la información del curso en XLSX.
 
-Los cursos pueden organizarse sin grupos dentro de la visión general, pero el experimento propuesto se limita a un curso con evaluación grupal. La ruta pública de portafolio no pertenece al caso.
+| Componente                          | Relación con el proyecto                                                                               |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Periodos y cursos                   | Contexto de organización y responsabilidad docente                                                     |
+| Padrón, acceso y matrícula          | Incorporación y vinculación de alumnos autorizados; no equivale a matricularlos oficialmente en el SUM |
+| Configuración y selección de grupos | Apoyo para identificar participantes de las evaluaciones                                               |
+| Registro de notas grupales          | Primera etapa principal: una calificación por grupo y actividad                                        |
+| Consulta de resultados y reclamos   | Segunda etapa principal: seguimiento de evaluaciones                                                   |
+| Puntos individuales                 | Registro y consulta relacionados; reclamos privados y cálculo individual al exportar                   |
+| Exportación XLSX                    | Salida por curso para uso del docente, sin integración con el SUM                                      |
 
-## 4.2 Actores y permisos previstos
+## 4.2 Actores y responsabilidades
 
-- **Docente responsable:** prepara las entradas de sus cursos, organiza grupos, autoriza traslados, define actividades, registra y corrige notas grupales y revisa la conciliación. No opera sobre cursos ajenos.
-- **Alumno autorizado:** accede a sus cursos y matrícula, consulta grupo vigente y puntos propios y selecciona grupo dentro de la ventana y cupo. No consulta ni modifica notas grupales en el alcance propuesto.
-- **Servicios de identidad y datos:** apoyan autenticación, persistencia y controles; no sustituyen la responsabilidad académica del docente.
-- **Equipo del trabajo:** analiza y diseña en Parte I; implementaría y evaluaría en Parte II. No es un rol de usuario de la plataforma.
+**Docente responsable:** prepara sus cursos, incorpora alumnos, define número y capacidad de grupos y habilita su selección. Evalúa los trabajos fuera de la plataforma, registra y corrige notas y puntos, atiende reclamos y exporta la información. Decide sobre la procedencia de cada reclamo.
 
-## 4.3 Flujo propuesto
+**Alumno autorizado:** accede a sus cursos, elige o cambia de grupo cuando está permitido, consulta sus resultados y presenta reclamos sobre los registros que le corresponden. No modifica calificaciones ni consulta información académica ajena.
 
-**Preparación dependiente:** seleccionar periodo y curso → incorporar alumnos desde el padrón → vincular cuentas autorizadas y matrículas → organizar grupos y registrar sus pertenencias.
+La plataforma relaciona registros, verifica condiciones, muestra resultados y estados y avisa al docente de nuevos reclamos. No sustituye su juicio académico.
 
-**Proceso central:** docente identifica curso y actividad → define fecha de realización → consulta grupos aplicables históricamente → introduce nota → se comprueban permisos, curso y rango → se propone confirmar el registro y conservar evidencia → si procede, corrige sin borrar el historial → revisa grupos calificados, faltantes y excepciones → concilia o mantiene pendiente la evaluación.
+## 4.3 Frontera del proceso
 
-El flujo describe el comportamiento esperado. No representa una ejecución. Los diagramas y el recorrido de baja fidelidad están en 09.
+- **Entradas:** curso, alumnado autorizado, grupos y participantes identificados, actividades evaluadas y calificaciones decididas por el docente.
+- **Registro:** selección de curso y actividad, ingreso de la nota grupal, asociación con participantes, revisión de pendientes y correcciones.
+- **Seguimiento:** consulta de resultados propios, presentación de reclamos, revisión y respuesta final del docente.
+- **Salidas:** registros consultables, reclamos con estado y respuesta y archivo XLSX del curso.
 
-## 4.4 Requisitos de la propuesta
+La selección de grupos y la carga del padrón habilitan el recorrido principal. La consulta y atención de reclamos de puntos se incluyen como funciones relacionadas, no como calificaciones grupales adicionales.
 
-Los identificadores R se usan en esta carpeta para distinguir los requisitos del núcleo de las especificaciones técnicas más amplias. No sustituyen ni modifican los FR externos.
+## 4.4 Requisitos funcionales
 
-| ID  | Requisito esperado                                                                         | Relación con fuentes técnicas        |
-| --- | ------------------------------------------------------------------------------------------ | ------------------------------------ |
-| R1  | Restringir acceso por identidad, rol y responsabilidad sobre el curso                      | FR-001–005                           |
-| R2  | Recibir autorizaciones, matrículas y grupos coherentes del curso, sin importar notas       | FR-006–013, como dependencias        |
-| R3  | Determinar pertenencia por fecha de actividad y conservar traslados sin solapamientos      | FR-014–017                           |
-| R4  | Definir una actividad identificable y fechada; revisar el impacto de cambiar su fecha      | FR-018–019                           |
-| R5  | Registrar una nota vigente de 0 a 20 por grupo y evaluación del mismo curso                | FR-020–022                           |
-| R6  | Distinguir éxito, rechazo, fallo e incertidumbre; permitir reintentos sin duplicar efectos | FR-023–024                           |
-| R7  | Conservar valores anterior/nuevo, responsable e instante de una corrección grupal          | FR-025–026, FR-036                   |
-| R8  | Conciliar grupos esperados, calificados, faltantes y excepciones, sin ocultar pendientes   | FR-033–037                           |
-| R9  | Separar puntos y notas; limitar la vista estudiantil a datos propios permitidos            | FR-028–032                           |
-| R10 | Diseñar evidencias e indicadores seguros y reproducibles para la evaluación futura         | FR-038–039 y protocolo de evaluación |
+| ID  | Función requerida                                                                                                                           |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| R01 | Organizar periodos y cursos bajo responsabilidad docente y limitar el acceso a sus usuarios autorizados                                     |
+| R02 | Incorporar alumnos desde el padrón, revisar los datos y evitar duplicados o asociaciones al curso incorrecto                                |
+| R03 | Permitir al docente definir número y capacidad de grupos y abrir, ampliar o reabrir la ventana para todo el curso                           |
+| R04 | Permitir elegir y cambiar de grupo únicamente con ventana abierta y cupo disponible                                                         |
+| R05 | Relacionar cada actividad con el grupo y sus integrantes al momento de realizarla                                                           |
+| R06 | Registrar y corregir una nota de 0 a 20 por grupo y evaluación, conservando la información del cambio                                       |
+| R07 | Registrar puntos individuales y permitir corregir asignaciones sin perder el registro original                                              |
+| R08 | Mostrar a cada alumno sus puntos y notas grupales correspondientes al quedar registrados                                                    |
+| R09 | Recibir un reclamo por grupo y evaluación de cualquier participante de aquella actividad, y compartirlo con esos participantes y el docente |
+| R10 | Recibir un reclamo por movimiento de puntos, privado entre el alumno correspondiente y el docente                                           |
+| R11 | Mostrar el recorrido Pendiente → En revisión → Respondido, con decisión final y respuesta motivada del docente                              |
+| R12 | Avisar por correo al docente de cada nuevo reclamo mediante mensaje breve y enlace, sin resultados académicos ni texto del reclamo          |
+| R13 | Evitar un segundo reclamo sobre el mismo registro, incluso después de su respuesta; no admitir réplica ni reapertura del alumno             |
+| R14 | Exportar información por curso, con notas por alumno, puntos y cálculo individual según la regla de trabajo descrita en 5                   |
 
-Se priorizan como obligatorios del **diseño** R1–R10. Los filtros avanzados y resúmenes visuales son mejoras opcionales. Esta prioridad no significa que esas funciones se implementen en semana 8. En Parte II, las dependencias deberán estar disponibles y verificadas para ensayar el núcleo, sin convertir cada módulo en un experimento independiente.
+Estos requisitos expresan el alcance académico acordado. La validación de información y la atención de solicitudes forman parte de la solución sin desplazar el eje de registro y seguimiento de evaluaciones.
 
-## 4.5 Reglas y excepciones
+## 4.5 Reglas de funcionamiento
 
-1. Un curso tiene un docente responsable para este caso; no se diseña codocencia.
-2. El archivo institucional incorpora alumnos, nunca calificaciones.
-3. Autorización previa y matrícula de una cuenta autenticada son conceptos distintos; el dominio institucional por sí solo no otorga acceso al curso.
-4. La nota es grupal, de 0 a 20. La precisión decimal debe confirmarse; un campo vacío será pendiente, no cero ni nota válida.
-5. Una corrección de nota grupal alcanza a la población histórica de la actividad, aunque después existan traslados.
-6. La selección estudiantil requiere ventana abierta y cupo; el docente puede autorizar un traslado fuera de ella.
-7. No se inventan fechas ni pertenencias desconocidas. Se identifica la incertidumbre para revisión.
-8. Una excepción grupal documenta una incidencia; no crea una nota individual ni convierte puntos en calificaciones.
+- Una nota o un movimiento de puntos confirmado queda visible para sus destinatarios, sin publicación adicional.
+- Una nota no registrada permanece vacía o pendiente; cero es una calificación que el docente registra expresamente.
+- La nota y el reclamo grupal corresponden a los participantes de la actividad, aunque después cambien de grupo.
+- Los estudiantes eligen entre grupos configurados por el docente; no crean grupos ni son asignados automáticamente.
+- La reapertura habilita cambios para todo el curso, sujetos a cupo; no concede una excepción individual de selección.
+- Responder favorablemente un reclamo no cambia automáticamente una nota o un movimiento: el docente realiza la corrección que proceda.
+- El aviso por correo no sustituye la consulta del reclamo y su respuesta en la plataforma.
 
-Casos previstos: límites 0/20; nota inválida; cruce de cursos; acceso estudiantil a notas; docente ajeno; actividad antes/después de traslado; actividad y traslado del mismo día; competencia por último cupo; corrección concurrente; respuesta perdida y reintento; cambio de fecha; historia insuficiente. Sus pruebas se planifican para Parte II.
+## 4.6 Condiciones de calidad
 
-## 4.6 Condiciones no funcionales y exclusiones
+La información debe ser comprensible, permitir identificar pendientes y errores y conservar la privacidad de cada actor. Los recorridos deben poder realizarse con teclado, contar con etiquetas y mensajes claros y no comunicar estados solo por color. El registro repetido de una misma acción no debe producir duplicados. Ante un fallo se debe explicar si el registro fue confirmado o necesita revisión.
 
-El diseño considera mínimo privilegio, privacidad, consistencia transaccional, accesibilidad de teclado, errores comprensibles, recuperación ante incertidumbre y señales correlacionables. No garantiza disponibilidad, rendimiento o recuperación productiva sin comprobación futura.
+## 4.7 Exclusiones
 
-Quedan excluidos exportación oficial de actas o notas, corrección individual excepcional, importación de notas, conversión de puntos en notas, panel institucional adicional, contenidos, entregas, asistencia, foros, notificaciones y nuevos tipos de evaluación. Una descarga técnica XLSX hallada en el código de referencia no demuestra exportación oficial ni cambia este alcance (véase 07).
+No se incluye recepción de trabajos, plazos de entrega, contenidos de clase, asistencia, foros, mensajería general, evaluación automática del contenido, integración con el SUM, actas oficiales, apelaciones, correos al alumno o recordatorios automáticos. La petición de reabrir la ventana de grupos no se incorpora como una categoría adicional de reclamo en la plataforma.
+
+La corrección individual excepcional de una nota grupal se mantiene fuera del alcance. El ajuste individual por puntos en el archivo exportado es una regla distinta, expresamente declarada como supuesto del equipo.
