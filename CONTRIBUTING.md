@@ -2,8 +2,10 @@
 
 ## Flujo de trabajo
 
+La [constitución](.specify/memory/constitution.md) define el flujo Git Flow. La organización y revisión del equipo están en [Equipo y flujo de trabajo](docs/04-gestion/equipo-y-flujo-de-trabajo.md).
+
 1. El trabajo se rastrea en Issues y, cuando corresponda, en el GitHub Project del equipo.
-2. Crea una rama desde `main` con un nombre descriptivo, por ejemplo `feat/teacher-dashboard` o `fix/oauth-callback`.
+2. Crea una rama desde `develop` con un nombre descriptivo: `feature/teacher-dashboard` para funciones o `bugfix/oauth-callback` para correcciones regulares. Si `develop` o sus protecciones no están configuradas en el remoto, coordina su preparación; no sustituyas el flujo por cambios directos a `main`.
 3. Mantén el cambio enfocado. No incluyas `.env.local`, claves ni otros secretos.
 4. Antes de abrir el PR, ejecuta desde `portfolio-coursse/`:
 
@@ -14,11 +16,12 @@
     pnpm build
     ```
 
-5. Abre un PR hacia `main`, completa la plantilla y vincula la Issue con `Closes #<número>`.
+5. Abre un PR hacia `develop`, completa la plantilla y vincula la Issue con `Closes #<número>` cuando exista una Issue real.
 6. El propietario del repositorio revisa y aprueba el PR. CI debe pasar antes de integrar.
-7. Usa **Squash and merge**. El título del PR debe seguir Conventional Commits: semantic-release usa ese título como mensaje de commit para decidir si corresponde una nueva versión.
+7. Para funciones y correcciones regulares usa **Squash and merge** hacia `develop`. El título del PR debe seguir Conventional Commits para que el mensaje resultante conserve el significado del cambio.
+8. Prepara versiones en `release/<version>` desde `develop`; tras validar, intégralas mediante PR en `main` y sincroniza de vuelta a `develop`, conservando el historial de cambios que necesita semantic-release. Las correcciones urgentes usan `hotfix/<nombre>` desde `main` y se integran en `main` y `develop`.
 
-No se integra directamente a `main`.
+No se integra directamente a `main` ni a `develop`. Antes de operar el flujo, verifica ramas, protecciones y cobertura de los workflows para los destinos correspondientes; este documento no acredita que estén configurados.
 
 ## Mensajes Conventional Commits
 

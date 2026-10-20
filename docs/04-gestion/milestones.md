@@ -2,7 +2,7 @@
 
 **Calendario y contingencia:** la fuente única de periodos, puntos de control y preparación posterior es [calendario-y-contingencia.md](calendario-y-contingencia.md). Este archivo mantiene los resultados y criterios de cierre de M1–M4, sin una segunda versión del calendario.
 
-La duración de cuatro semanas y la documentación semanal fueron acordadas con el solicitante. La distribución funcional de los hitos se propone para revisión antes de reorganizar el [backlog provisional](backlog-y-responsabilidades.md). Aún no se han asignado fechas, responsables nominales ni estimaciones.
+La duración de cuatro semanas y la documentación semanal fueron acordadas con el solicitante. Las fichas se organizan por hito en el [backlog](../backlog/milestones.md), con [asignación por rol](../backlog/por-integrante.md). Aún se deben validar capacidad, fechas, responsables nominales y estimaciones antes de comprometer cada semana.
 
 ## M1. Curso preparado y evaluación relacionada con sus participantes
 
