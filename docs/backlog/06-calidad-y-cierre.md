@@ -4,6 +4,8 @@
 
 ### QA-01 · Revisar accesibilidad y claridad de los recorridos integrados
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). No se ejecutó recorrido visual en BASE-01. Comprobar navegación real, teclado/foco, estados, contexto y diseño adaptable; no declarar usabilidad o accesibilidad por inspección de componentes.
+
 **Rol:** R2 · **Revisor:** R4 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-05, REC-04, REC-05, EXP-03
 
 **GitHub:** [#42](https://github.com/NickSalA/portfolio-course/issues/42) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @fabrizio25504
@@ -17,6 +19,8 @@
 **Documentación:** casos, hallazgos, correcciones y limitaciones de revisión.
 
 ### QA-02 · Integrar privacidad, integridad y recuperación
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#comprobaciones-necesarias-para-aceptación-funcional). Retomar hallazgos de aislamiento, vínculos, revocación, bypass de selección, historia y reintentos; exigir evidencia de corrección y regresión, no solo actualización documental.
 
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-07, REC-07, EXP-04
 
@@ -33,6 +37,8 @@
 
 ### QA-03 · Preparar operación y demostración reproducible
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). El inventario identifica rutas/componentes, no demostración ejecutada. Preparar cuentas y recorrido reproducible, diferenciando servicios externos, navegación en vivo y evidencia previa.
+
 **Rol:** R5 · **Revisor:** R1 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-06, EXP-03
 
 **GitHub:** [#44](https://github.com/NickSalA/portfolio-course/issues/44) · **Asignado:** @Forex549 · **Revisión propuesta:** @NickSalA
@@ -48,6 +54,8 @@
 
 ### QA-04 · Evaluar registro y seguimiento con escenarios acordados
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#comprobaciones-necesarias-para-aceptación-funcional). El contraste es estático, no medición ni aceptación funcional. Registrar resultados reales con condiciones y limitaciones, sin reutilizar estimaciones como tiempos medidos.
+
 **Rol:** R4 · **Revisor:** R1 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** QA-01, QA-02, QA-03
 
 **GitHub:** [#45](https://github.com/NickSalA/portfolio-course/issues/45) · **Asignado:** @fabrizio25504 · **Revisión propuesta:** @NickSalA
@@ -62,6 +70,8 @@
 **Documentación:** protocolo, resultados y limitaciones en el registro de evaluación.
 
 ### QA-05 · Cerrar integración y pendientes del sistema
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#comprobaciones-necesarias-para-aceptación-funcional). Reconciliar hallazgos del inventario con evidencia posterior y pendientes por issue. No cerrar por haber documentado riesgos ni convertir el inventario histórico en prueba del estado nuevo.
 
 **Rol:** R1 · **Revisor:** R4 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** QA-04
 

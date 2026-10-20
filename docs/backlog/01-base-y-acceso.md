@@ -16,7 +16,11 @@
 
 **Documentación:** estado actual, caso y notas de planificación; sin marcar aceptado solo por existir código.
 
+**Evidencia de trabajo:** [inventario y contraste estático del recorrido](../03-calidad-y-operacion/inventario-capacidades-base-01.md), con cadenas interfaz → servidor → RPC/RLS, hallazgos y comprobaciones pendientes. No constituye aceptación funcional ni cierre en GitHub; estimaciones por revisar con el equipo.
+
 ### BASE-02 · Preparar datos sintéticos y comprobaciones aisladas
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#comprobaciones-necesarias-para-aceptación-funcional). Preparar los casos de dos docentes, IDs coincidentes/no coincidentes, autorización ajena, revocación con sesión previa, cambios de grupo y reintentos. El inventario no contiene resultados funcionales ejecutados.
 
 **Rol:** R4 · **Revisor:** R3 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** Ninguno
 
@@ -33,6 +37,8 @@
 
 ### BASE-03 · Verificar autenticación y acceso académico por recurso
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#1-acceso-autorización-y-matrícula). Contrastar correlación de RLS de cursos/grupos, integridad matrícula/autorización, revocación no atómica y fuentes de identidad. Revisar también escrituras directas y datos de compañeros expuestos por RPC.
+
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-02
 
 **GitHub:** [#12](https://github.com/NickSalA/portfolio-course/issues/12) · **Asignado:** @MathiMomos · **Revisión propuesta:** @fabrizio25504
@@ -47,6 +53,8 @@
 
 ### BASE-04 · Preparar periodos y cursos bajo responsabilidad docente
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#2-periodos-cursos-e-importación). Reutilizar gestión de cursos/periodos; resolver autoridad sobre periodos globales y efectos en cursos ajenos. Verificar operaciones sin filas afectadas y contexto visible.
+
 **Rol:** R1 · **Revisor:** R3 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-03
 
 **GitHub:** [#13](https://github.com/NickSalA/portfolio-course/issues/13) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
@@ -60,6 +68,8 @@
 **Documentación:** recorrido de preparación y pruebas correspondientes.
 
 ### BASE-05 · Validar e incorporar el padrón de alumnos
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#2-periodos-cursos-e-importación). Reutilizar importación de padrón; contrastar validación de filas en servidor, duplicados normalizados, resultado por lote, cursos archivados y RPC antigua aún publicada.
 
 **Rol:** R1 · **Revisor:** R4 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-04
 
@@ -76,6 +86,8 @@
 
 ### BASE-06 · Vincular autorización y matrícula a la cuenta correcta
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#1-acceso-autorización-y-matrícula). Validar curso e identidad del vínculo matrícula/autorización y revocación coherente. Probar sincronización antes/después del login y selección conservada tanto con grupo autorizado nulo como no nulo.
+
 **Rol:** R3 · **Revisor:** R1 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-03, BASE-05
 
 **GitHub:** [#15](https://github.com/NickSalA/portfolio-course/issues/15) · **Asignado:** @MathiMomos · **Revisión propuesta:** @NickSalA
@@ -90,6 +102,8 @@
 
 ### BASE-07 · Revisar la experiencia de acceso y contexto académico
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). Ejecutar navegación por rol y revisar contexto, vacíos y errores. Hay interfaces identificadas en código, no verificadas visualmente; distinguir existencia, descubrimiento, funcionamiento y usabilidad.
+
 **Rol:** R2 · **Revisor:** R4 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-03, BASE-04
 
 **GitHub:** [#16](https://github.com/NickSalA/portfolio-course/issues/16) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @fabrizio25504
@@ -103,6 +117,8 @@
 **Documentación:** recorrido y representación de pantallas actualizada.
 
 ### BASE-08 · Preparar configuración y prueba de aviso por correo
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). No se encontró aviso académico implementado; correo de Supabase Auth no equivale al aviso de reclamos. Preparar proveedor y política de fallo/reintento sin duplicar REC-06.
 
 **Rol:** R5 · **Revisor:** R1 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** Ninguno
 

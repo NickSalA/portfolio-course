@@ -4,6 +4,8 @@
 
 ### GRP-01 · Configurar número, capacidad y ventana de grupos
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#3-grupos-cupo-ventana-e-historia). Reutilizar capacidad y reapertura general existentes. El número de grupos es automático, no independiente; revisar reducción que elimina grupos con posibles notas y coordinación con selección concurrente.
+
 **Rol:** R2 · **Revisor:** R1 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-04
 
 **GitHub:** [#18](https://github.com/NickSalA/portfolio-course/issues/18) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @NickSalA
@@ -17,6 +19,8 @@
 **Documentación:** condiciones de configuración y prototipo del recorrido.
 
 ### GRP-02 · Conservar la historia de pertenencia a grupos
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#3-grupos-cupo-ventana-e-historia). El cambio sobrescribe group_id sin historia. Preservar grupos relevantes y notas frente a borrados en cascada; no reconstruir pertenencias previas desde el grupo actual.
 
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-03, BASE-06
 
@@ -33,6 +37,8 @@
 
 ### GRP-03 · Elegir y cambiar de grupo preservando historia y cupo
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#3-grupos-cupo-ventana-e-historia). Conservar validaciones de la RPC de selección; contrastar bypass docente directo, sincronización que restaura el grupo autorizado y concurrencia con cambios de capacidad.
+
 **Rol:** R1 · **Revisor:** R3 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** GRP-01, GRP-02
 
 **GitHub:** [#20](https://github.com/NickSalA/portfolio-course/issues/20) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
@@ -46,6 +52,8 @@
 **Documentación:** reglas de selección, fallos y prueba de concurrencia.
 
 ### GRP-04 · Completar la selección de grupo del alumno
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). Reutilizar GroupSelection; ejecutar elección/cambio, rechazo, recarga y reapertura. Revisar minimización de nombres/correos en la RPC; el payload entregado no queda protegido por ocultarlo en pantalla.
 
 **Rol:** R2 · **Revisor:** R4 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** GRP-03, BASE-07
 
@@ -61,6 +69,8 @@
 
 ### GRP-05 · Comprobar grupos y participación histórica en M1
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#comprobaciones-necesarias-para-aceptación-funcional). Incluir último cupo concurrente, reducción de capacidad, selección B con autorización A, grupo vacío con notas y trayectoria T1 en A/T2 en B. No asumir que los controles existentes ya pasaron estas pruebas.
+
 **Rol:** R4 · **Revisor:** R1 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** GRP-04, GRP-06
 
 **GitHub:** [#22](https://github.com/NickSalA/portfolio-course/issues/22) · **Asignado:** @fabrizio25504 · **Revisión propuesta:** @NickSalA
@@ -74,6 +84,8 @@
 **Documentación:** evidencia de M1 y pendientes para registro.
 
 ### GRP-06 · Definir actividades y resolver sus participantes
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#3-grupos-cupo-ventana-e-historia). No hay fecha de realización ni resolver de participantes históricos en el modelo revisado. Acordar orden temporal y reparación de pasado desconocido antes de atribuir resultados.
 
 **Rol:** R1 · **Revisor:** R3 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** GRP-02, BASE-04
 

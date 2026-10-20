@@ -14,6 +14,16 @@ Catálogo de **44 issues creadas en GitHub**, asignadas a los cinco usuarios aco
 - [Equipo y flujo](../04-gestion/equipo-y-flujo-de-trabajo.md): roles, suplencias y revisión cruzada.
 - [Gestión del trabajo](../04-gestion/backlog-y-responsabilidades.md): estados, preparación y cierre de historias.
 
+### Al comenzar y completar una issue
+
+1. Si se recibe solo «issue #N», localizar su ID y ficha mediante [github.md](github.md).
+2. Leer sus **Antecedentes BASE-01** y la sección enlazada del [inventario](../03-calidad-y-operacion/inventario-capacidades-base-01.md); contrastarlos con el código actual y el caso. Las fichas de documentación/entrega usan el inventario como referencia histórica y la evidencia posterior como fuente de resultados, no como prueba de funcionamiento.
+3. Identificar qué se conserva, qué brecha pertenece a la issue y qué queda fuera de alcance. Los antecedentes no añaden dependencias ni amplían automáticamente la aceptación.
+4. Al completar, registrar antecedentes resueltos o que ya no aplican, pruebas realmente ejecutadas y pendientes con issue/responsable. En interfaces, separar código existente, navegación identificada, funcionamiento probado y usabilidad comprobada.
+5. Mantener pendientes explícitos los recorridos no ejecutados. No modificar el inventario histórico para atribuirle resultados posteriores; registrar nueva evidencia en la documentación de la tarea.
+
+**Seguimiento:** los antecedentes se incorporaron a las fichas locales; no se sincronizan automáticamente con GitHub. Al actualizar una issue remota, trasladar su bloque pertinente y registrar dónde se actualizó el seguimiento. Esta edición documental no cambia estados, asignaciones ni dependencias de GitHub.
+
 ## 2. Catálogo por recorrido
 
 | Archivo                                                        | IDs                          | Cantidad | Contenido                                                          |
@@ -39,6 +49,7 @@ Cada ficha contiene:
 - **Prioridad:** las fichas cubren alcance comprometido y aparecen como Alta; el orden real se determina por dependencias y capacidad, no por esa etiqueta sola.
 - **Estado:** inicialmente Backlog, incluso cuando exista código candidato.
 - **Bloqueado por:** IDs de resultados necesarios para cerrar la ficha. El trabajo de representación o prueba con datos sintéticos puede adelantarse sin declarar completada la integración.
+- **Antecedentes BASE-01:** referencia específica al contraste inicial y a las comprobaciones pertinentes, cuando corresponda; no es aceptación ni estado actual garantizado.
 - **Tareas, aceptación y documentación:** acciones revisables, resultado verificable y material que debe actualizarse.
 
 No se introducen sprints, fechas límite inventadas, porcentajes de cobertura, tecnologías nuevas ni requisitos del proyecto usado como referencia. Las issues usan etiquetas de rol, área, prioridad y tipo de trabajo; las milestones expresan el hito. El registro de GitHub conserva sus enlaces reales.

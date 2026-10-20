@@ -4,6 +4,8 @@
 
 ### EVA-01 · Registrar y corregir una nota por grupo y evaluación
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#4-registro-corrección-y-consulta-de-notas). Conservar rango 0–20, unicidad y RLS de mismo curso; el upsert actual sobrescribe nota/feedback sin versiones ni autor/motivo de corrección. Mantener participantes originales y revisar borrados destructivos.
+
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** GRP-06, BASE-03
 
 **GitHub:** [#24](https://github.com/NickSalA/portfolio-course/issues/24) · **Asignado:** @MathiMomos · **Revisión propuesta:** @fabrizio25504
@@ -19,6 +21,8 @@
 
 ### EVA-02 · Verificar puntos individuales y corrección no destructiva
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#5-puntos-y-correcciones). Conservar saldo derivado y anulación autorizada; completar trazabilidad de anulación/reemplazo y comprobar titularidad/contexto. Los anulados se ocultan de los historiales revisados.
+
 **Rol:** R1 · **Revisor:** R3 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-06
 
 **GitHub:** [#25](https://github.com/NickSalA/portfolio-course/issues/25) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
@@ -32,6 +36,8 @@
 **Documentación:** movimientos incluidos/excluidos del saldo y pruebas; decisiones pendientes de cálculo se cierran en EXP-01.
 
 ### EVA-03 · Completar la matriz docente de notas y pendientes
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). Existe /teacher/grades con entrada «Notas» y tabla de consulta/edición; no hay evidencia visual ni vista independiente de solo consulta identificada. Reutilizarla y comprobar guardado por pérdida de foco, confirmación, fallo, pendientes/cero y participantes históricos.
 
 **Rol:** R2 · **Revisor:** R4 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-01, BASE-07
 
@@ -47,6 +53,8 @@
 
 ### EVA-04 · Autorizar consultas por participación histórica y titularidad
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#4-registro-corrección-y-consulta-de-notas). 0029 bloquea lectura estudiantil; no restaurar la política de 0028 basada en grupo actual. Diseñar acceso histórico y titularidad de puntos con pruebas directas.
+
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-01, EVA-02, GRP-02
 
 **GitHub:** [#27](https://github.com/NickSalA/portfolio-course/issues/27) · **Asignado:** @MathiMomos · **Revisión propuesta:** @fabrizio25504
@@ -60,6 +68,8 @@
 **Documentación:** permisos vigentes, diseño y matriz esperado/observado.
 
 ### EVA-05 · Mostrar notas y puntos propios en el panel del alumno
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). El panel existente muestra puntos, no notas. Integrar consulta histórica sin reconstruir el panel completo; verificar actividad/grupo original, pendientes/cero y estados visibles.
 
 **Rol:** R2 · **Revisor:** R4 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-04, BASE-07
 
@@ -75,6 +85,8 @@
 
 ### EVA-06 · Comprobar registro y consulta de extremo a extremo
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#comprobaciones-necesarias-para-aceptación-funcional). Ejecutar registro/corrección, límites, consulta por participante histórico y acceso ajeno. Separar pruebas de interfaz, persistencia y políticas directas; el inventario no certifica el recorrido M2.
+
 **Rol:** R4 · **Revisor:** R1 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-03, EVA-05, EVA-07
 
 **GitHub:** [#29](https://github.com/NickSalA/portfolio-course/issues/29) · **Asignado:** @fabrizio25504 · **Revisión propuesta:** @NickSalA
@@ -88,6 +100,8 @@
 **Documentación:** pruebas y resultados de M2.
 
 ### EVA-07 · Integrar recuperación de guardados sin duplicación
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#5-puntos-y-correcciones). El registro de puntos trata cualquier 23505 como éxito sin verificar equivalencia. Probar UUID con contenido igual/distinto; revisar también confirmación incierta y sobrescrituras concurrentes de notas.
 
 **Rol:** R1 · **Revisor:** R3 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-01, EVA-02, GRP-03
 

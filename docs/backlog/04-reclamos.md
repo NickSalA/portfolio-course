@@ -6,6 +6,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 ### REC-01 · Modelo, permisos y unicidad de reclamos
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). No se encontró modelo de reclamos implementado. Diseñar unicidad y permisos sobre participantes históricos/titular, sin atribución por grupo actual.
+
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-04
 
 **GitHub:** [#31](https://github.com/NickSalA/portfolio-course/issues/31) · **Asignado:** @MathiMomos · **Revisión propuesta:** @fabrizio25504
@@ -20,6 +22,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 **Documentación:** actualizar [modelo de datos](../02-diseno/modelo-datos.md) con relaciones, restricciones y permisos; registrar comprobaciones en [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md).
 
 ### REC-02 · Presentación de ambos tipos de reclamo
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). No se encontró operación de presentación. Conservar identidad del autor y registro académico original; comprobar concurrencia e idempotencia sin supeditar persistencia al correo.
 
 **Rol:** R5 · **Revisor:** R3 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-01
 
@@ -36,6 +40,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 ### REC-03 · Transiciones y respuesta final docente
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). No se encontró implementación de estados/respuesta. La respuesta final debe permanecer separada de las correcciones de notas/puntos, cuya trazabilidad también requiere trabajo.
+
 **Rol:** R5 · **Revisor:** R4 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-02
 
 **GitHub:** [#33](https://github.com/NickSalA/portfolio-course/issues/33) · **Asignado:** @Forex549 · **Revisión propuesta:** @fabrizio25504
@@ -50,6 +56,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 **Documentación:** actualizar [modelo de datos](../02-diseno/modelo-datos.md) con estados y restricciones; registrar transiciones válidas e inválidas en [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md).
 
 ### REC-04 · Interfaz estudiantil para presentar y consultar
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). No se identificó interfaz estudiantil de reclamos. Integrarla con resultado histórico/movimiento propio y registrar navegación, funcionamiento y usabilidad por separado.
 
 **Rol:** R2 · **Revisor:** R4 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-02, REC-03
 
@@ -66,6 +74,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 ### REC-05 · Bandeja y detalle docente
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). No se identificó bandeja/detalle docente de reclamos. Verificar descubrimiento desde navegación, contexto del registro, respuesta final y operación académica separada.
+
 **Rol:** R5 · **Revisor:** R2 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-03
 
 **GitHub:** [#35](https://github.com/NickSalA/portfolio-course/issues/35) · **Asignado:** @Forex549 · **Revisión propuesta:** @RobertoPizarro
@@ -81,6 +91,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 ### REC-06 · Correo docente y recuperación de fallos
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). No se encontró aviso académico implementado. Reutilizar preparación de BASE-08; conservar reclamo ante fallo y distinguir envío técnico de entrega/lectura.
+
 **Rol:** R5 · **Revisor:** R1 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-02, BASE-08
 
 **GitHub:** [#36](https://github.com/NickSalA/portfolio-course/issues/36) · **Asignado:** @Forex549 · **Revisión propuesta:** @NickSalA
@@ -95,6 +107,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 **Documentación:** actualizar [controles operativos](../03-calidad-y-operacion/controles-operativos.md) con configuración sin secretos y recuperación; registrar éxito, fallo y reintento en [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md).
 
 ### REC-07 · QA de reclamos y correo
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#comprobaciones-necesarias-para-aceptación-funcional). Preparar participantes anteriores/nuevos, actores ajenos y repetición concurrente; comprobar interfaces y correo sin inferir aceptación de presencia de código o configuración Auth.
 
 **Rol:** R4 · **Revisor:** R3 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-04, REC-05, REC-06
 

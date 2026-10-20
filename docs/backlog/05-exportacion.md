@@ -6,6 +6,8 @@ Antes de implementar, verificar lo existente y conservar lo que pase los criteri
 
 ### EXP-01 · Cerrar decisiones del cálculo y las columnas
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). Hay exportadores separados de notas y puntos, no salida individual integrada. Cerrar negativos, anulados, precisión y columnas; mantener el cálculo como supuesto revisable del equipo.
+
 **Rol:** R1 · **Revisor:** R3 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-01
 
 **GitHub:** [#38](https://github.com/NickSalA/portfolio-course/issues/38) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
@@ -21,6 +23,8 @@ Antes de implementar, verificar lo existente y conservar lo que pase los criteri
 **Documentación:** actualizar [caso vigente](../01-definicion/caso-evaluacion-grupal.md) con las decisiones acordadas y [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md) con ejemplos esperados, identificados como preparación y no como pruebas ejecutadas.
 
 ### EXP-02 · Cálculo puro de saldo y promedio ajustado
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). No se identificó cálculo individual integrado. Separar cálculo puro de generación XLSX y usar únicamente decisiones cerradas en EXP-01, sin modificar notas ni saldo.
 
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EXP-01, EVA-04
 
@@ -38,6 +42,8 @@ Antes de implementar, verificar lo existente y conservar lo que pase los criteri
 
 ### EXP-03 · Descarga XLSX por curso con atribución histórica
 
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). Reutilizar generación XLSX, no la atribución actual: exporta integrantes actuales y notas locales incluso no confirmadas, con pendiente «-». Integrar datos históricos confirmados y cálculo sin mutaciones.
+
 **Rol:** R5 · **Revisor:** R2 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EXP-02
 
 **GitHub:** [#40](https://github.com/NickSalA/portfolio-course/issues/40) · **Asignado:** @Forex549 · **Revisión propuesta:** @RobertoPizarro
@@ -53,6 +59,8 @@ Antes de implementar, verificar lo existente y conservar lo que pase los criteri
 **Documentación:** actualizar [estado actual](../03-calidad-y-operacion/estado-actual.md) con el recorrido de descarga y sus límites; registrar archivo sintético y comprobaciones en [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md).
 
 ### EXP-04 · QA de descarga, cálculo, privacidad y repetición
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#comprobaciones-necesarias-para-aceptación-funcional). Comprobar guardado fallido seguido de descarga, pendientes/cero, cambio A→B y repetición sin cambios académicos. Abrir y revisar archivos sintéticos; no basta encontrar un botón de exportación.
 
 **Rol:** R4 · **Revisor:** R1 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EXP-03
 
