@@ -16,6 +16,8 @@
 
 **Documentación:** estado actual, caso y notas de planificación; sin marcar aceptado solo por existir código.
 
+**Evidencia de trabajo:** [inventario y contraste estático del recorrido](../03-calidad-y-operacion/inventario-capacidades-base-01.md), con cadenas interfaz → servidor → RPC/RLS, hallazgos y comprobaciones pendientes. No constituye aceptación funcional ni cierre en GitHub; estimaciones por revisar con el equipo.
+
 ### BASE-02 · Preparar datos sintéticos y comprobaciones aisladas
 
 **Rol:** R4 · **Revisor:** R3 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** Ninguno
