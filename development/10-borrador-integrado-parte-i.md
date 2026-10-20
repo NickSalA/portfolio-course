@@ -1,740 +1,680 @@
-# Automatización y control de la gestión de evaluaciones grupales
+# Plataforma de gestión académica para el registro y seguimiento de evaluaciones grupales
 
-## Borrador integrado — Parte I, semana 8
+## Carátula de trabajo
 
-**Perspectiva:** propuesta de análisis, diseño y prototipo documental de baja fidelidad, todavía no implementada como solución académica. La implementación, las pruebas y la evaluación se prevén para semana 16. El material técnico examinado es referencia de dominio, no resultado de este trabajo.
-
-## Carátula de trabajo — completar antes de maquetar
-
-- Universidad: Universidad Nacional Mayor de San Marcos (contexto del caso; confirmar datos de carátula)
 - Curso: Automatización y Control de Software 2026-2
-- Título: Automatización y control de la gestión de evaluaciones grupales
-- Docente: pendiente de completar
-- Integrantes: pendientes de completar
-- Fecha de entrega: pendiente de confirmar
+- Entrega: avance de semana 8
+- Contexto del caso: docente de la Universidad Nacional Mayor de San Marcos
+- Institución de presentación: por completar
+- Docente del curso: por completar
+- Integrantes: por completar
+- Fecha: por completar
 
-## Índice de contenido
+## Presentación
+
+El proyecto busca desarrollar una plataforma para el registro y seguimiento de evaluaciones grupales. Este documento reúne el análisis del caso, los objetivos del proyecto completo, la propuesta funcional, el prototipo documental y el plan de desarrollo. Los productos se presentan según su naturaleza: el diseño y los ejemplos ilustran el funcionamiento previsto; la evaluación se organiza en el plan de trabajo.
+
+## Índice
 
 1. Introducción y planteamiento del problema
-2. Objetivos del trabajo académico
+2. Objetivos
 3. Marco teórico
-4. Caso de aplicación, alcance, actores y requisitos
-5. Diseño de arquitectura, información y controles
-6. Plan futuro de implementación, pruebas y evaluación
-7. Productos de Parte I, asuntos abiertos y conclusiones
+4. Caso de aplicación, alcance y requisitos
+5. Propuesta de solución
+6. Plan de desarrollo, indicadores y equipo
+7. Conclusiones y recomendaciones
 8. Bibliografía y fichas de investigación
-9. Anexos de análisis, diseño y prototipo
+9. Anexos: procesos, prototipo e instrumentos
 
-La sección 7 presenta productos documentales disponibles, no resultados operativos. P-01 está en el anexo D de la sección 9. El PowerPoint y el PDF final maquetado están por elaborar. Esta compilación reproduce íntegramente las secciones 01–09 para evitar versiones distintas de los objetivos y del alcance; las fichas bibliográficas candidatas son material de trabajo, no bibliografía utilizada comprobada.
+La compilación reproduce las secciones fuente. Las fichas y referencias candidatas del capítulo 8 son material de investigación y se distinguen de la bibliografía utilizada. El plan interno de refinamiento no forma parte de este informe.
 
 # 1. Introducción y planteamiento del problema
 
-## 1.1 Introducción y perspectiva de la entrega
+## 1.1 Introducción
 
-La gestión académica relaciona identidad, acceso autorizado, periodos, cursos, incorporación de alumnos, matrículas, grupos, puntos individuales y evaluaciones grupales. Dentro de esa visión, este trabajo selecciona un solo proceso principal: la gestión y control de evaluaciones grupales para el docente responsable del curso. Los demás módulos aportan contexto, entradas o dependencias; no se propone construir ni evaluar un LMS completo.
+La gestión de evaluaciones grupales requiere relacionar los trabajos evaluados con sus participantes, registrar calificaciones y permitir su revisión. Este proyecto plantea desarrollar una plataforma de gestión académica que reúna el registro y el seguimiento de las evaluaciones en los cursos del docente del caso de estudio, situado en la Universidad Nacional Mayor de San Marcos.
 
-Esta Parte I se sitúa en la semana 8 del curso Automatización y Control de Software 2026-2. La guía distingue la entrega de diseño y prototipo, orientada a analizar el problema y diseñar la solución, de la Parte II de semana 16, destinada a implementar, probar y evaluar. Aquí se presentan diagnóstico documental, requisitos, diseño y una representación de baja fidelidad; no una solución operativa.
+La plataforma contempla acceso docente y estudiantil, periodos, cursos, incorporación del padrón, matrícula, organización de grupos y puntos individuales. Dentro de ese contexto se seleccionan dos etapas relacionadas: el registro de evaluaciones grupales y el seguimiento mediante consulta de resultados y atención de reclamos. El docente conserva la responsabilidad de evaluar los trabajos y decidir sus calificaciones.
 
-Se examinó documentación, especificaciones, aplicación y modelo de datos del repositorio para comprender el caso y formular la propuesta. Ese material técnico no se atribuye como implementación o evaluación de este trabajo. Tampoco se afirma que el repositorio carezca de código. No se realizaron entrevistas, observaciones de campo, pruebas de la solución académica ni mediciones para esta entrega.
+## 1.2 Realidad problemática
 
-## 1.2 Situación problemática reportada
+De acuerdo con el relato del responsable del proyecto sobre la situación comunicada por el profesor, este trabajaba con varios archivos XLSX. El SUM le proporcionaba la relación de alumnos, pero debía elaborar su propia plantilla para registrar notas. Los estudiantes formaban sus grupos por su cuenta.
 
-Según el caso registrado en `docs/01-definicion/caso-evaluacion-grupal.md`, un docente de la UNMSM llevaba notas en una hoja XLSX y registraba por separado grupos y puntos individuales. Durante las primeras semanas recibe del SUM una relación de alumnos en XLSX para su incorporación inicial. Este archivo no contiene notas para importar. La descripción es una fuente interna del caso, no un estudio empírico independiente.
+Para registrar la calificación de un trabajo, el docente debía consultar o revisar el entregable, identificar si correspondía a un grupo y reconocer a sus integrantes. Después buscaba a cada alumno en su archivo de notas y anotaba individualmente la calificación. La evaluación de un solo trabajo grupal daba lugar, por tanto, a búsquedas y anotaciones repetidas.
 
-La separación de registros plantea necesidades de conciliación: relacionar curso, actividad, grupos y notas; reconocer faltantes; y explicar qué calificación corresponde a un alumno cuando cambia de grupo. Se identifican riesgos de omisiones, duplicados, valores inválidos y atribuciones equivocadas. No se conoce su frecuencia ni su costo real: esos aspectos requieren levantamiento y medición posteriores.
+Los alumnos tampoco disponían de un medio individual de consulta de sus puntos durante el ciclo, salvo sus propias anotaciones. El registro permanecía en poder del docente y su efecto se conocía al cierre del curso. Compartir el registro general planteaba una preocupación por la exposición de información de otros alumnos. La necesidad expresada incluía facilitar la revisión durante el ciclo y la comunicación oportuna de desacuerdos, en lugar de descubrir diferencias al finalizar.
 
-## 1.3 Problema central y diagnóstico
+El esfuerzo de búsqueda y anotación está descrito en el relato. Su incidencia sobre el tiempo es una interpretación del responsable del proyecto que deberá evaluarse; no se dispone de tiempos medidos ni de una frecuencia documentada de errores. Las aclaraciones del caso proceden de ese relato y de los acuerdos del equipo, no de entrevistas o mediciones realizadas para este informe.
 
-El problema consiste en gestionar y explicar las notas grupales con información relacionada que se registra por separado, especialmente ante traslados y correcciones. La regla documentada establece que cuenta el grupo al que pertenecía el alumno al realizarse la actividad, no el grupo vigente al guardar o corregir la nota. Una lista del grupo actual no basta como representación de esa historia.
+## 1.3 Problema central
 
-| Aspecto reportado o requerido                 | Riesgo o necesidad inferida                       | Respuesta que se propone diseñar                       |
-| --------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------ |
-| Notas, grupos y puntos en registros separados | Conciliación manual y posible confusión semántica | Información relacionada, sin convertir puntos en notas |
-| Cambios de grupo durante el curso             | Atribución retrospectiva incorrecta               | Pertenencias temporales y fecha de actividad           |
-| Registro y corrección docente                 | Valores inválidos o cambios inexplicables         | Validaciones y conservación de correcciones            |
-| Posibles fallos de guardado                   | Incertidumbre y repetición de cambios             | Estados explícitos y reintento seguro                  |
-| Cierre de una evaluación                      | Faltantes que podrían pasar inadvertidos          | Conciliación de grupos, notas y excepciones            |
+El registro de las evaluaciones grupales requiere identificar a los participantes de cada trabajo, buscarlos individualmente y repetir la anotación de una misma calificación en archivos separados. A esta gestión manual se suma la falta de un medio individual de consulta de puntos durante el ciclo que facilite la revisión de la información y el seguimiento de desacuerdos.
 
-Los riesgos son hipótesis de análisis, no incidentes observados o cuantificados por el equipo.
+El problema no es el uso de hojas de cálculo en sí mismo, sino la separación entre la organización de los estudiantes, el registro de resultados y su revisión. Los cambios de grupo son una situación que debe contemplarse para conservar la correspondencia de cada evaluación, pero no constituyen el motivo principal del proyecto.
 
-## 1.4 Pregunta orientadora
+## 1.4 Formulación del problema
 
-¿Cómo diseñar una solución de automatización y control para la gestión de evaluaciones grupales que articule las entradas académicas del curso, preserve la pertenencia histórica de sus alumnos y permita registrar, corregir y conciliar notas con reglas, permisos y excepciones explícitos?
+¿En qué medida el uso de una plataforma de gestión académica contribuye a mejorar el registro y seguimiento de las evaluaciones grupales en los cursos del docente del caso de estudio?
 
-## 1.5 Frontera del trabajo
+En esta pregunta, **registro** comprende la asociación de calificaciones con grupos y participantes, su revisión y corrección. **Seguimiento** comprende la consulta individual de resultados y la atención de reclamos. No se refiere al seguimiento del aprendizaje en todas sus dimensiones.
 
-La entrada del proceso principal es un curso bajo responsabilidad docente con alumnado autorizado, matrículas y grupos identificados. Se diseña la definición de actividades, el registro y la corrección de notas grupales y la conciliación de sus resultados. La preparación del padrón y la selección de grupos se describen como dependencias, no como procesos adicionales de evaluación de eficacia.
+## 1.5 Justificación
 
-La salida esperada es una evaluación revisada por el docente, con grupos calificados o excepciones identificadas y sin faltantes inexplicados. La validez de cerrar con excepciones debe acordarse antes de implementar. La exportación oficial, la corrección individual excepcional, los nuevos tipos de notas y las funciones generales de LMS quedan fuera de la propuesta.
+El proyecto busca sustituir la búsqueda y anotación repetitiva por un registro de calificación por grupo, relacionado con los participantes de cada actividad. También propone un medio de consulta en el que cada estudiante acceda únicamente a sus puntos y notas grupales correspondientes, sin compartir el archivo general del docente.
 
-## 1.6 Fuentes y límites del diagnóstico
+La atención de reclamos permite complementar la consulta con un recorrido identificable de presentación, revisión y respuesta. La visibilidad de notas grupales y los reclamos dentro de la plataforma son decisiones adoptadas al delimitar la solución, no hechos que se atribuyan retrospectivamente a una petición inicial literal del profesor.
 
-Se contrastaron `README.md`, `docs/`, `specs/001-manage-group-evaluation/` y las fuentes pertinentes de `portfolio-coursse/`. Su alcance técnico no se traslada automáticamente al compromiso académico. Las diferencias y decisiones por confirmar se registran en 07; las fuentes externas y su grado de verificación figuran en 08.
+Se espera facilitar el trabajo de registro y la revisión oportuna de resultados. La magnitud de esa contribución se analizará mediante pruebas y criterios de evaluación. Su pertinencia para el curso radica en combinar actividades repetitivas, validaciones, eventos, estados, detección de situaciones excepcionales y seguimiento de solicitudes dentro de un proceso académico delimitado.
+
+## 1.6 Delimitación general
+
+El proyecto comprende el registro de notas grupales, consulta de resultados propios, reclamos, revisión docente y exportación XLSX por curso. La carga del padrón, el acceso autorizado y la selección de grupos son funciones de apoyo. La consulta y los reclamos de puntos individuales complementan el recorrido estudiantil; su aplicación en el cálculo de exportación se establece como supuesto de trabajo en la sección 5.
+
+La plataforma no recibe trabajos ni administra sus plazos de entrega, no evalúa automáticamente su contenido y no se integra con el SUM para publicar calificaciones oficiales.
 
 ---
 
-# 2. Objetivos del trabajo académico — Parte I
+# 2. Objetivos
 
-## Objetivo general
+## 2.1 Objetivo general
 
-Analizar el proceso de gestión de evaluaciones grupales en el caso académico documentado y proponer una solución de automatización y control, mediante la delimitación de sus requisitos, el diseño del proceso y del sistema y una representación de baja fidelidad, que sirva de base para su posterior implementación y evaluación.
+Desarrollar una plataforma de gestión académica para el registro y seguimiento de las evaluaciones grupales en los cursos del docente del caso de estudio.
 
-## Objetivos específicos
+## 2.2 Objetivos específicos
 
-1. Caracterizar el proceso reportado de registro de notas y organización de grupos, identificando actores, entradas, actividades repetitivas, dificultades y necesidades de control mediante un diagnóstico y un modelo del proceso.
-2. Delimitar el alcance de la propuesta dentro de la plataforma académica, especificando requisitos, reglas de negocio, permisos y excepciones, y distinguiendo las dependencias de las funciones excluidas.
-3. Diseñar el flujo propuesto, el modelo de información y la arquitectura de la solución, con especial atención a la pertenencia histórica a grupos, el registro y la corrección de notas y la conciliación docente.
-4. Definir las validaciones, los controles y el tratamiento de errores y reintentos, y representarlos en un prototipo documental de baja fidelidad del recorrido docente, sin atribuirle funcionamiento ni validación con usuarios.
-5. Formular un plan de implementación, pruebas y evaluación para la Parte II, con casos de aceptación, instrumentos de registro e indicadores cuya medición permita contrastar posteriormente la propuesta con el proceso manual.
+1. Analizar el proceso actual de registro y seguimiento de las evaluaciones grupales para identificar las necesidades de los docentes y estudiantes.
+2. Diseñar el funcionamiento de la plataforma a partir de los requisitos y las reglas del proceso de evaluación.
+3. Implementar las funciones de registro y seguimiento de las evaluaciones grupales y las funciones de apoyo necesarias para su operación.
+4. Evaluar la contribución de la plataforma al registro y seguimiento de las evaluaciones grupales mediante pruebas de funcionamiento e indicadores acordados.
 
-## Correspondencia con entregables de semana 8
+## 2.3 Correspondencia con los productos del proyecto
 
-| Objetivo | Producto verificable en el informe                             | Sección o artefacto                   |
-| -------- | -------------------------------------------------------------- | ------------------------------------- |
-| OE1      | Diagnóstico documental y modelo del proceso reportado          | 01 y anexo A de 09                    |
-| OE2      | Frontera, actores, requisitos y asuntos por validar            | 04 y anexo B de 09                    |
-| OE3      | Flujo, arquitectura, entidades e invariantes propuestas        | 04, 05 y anexos A–C de 09             |
-| OE4      | Matriz de controles, estados, errores y recorrido representado | 05 y prototipo P-01 del anexo D de 09 |
-| OE5      | Cronograma, protocolo, indicadores y casos futuros             | 06 y anexos E–F de 09                 |
+| Objetivo         | Producto asociado                              | Apartados que lo desarrollan o planifican                |
+| ---------------- | ---------------------------------------------- | -------------------------------------------------------- |
+| OE1. Analizar    | Diagnóstico del proceso y requisitos           | 1 y 4; diagrama del proceso actual en 9                  |
+| OE2. Diseñar     | Diseño funcional y prototipo                   | 4, 5 y prototipo P-01 en 9                               |
+| OE3. Implementar | Plataforma con los recorridos acordados        | Funciones descritas en 4 y 5; actividades previstas en 6 |
+| OE4. Evaluar     | Pruebas y evaluación de registro y seguimiento | Indicadores y plan de evaluación en 6; instrumentos en 9 |
 
-Los objetivos describen productos de análisis y diseño de la Parte I. Autenticar usuarios, registrar notas o conciliar evaluaciones son funciones esperadas del sistema; RLS, transacciones e identificadores de operación son decisiones de diseño; implementarlos, ejecutar pruebas y medir mejoras son actividades futuras de Parte II. Ninguno de estos últimos constituye un logro operativo de semana 8.
+Los objetivos corresponden al proyecto completo. Sus productos se desarrollan de manera progresiva conforme al plan de trabajo. La carga del padrón, la selección de grupos, la consulta de puntos, los reclamos y el aviso al docente se detallan en el alcance, sin convertirse en objetivos independientes.
 
 ---
 
 # 3. Marco teórico
 
-> **Alcance de la Parte I (semana 8):** este capítulo fundamenta una propuesta no implementada mediante análisis, diseño y prototipo. La implementación, las pruebas y la evaluación se reservan para la semana 16. Los beneficios se presentan como expectativas, no como resultados.
+El proyecto tiene como objetivo desarrollar una plataforma de gestión académica para el registro y seguimiento de las evaluaciones grupales en los cursos del docente del caso de estudio. Este capítulo explica los conceptos que orientan su funcionamiento: automatización de tareas repetitivas, organización de la información académica, control de registros, seguimiento estudiantil, privacidad, accesibilidad y evaluación de la solución.
 
-La estructura responde a las indicaciones de la guía PDF del curso 2026-2, leída para esta revisión (p. 2): definir el componente, explicar los problemas que aborda, sus ventajas y desventajas, cuándo recomendarlo y los conceptos relacionados. La referencia de la guía y el estado de comprobación de las fuentes se registran en el capítulo 8. Las decisiones del caso no se atribuyen a literatura pendiente de consulta.
+Se distinguen los fundamentos bibliográficos de las reglas particulares del proyecto. La descripción del proceso actual procede del relato del solicitante; las decisiones funcionales corresponden a los acuerdos registrados en el plan de refinamiento. Estas fuentes del caso no se presentan como entrevistas ni como resultados de observación directa.
 
-## 3.1 Automatización y control de procesos
+## 3.1 Automatización de tareas repetitivas y gestión por procesos
 
-Para esta propuesta, la automatización consiste en trasladar tareas recurrentes y reglas explícitas de un proceso a un sistema, manteniendo la intervención humana ante excepciones. Sus componentes conceptuales son entradas, actividades, responsables, reglas, estados y salidas. El problema que se busca abordar es la dispersión de registros y la dificultad para conciliar notas y cambios de grupo.
+La automatización consiste en ejecutar actividades recurrentes conforme a reglas definidas, sin exigir que una persona repita cada operación. La gestión por procesos permite examinar esas actividades como un conjunto relacionado de entradas, responsables, decisiones y resultados. La presentación editorial de Dumas et al. (2018) sitúa la identificación, el análisis, el rediseño, la automatización y el seguimiento dentro de un mismo ciclo de gestión.
 
-Se espera reducir tareas repetitivas y aplicar validaciones consistentes. Como desventajas, existen costos de preparación y mantenimiento, y el riesgo de reproducir reglas incompletas o datos erróneos. Se recomienda cuando las actividades son recurrentes y sus reglas pueden acordarse; no cuando se pretende reconstruir hechos históricos sin información confiable. El libro de Dumas et al. se conserva como candidato para ampliar el fundamento de gestión por procesos, pendiente de consulta.
+Según el relato del solicitante, el registro anterior exige identificar a los integrantes de cada grupo y trasladar la misma nota, alumno por alumno, a Excel. La tarea repetitiva no es emitir el juicio académico, sino localizar a sus destinatarios y reproducir el resultado. La plataforma busca que el docente registre una calificación grupal y que esta se relacione con quienes participaron en la actividad, conservando su presentación individual al preparar el archivo del curso.
 
-## 3.2 Digitalización de la gestión académica
+La ventaja esperada es reducir la repetición y las oportunidades de omisión o transcripción incorrecta. Su límite es que una regla equivocada o una composición de grupo mal registrada también puede reproducir errores. Por ello, se recomienda automatizar actividades con reglas claras y conservar la revisión docente sobre los resultados y sus correcciones. Automatizar el registro no equivale a calificar automáticamente los trabajos.
 
-En este caso, digitalizar significa representar y organizar información académica en medios digitales. La transformación del proceso sería un cambio más amplio en prácticas, responsabilidades y uso de esa información; disponer de una interfaz no demuestra por sí solo ese cambio. Se proponen como componentes el registro académico, los flujos docentes y las reglas de acceso.
+## 3.2 Gestión académica y organización de la información
 
-La centralización podría facilitar consultas y conciliación, pero también genera dependencia de la disponibilidad del sistema, necesidades de capacitación y riesgos de concentración de datos. Se recomienda cuando existen registros dispersos y responsables dispuestos a acordar su gestión. Benavides et al. y OECD permanecen como fuentes candidatas para profundizar este contexto; no se presentan aquí conclusiones atribuidas a textos no comprobados.
+En este proyecto, la gestión académica comprende la organización de cursos, grupos, evaluaciones, notas y puntos, junto con las responsabilidades de docentes y estudiantes. Digitalizar estos registros significa disponer de información ordenada para trabajar y consultar; mejorar la gestión requiere, además, definir quién registra, quién consulta y cómo se atienden las discrepancias.
+
+UNESCO (s. f.), en la presentación del Informe GEM 2023, reconoce la gestión del sistema educativo entre los ámbitos en que puede contribuir la tecnología, pero también señala la importancia del acceso, la regulación y la preparación docente. Este enfoque permite situar la plataforma como apoyo a una necesidad académica concreta, no como una mejora educativa garantizada por el solo uso de medios digitales.
+
+La organización común de la información puede facilitar su consulta y disminuir la necesidad de reunir registros separados. Como contrapartida, exige mantenerlos actualizados y que los usuarios comprendan el procedimiento. Se recomienda delimitar la plataforma al registro y seguimiento de evaluaciones, sin confundirla con un sistema que recibe trabajos, controla entregas o administra todos los procesos de la institución.
 
 ## 3.3 Evaluación grupal y pertenencia histórica
 
-La nota grupal representa la calificación de una actividad colectiva; los puntos individuales constituyen un registro distinto según las reglas del caso. La pertenencia histórica indica qué estudiantes integraban un grupo en el momento de una actividad, en lugar de usar únicamente su composición actual. Estos conceptos provienen del dominio del proyecto, no de una validación pedagógica de la solución.
+La evaluación grupal produce una calificación asociada a una actividad colectiva. Para el registro académico, es necesario distinguir la nota del grupo de la identificación de los estudiantes a quienes corresponde. La pertenencia histórica representa quiénes integraban el grupo cuando se realizó la actividad, aunque después se hayan trasladado a otro.
 
-El problema aparece cuando un cambio posterior de grupo altera la interpretación de una nota pasada. Se propone relacionar la fecha de realización de la evaluación con los periodos de pertenencia. La ventaja esperada es una atribución explicable; sus límites son la necesidad de fechas confiables y la complejidad de corregir información histórica. Se recomienda cuando los grupos pueden cambiar durante el curso. No permite inferir contribuciones individuales ni resolver la equidad de la evaluación. La corrección individual queda fuera del alcance propuesto; las fuentes sobre evaluación por pares se mantienen pendientes en el capítulo 8.
+Esta distinción evita atribuir una nota anterior a los integrantes actuales que no participaron en el trabajo. También permite reconocer a quienes sí participaron cuando consultan el resultado o presentan un reclamo. Su ventaja es conservar una relación explicable entre actividad, grupo y estudiante; su dificultad reside en disponer de información confiable sobre esa participación. No permite deducir cuánto aportó cada integrante ni demostrar por sí sola la equidad de la calificación.
 
-## 3.4 Integridad, transacciones e idempotencia
+En el caso acordado, el docente define el número de grupos y su capacidad. Los alumnos eligen o cambian de grupo durante una ventana habilitada y sujetos a cupo. Una reapertura permite la selección a todo el curso, pero no modifica la participación registrada en actividades anteriores. Mantener esta separación es recomendable cuando los grupos pueden cambiar durante el periodo académico.
 
-La integridad de datos consiste, para el diseño, en conservar registros compatibles con las reglas de rango, unicidad y relación entre entidades. Una transacción agrupa varios cambios en una operación de todo o nada, según la documentación de PostgreSQL (PostgreSQL Global Development Group, s. f.-b, sec. 3.4). Se propone usar este concepto para que un cambio de pertenencia o una corrección de nota no deje registros parciales.
+## 3.4 Registro y control académico
 
-La idempotencia significa que repetir una solicitud idéntica conserva el efecto pretendido de una sola solicitud (Fielding et al., 2022, sec. 9.2.2). Es útil ante reintentos por fallos de comunicación. La propuesta de evitar guardados duplicados es una adaptación al negocio, no un mecanismo exigido por el RFC ni una garantía ya implementada.
+El registro conserva un resultado y su contexto: curso, evaluación, grupo o alumno correspondiente. El control académico comprende la revisión de que esa información sea completa, coherente y susceptible de corrección por el responsable. La trazabilidad, en este contexto, es la posibilidad de explicar a qué actividad corresponde una nota y reconocer las modificaciones pertinentes.
 
-La ventaja esperada de estos controles es evitar inconsistencias y duplicados; sus costos son el diseño de reglas, el tratamiento de conflictos y la verificación posterior. Se recomiendan cuando una acción modifica registros relacionados o puede repetirse. No garantizan que una calificación sea académicamente correcta: esa responsabilidad requiere revisión docente.
+Un control esencial es distinguir una nota pendiente de una calificación de cero. La primera indica que todavía no se ha registrado un resultado; la segunda expresa una decisión académica del docente. Confundirlas alteraría la interpretación del avance y de los promedios. Del mismo modo, una corrección debe quedar vinculada al registro que modifica, en lugar de generar resultados contradictorios.
 
-## 3.5 Autenticación, autorización y mínimo privilegio
+Los puntos individuales se conservan como un registro distinto de la nota grupal. Como supuesto de trabajo acordado con el solicitante, no como regla confirmada por el profesor, se contempla aplicarlos automáticamente al preparar la exportación del curso: cada punto aumenta una unidad de nota individual en los trabajos con margen, sin superar 20 por trabajo ni modificar las notas grupales base. Los trabajos tienen igual peso y los puntos no se repiten entre ellos; el excedente queda identificado sin aplicación.
 
-Autenticar consiste en comprobar una identidad; autorizar, en determinar qué acciones puede realizar sobre un recurso. El mínimo privilegio se adopta como principio de diseño: conceder solo el acceso necesario para una responsabilidad. En el caso propuesto, el rol de docente se combinaría con su responsabilidad sobre el curso; una sesión válida no bastaría para modificar cualquier registro.
+La exportación solo calcula: no consume ni modifica los puntos. El promedio de cierre requiere las notas de los trabajos incluidos y se muestra con dos decimales, redondeando únicamente el resultado final. Estas reglas ilustran la importancia de separar los registros originales de los resultados calculados. El detalle definitivo de las columnas del archivo permanece por precisar.
 
-La seguridad por filas (RLS) permite restringir qué registros pueden consultarse o modificarse mediante políticas. PostgreSQL advierte que hay roles privilegiados que pueden eludirlas (PostgreSQL Global Development Group, s. f.-a, sec. 5.9). Se propone como complemento de los controles de servidor, no como sustituto de las reglas académicas. El catálogo NIST SP 800-53 ofrece un marco general de controles adaptables al riesgo (Joint Task Force, 2020); la lectura de controles específicos sigue pendiente.
+El beneficio esperado del control es facilitar la revisión y evitar interpretaciones ambiguas. Su costo es la necesidad de acordar y mantener reglas comprensibles; ninguna validación sustituye la responsabilidad docente sobre la calificación.
 
-La ventaja esperada es limitar accesos indebidos. La desventaja es la complejidad de mantener permisos y políticas coherentes. Se recomienda cuando distintos responsables acceden a información de cursos diferentes; los permisos deben comprobarse en la implementación futura, no inferirse de botones ocultos en el prototipo.
+## 3.5 Seguimiento, consulta y atención de reclamos
 
-## 3.6 Trazabilidad, auditoría y observabilidad
+El seguimiento académico es la posibilidad de consultar los resultados y conocer la atención de las discrepancias a lo largo del curso. Se diferencia del registro porque considera lo que ocurre después de guardar una nota: acceso del estudiante, identificación de posibles errores y respuesta del docente.
 
-La trazabilidad es la posibilidad de reconstruir un cambio; la auditoría utiliza registros para revisar actuaciones, y la observabilidad aporta señales sobre el funcionamiento del sistema. Kent y Souppaya (2006), en el resumen oficial consultado, presentan la gestión de registros como una práctica que requiere infraestructura y procesos organizacionales, no solo una tecnología de emisión de mensajes.
+En la plataforma, las notas grupales y los puntos quedan disponibles para sus destinatarios cuando el docente confirma su registro, sin una publicación posterior. Cada alumno consulta sus puntos y las notas de las actividades en las que participó. Esta disponibilidad puede favorecer una revisión oportuna, aunque no garantiza que el alumno consulte o comprenda el resultado.
 
-Se propone distinguir el historial académico —valor anterior, nuevo valor, responsable e instante— de las señales operativas de intentos y errores. El problema abordado es la falta de explicación de una corrección o de un fallo. La ventaja esperada es facilitar revisión y diagnóstico; los costos son almacenamiento, protección, conservación y posible exposición de información personal. Se recomienda cuando las modificaciones necesitan justificación, con acceso restringido y sin divulgar notas o identidades en registros públicos.
+El reclamo es una solicitud de revisión vinculada a un registro específico. Su recorrido es **Pendiente → En revisión → Respondido**. El docente emite la decisión final y explica por qué mantiene o corrige el resultado. Responder no cambia automáticamente una nota o un movimiento de puntos: la corrección, cuando corresponda, es una acción expresa del docente.
 
-## 3.7 Calidad, prototipo y evaluación futura
+Cualquier participante de una actividad puede presentar el único reclamo del grupo sobre esa evaluación. Los participantes históricos y el docente pueden consultar su estado y respuesta. Para puntos individuales, solo el alumno titular puede reclamar sobre un movimiento propio y consultar la respuesta con el docente. No se admiten solicitudes duplicadas sobre el mismo registro ni reapertura después de la respuesta.
 
-En esta propuesta, la calidad se expresa mediante criterios de aceptación relacionados con las reglas académicas, la seguridad y la facilidad de uso. Un prototipo representa pantallas y recorridos para discutir el diseño; no demuestra que la solución funcione ni que produzca mejoras. Las pruebas contrastarán posteriormente comportamientos con resultados esperados, y la evaluación analizará si la solución responde al problema planteado.
+Al presentar un reclamo se avisa por correo al docente responsable mediante un mensaje breve y un enlace, sin incluir calificaciones, puntos o el texto del reclamo. El aviso facilita advertir una solicitud nueva, pero no reemplaza su atención dentro de la plataforma ni acredita que el mensaje haya sido leído. Este procedimiento aporta orden y un estado consultable, a cambio de requerir atención docente; no constituye una conversación ni una instancia adicional de apelación.
 
-Para la semana 8 se propone describir escenarios válidos, inválidos y excepcionales. Para la semana 16 se prevé implementar, probar reglas y permisos, recorrer flujos críticos y evaluar los indicadores definidos. La ventaja de planificar estos criterios es hacer revisable la propuesta; sus límites son el tiempo de preparación y que los escenarios elegidos pueden omitir fallos. Se recomienda priorizar los recorridos con mayor impacto académico. Las referencias sobre pruebas, integración continua y revisión de código quedan como candidatas, sin atribuirles beneficios no comprobados.
+## 3.6 Privacidad y confidencialidad académica
 
-## 3.8 Accesibilidad, rendimiento y privacidad
+La privacidad implica limitar el uso y la divulgación de información personal; la confidencialidad exige que los registros sean conocidos únicamente por sus destinatarios autorizados. En una plataforma académica, disponer de información centralizada no justifica hacerla visible a todo el curso.
 
-La accesibilidad busca que las personas puedan percibir, operar y comprender una interfaz, con contenido interpretable por tecnologías de asistencia. WCAG 2.2 organiza sus criterios en cuatro principios: perceptible, operable, comprensible y robusto (World Wide Web Consortium, 2024). Para la futura interfaz se proponen navegación por teclado, foco visible, etiquetas claras, errores identificables y estados que no dependan solo del color. P-01 solo representa contenido y recorrido de forma estática, por lo que no permite comprobar teclado o foco. Son criterios de diseño; no se declara conformidad WCAG sin evaluar páginas y procesos completos.
+Las reglas del caso aplican esta distinción: los puntos y sus reclamos son individuales; las notas y los reclamos grupales se consultan según la participación en la actividad. Un traslado de grupo no concede acceso a resultados anteriores de otros estudiantes. Los avisos por correo remiten a la plataforma sin exponer el contenido académico, y los ejemplos de demostración deben utilizar datos ficticios.
 
-Estas medidas pueden reducir barreras de interacción, aunque requieren revisión manual y no cubren todas las necesidades de todas las personas. Se recomiendan desde el diseño de cualquier flujo académico. El rendimiento alude al tiempo de respuesta y los recursos utilizados: la respuesta visible en dos segundos para el 95 % de las acciones interactivas es una meta candidata por validar para la evaluación futura, no un estándar universal ni un resultado actual.
+Estas medidas buscan evitar la exposición innecesaria y permitir consultas propias sin divulgar resultados ajenos. Exigen, como contrapartida, revisar cuidadosamente los destinatarios de cada información. Son criterios funcionales de protección; la normativa aplicable requiere una revisión específica antes de afirmar cumplimiento legal.
 
-La privacidad se aborda como limitación del acceso y de la divulgación de información personal. Se propone trabajar con datos sintéticos y excluir secretos, correos reales y calificaciones reales de repositorios y anexos públicos. RFC 9110 advierte de riesgos de divulgación y reidentificación en registros y direcciones web (Fielding et al., 2022, secs. 17.7–17.9). Esta precaución puede limitar el realismo de las pruebas, pero se recomienda antes de utilizar datos reales. La Ley peruana N.º 29733 y el Decreto Supremo N.º 016-2024-JUS permanecen pendientes de comprobación del texto oficial y de su aplicabilidad; no se afirma cumplimiento legal.
+## 3.7 Accesibilidad y facilidad de uso
 
-## 3.9 Síntesis conceptual aplicada
+La accesibilidad busca que personas con diferentes capacidades puedan percibir, comprender y utilizar la información. WCAG 2.2 organiza este propósito en cuatro principios: perceptible, operable, comprensible y robusto (World Wide Web Consortium, 2024). La facilidad de uso se refiere aquí a que docentes y estudiantes puedan completar sus tareas y entender sus resultados sin confusión innecesaria.
 
-La propuesta reúne cinco principios: acceso limitado por responsabilidad, coherencia de datos, historia explicable, reintentos sin duplicación y evidencia proporcional. Se plantea una sola aplicación como decisión de alcance, sujeta a revisión del diseño; no como arquitectura implementada ni superioridad demostrada.
+Para el proyecto, estos conceptos orientan etiquetas claras, navegación consistente, texto legible, uso del teclado, indicación visible de la posición de navegación y mensajes que expliquen cómo corregir errores. Los estados de los reclamos deben reconocerse mediante palabras, no solo colores. También debe ser evidente la diferencia entre una nota pendiente y un cero registrado.
 
-Las fuentes internas de requisitos y diseño sirven para describir el dominio y rastrear decisiones (véase el capítulo 8). No son bibliografía académica independiente ni evidencia de implementación, pruebas o resultados de la Parte I.
+Estas medidas pueden reducir barreras en el registro y la consulta. Su límite es que requieren evaluación con los recorridos completos y no cubren todas las necesidades de todas las personas. Se recomienda considerarlas desde el diseño; una representación de pantallas no basta para declarar conformidad con WCAG.
 
----
+## 3.8 Prototipo y evaluación de la solución
 
-# 4. Caso de aplicación, alcance, actores y requisitos
+Un prototipo representa la organización de la información y los recorridos de uso para revisar si el diseño comunica lo necesario. Permite discutir cómo registrar una nota grupal, consultar resultados propios y atender un reclamo antes de cerrar las decisiones de funcionamiento. Su utilidad es detectar omisiones y ambigüedades; su límite es que mostrar una pantalla no demuestra la corrección de los registros ni la mejora del proceso.
 
-## 4.1 Visión de plataforma y frontera de automatización
+Las pruebas de funcionamiento contrastan acciones y reglas con resultados esperados. La evaluación del proyecto examina su contribución al registro y seguimiento mediante indicadores acordados. Conviene distinguir ambas: cumplir una regla no demuestra, por sí solo, que el procedimiento sea más rápido o comprensible.
 
-| Elemento                      | Relación con el caso                                                              | Frontera académica                                              |
-| ----------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Acceso docente y estudiantil  | Identifica a la persona                                                           | Dependencia; autenticación no equivale a autorización           |
-| Autorización                  | Determina rol y acceso al curso                                                   | Regla transversal del diseño                                    |
-| Periodos y cursos             | Un periodo organiza cursos; cada curso tiene un responsable                       | Contexto organizativo, no gestión institucional completa        |
-| Incorporación y matrícula     | El XLSX del SUM prepara autorizaciones; la cuenta coincidente se vincula al curso | Entrada; no importa notas ni supone matrícula oficial en el SUM |
-| Grupos y selección            | Organización por curso, cupo y ventana; traslado por docente                      | Dependencia temporal indispensable para atribuir notas          |
-| Puntos individuales           | Movimientos asociados al alumno autorizado                                        | Contexto separado; no son notas ni intervienen en su cálculo    |
-| Evaluaciones y notas grupales | Actividad fechada y nota por grupo                                                | Núcleo del proceso a automatizar y evaluar                      |
-| Conciliación                  | Revisión docente de grupos esperados, notas y excepciones                         | Cierre controlado propuesto                                     |
+Como dimensiones candidatas se consideran el tiempo necesario para registrar notas, la correspondencia entre participantes y resultados, la posibilidad de completar una consulta propia y la comprensión del estado y respuesta de un reclamo. El método, los participantes y los valores de comparación deben acordarse antes de medir. Una comparación con el procedimiento anterior requerirá tareas equivalentes y condiciones descritas; no se atribuyen mejoras sin evidencia.
 
-Los cursos pueden organizarse sin grupos dentro de la visión general, pero el experimento propuesto se limita a un curso con evaluación grupal. La ruta pública de portafolio no pertenece al caso.
-
-## 4.2 Actores y permisos previstos
-
-- **Docente responsable:** prepara las entradas de sus cursos, organiza grupos, autoriza traslados, define actividades, registra y corrige notas grupales y revisa la conciliación. No opera sobre cursos ajenos.
-- **Alumno autorizado:** accede a sus cursos y matrícula, consulta grupo vigente y puntos propios y selecciona grupo dentro de la ventana y cupo. No consulta ni modifica notas grupales en el alcance propuesto.
-- **Servicios de identidad y datos:** apoyan autenticación, persistencia y controles; no sustituyen la responsabilidad académica del docente.
-- **Equipo del trabajo:** analiza y diseña en Parte I; implementaría y evaluaría en Parte II. No es un rol de usuario de la plataforma.
-
-## 4.3 Flujo propuesto
-
-**Preparación dependiente:** seleccionar periodo y curso → incorporar alumnos desde el padrón → vincular cuentas autorizadas y matrículas → organizar grupos y registrar sus pertenencias.
-
-**Proceso central:** docente identifica curso y actividad → define fecha de realización → consulta grupos aplicables históricamente → introduce nota → se comprueban permisos, curso y rango → se propone confirmar el registro y conservar evidencia → si procede, corrige sin borrar el historial → revisa grupos calificados, faltantes y excepciones → concilia o mantiene pendiente la evaluación.
-
-El flujo describe el comportamiento esperado. No representa una ejecución. Los diagramas y el recorrido de baja fidelidad están en 09.
-
-## 4.4 Requisitos de la propuesta
-
-Los identificadores R se usan en esta carpeta para distinguir los requisitos del núcleo de las especificaciones técnicas más amplias. No sustituyen ni modifican los FR externos.
-
-| ID  | Requisito esperado                                                                         | Relación con fuentes técnicas        |
-| --- | ------------------------------------------------------------------------------------------ | ------------------------------------ |
-| R1  | Restringir acceso por identidad, rol y responsabilidad sobre el curso                      | FR-001–005                           |
-| R2  | Recibir autorizaciones, matrículas y grupos coherentes del curso, sin importar notas       | FR-006–013, como dependencias        |
-| R3  | Determinar pertenencia por fecha de actividad y conservar traslados sin solapamientos      | FR-014–017                           |
-| R4  | Definir una actividad identificable y fechada; revisar el impacto de cambiar su fecha      | FR-018–019                           |
-| R5  | Registrar una nota vigente de 0 a 20 por grupo y evaluación del mismo curso                | FR-020–022                           |
-| R6  | Distinguir éxito, rechazo, fallo e incertidumbre; permitir reintentos sin duplicar efectos | FR-023–024                           |
-| R7  | Conservar valores anterior/nuevo, responsable e instante de una corrección grupal          | FR-025–026, FR-036                   |
-| R8  | Conciliar grupos esperados, calificados, faltantes y excepciones, sin ocultar pendientes   | FR-033–037                           |
-| R9  | Separar puntos y notas; limitar la vista estudiantil a datos propios permitidos            | FR-028–032                           |
-| R10 | Diseñar evidencias e indicadores seguros y reproducibles para la evaluación futura         | FR-038–039 y protocolo de evaluación |
-
-Se priorizan como obligatorios del **diseño** R1–R10. Los filtros avanzados y resúmenes visuales son mejoras opcionales. Esta prioridad no significa que esas funciones se implementen en semana 8. En Parte II, las dependencias deberán estar disponibles y verificadas para ensayar el núcleo, sin convertir cada módulo en un experimento independiente.
-
-## 4.5 Reglas y excepciones
-
-1. Un curso tiene un docente responsable para este caso; no se diseña codocencia.
-2. El archivo institucional incorpora alumnos, nunca calificaciones.
-3. Autorización previa y matrícula de una cuenta autenticada son conceptos distintos; el dominio institucional por sí solo no otorga acceso al curso.
-4. La nota es grupal, de 0 a 20. La precisión decimal debe confirmarse; un campo vacío será pendiente, no cero ni nota válida.
-5. Una corrección de nota grupal alcanza a la población histórica de la actividad, aunque después existan traslados.
-6. La selección estudiantil requiere ventana abierta y cupo; el docente puede autorizar un traslado fuera de ella.
-7. No se inventan fechas ni pertenencias desconocidas. Se identifica la incertidumbre para revisión.
-8. Una excepción grupal documenta una incidencia; no crea una nota individual ni convierte puntos en calificaciones.
-
-Casos previstos: límites 0/20; nota inválida; cruce de cursos; acceso estudiantil a notas; docente ajeno; actividad antes/después de traslado; actividad y traslado del mismo día; competencia por último cupo; corrección concurrente; respuesta perdida y reintento; cambio de fecha; historia insuficiente. Sus pruebas se planifican para Parte II.
-
-## 4.6 Condiciones no funcionales y exclusiones
-
-El diseño considera mínimo privilegio, privacidad, consistencia transaccional, accesibilidad de teclado, errores comprensibles, recuperación ante incertidumbre y señales correlacionables. No garantiza disponibilidad, rendimiento o recuperación productiva sin comprobación futura.
-
-Quedan excluidos exportación oficial de actas o notas, corrección individual excepcional, importación de notas, conversión de puntos en notas, panel institucional adicional, contenidos, entregas, asistencia, foros, notificaciones y nuevos tipos de evaluación. Una descarga técnica XLSX hallada en el código de referencia no demuestra exportación oficial ni cambia este alcance (véase 07).
+En conjunto, estos conceptos orientan una plataforma que disminuya operaciones repetitivas, conserve registros interpretables y facilite el seguimiento por sus destinatarios, manteniendo el juicio académico y la resolución de reclamos bajo responsabilidad docente.
 
 ---
 
-# 5. Diseño de arquitectura, información y controles
+# 4. Caso de aplicación, alcance y requisitos
 
-## 5.1 Alternativa arquitectónica propuesta
+## 4.1 Visión general de la plataforma
 
-Se propone una aplicación web full-stack única con separación lógica entre presentación, casos de uso y persistencia. Next.js/React, Supabase y PostgreSQL se consideran una alternativa técnica compatible con las referencias examinadas, no una arquitectura ya implementada por este trabajo. La propuesta no necesita un servicio independiente: agregaría comunicación y límites de seguridad sin una necesidad identificada. La pertinencia de esta elección frente al criterio de «tendencia de arquitectura» de la guía debe confirmarse con el docente.
+La plataforma organiza los cursos del docente por periodo académico. A partir del padrón institucional se habilita el acceso de los alumnos y su vinculación al curso. Estos pueden elegir grupo durante la ventana establecida y consultar sus resultados. El docente registra notas grupales y puntos individuales, revisa reclamos y descarga la información del curso en XLSX.
 
-```mermaid
-flowchart TB
-    D[Docente o alumno autorizado] --> U[Presentación y estados de interacción]
-    U --> S[Casos de uso en servidor]
-    S --> A[Autenticación y autorización]
-    S --> B[Datos y reglas en PostgreSQL]
-    B --> H[Historia académica restringida]
-    S --> O[Señales operativas restringidas]
-```
+| Componente                          | Relación con el proyecto                                                                               |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Periodos y cursos                   | Contexto de organización y responsabilidad docente                                                     |
+| Padrón, acceso y matrícula          | Incorporación y vinculación de alumnos autorizados; no equivale a matricularlos oficialmente en el SUM |
+| Configuración y selección de grupos | Apoyo para identificar participantes de las evaluaciones                                               |
+| Registro de notas grupales          | Primera etapa principal: una calificación por grupo y actividad                                        |
+| Consulta de resultados y reclamos   | Segunda etapa principal: seguimiento de evaluaciones                                                   |
+| Puntos individuales                 | Registro y consulta relacionados; reclamos privados y cálculo individual al exportar                   |
+| Exportación XLSX                    | Salida por curso para uso del docente, sin integración con el SUM                                      |
 
-La presentación recogería datos, mostraría errores y permitiría reintentar. El servidor comprobaría identidad, responsabilidad y entradas y coordinaría las operaciones. La base de datos protegería coherencia, rangos, unicidad e historia. Estas responsabilidades son decisiones de diseño pendientes de construcción y prueba.
+## 4.2 Actores y responsabilidades
 
-## 5.2 Modelo conceptual propuesto
+**Docente responsable:** prepara sus cursos, incorpora alumnos, define número y capacidad de grupos y habilita su selección. Evalúa los trabajos fuera de la plataforma, registra y corrige notas y puntos, atiende reclamos y exporta la información. Decide sobre la procedencia de cada reclamo.
 
-| Entidad                  | Relación y función                                                           |
-| ------------------------ | ---------------------------------------------------------------------------- |
-| Identidad y perfil       | Identifica a la persona y su rol general; no concede acceso universal        |
-| Periodo y curso          | Un periodo reúne cursos; cada curso tiene un docente responsable             |
-| Autorización de alumno   | Habilitación previa para una identidad en un curso                           |
-| Matrícula                | Vincula cuenta autorizada y curso; puede estar activa o inactiva             |
-| Grupo                    | Pertenece a un curso y tiene capacidad y estado                              |
-| Pertenencia temporal     | Vincula matrícula y grupo durante un intervalo, incluido el estado sin grupo |
-| Movimiento de puntos     | Registro individual separado de las notas; contempla anulación sin borrado   |
-| Evaluación grupal        | Actividad del curso con nombre y fecha/hora de realización                   |
-| Nota grupal              | Valor vigente por grupo y evaluación; no se duplica como nota por alumno     |
-| Corrección grupal        | Conserva transición anterior/nueva, docente e instante                       |
-| Operación                | Identifica una intención de cambio y permite recuperar su resultado          |
-| Conciliación y excepción | Explican grupos esperados, notas, faltantes e incidencias                    |
+**Alumno autorizado:** accede a sus cursos, elige o cambia de grupo cuando está permitido, consulta sus resultados y presenta reclamos sobre los registros que le corresponden. No modifica calificaciones ni consulta información académica ajena.
 
-El modelo lógico de referencia está en `specs/001-manage-group-evaluation/data-model.md`. Sus nombres de tablas y contratos orientan el diseño; el informe no requiere un inventario de migraciones ni un plan de adaptación de código previo.
+La plataforma relaciona registros, verifica condiciones, muestra resultados y estados y avisa al docente de nuevos reclamos. No sustituye su juicio académico.
 
-## 5.3 Pertenencia histórica e invariantes
+## 4.3 Frontera del proceso
 
-Se proponen intervalos `[inicio, fin)`: el inicio se incluye y el fin se excluye. Un traslado cerraría el intervalo anterior y abriría el siguiente en una misma transacción. El grupo aplicable se resolvería con el instante de la actividad, nunca con la fecha de guardado ni con el grupo actual. La zona horaria y la precisión temporal son decisiones pendientes de confirmación académica.
+- **Entradas:** curso, alumnado autorizado, grupos y participantes identificados, actividades evaluadas y calificaciones decididas por el docente.
+- **Registro:** selección de curso y actividad, ingreso de la nota grupal, asociación con participantes, revisión de pendientes y correcciones.
+- **Seguimiento:** consulta de resultados propios, presentación de reclamos, revisión y respuesta final del docente.
+- **Salidas:** registros consultables, reclamos con estado y respuesta y archivo XLSX del curso.
 
-- Autorización, matrícula, grupo, evaluación y nota deben corresponder al mismo curso.
-- Una matrícula no puede tener intervalos solapados; como máximo tendría uno abierto.
-- Una pareja grupo-evaluación tiene una sola nota vigente, numérica entre 0 y 20.
-- La corrección conserva su historia y no cambia la pertenencia del alumno.
-- No se elimina información necesaria para explicar actividades pasadas.
-- Los puntos individuales no participan en el cálculo de la nota.
-- Una modificación que afecte grupos, notas o fecha obliga a revisar la conciliación anterior.
-- La historia desconocida se marca como incierta, sin reconstrucción ficticia.
+La selección de grupos y la carga del padrón habilitan el recorrido principal. La consulta y atención de reclamos de puntos se incluyen como funciones relacionadas, no como calificaciones grupales adicionales.
 
-## 5.4 Validaciones y controles diseñados
+## 4.4 Requisitos funcionales
 
-| Condición                              | Control propuesto                                             | Respuesta esperada y futura comprobación                        |
-| -------------------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------- |
-| Sesión ausente o curso ajeno           | Comprobación en servidor y políticas por fila (RLS)           | Denegar sin revelar datos; probar acceso directo y por interfaz |
-| Nota inválida o vacía                  | Validación de entrada y restricción de datos                  | Informar error o pendiente; no confirmar una nota inválida      |
-| Grupo y evaluación de cursos distintos | Integridad referencial coherente y validación de dominio      | Rechazar sin cambios parciales                                  |
-| Traslado o último cupo concurrente     | Operación transaccional e invariantes temporales/capacidad    | Una pertenencia coherente, sin superar cupo                     |
-| Respuesta perdida                      | Identificador por intención y resultado recuperable           | Mostrar incertidumbre; reintentar sin repetir el efecto         |
-| Corrección de nota                     | Actualización y anexado de corrección en una transacción      | Conservar valores, responsable e instante                       |
-| Cambio de fecha de actividad           | Vista previa de atribuciones afectadas y confirmación docente | Evitar cambio silencioso; rechazar confirmación obsoleta        |
-| Evaluación incompleta                  | Conteo de grupos históricos, notas y excepciones              | Mantener faltantes visibles y no cerrar sin explicación         |
-| Historia insuficiente                  | Estado de revisión requerida                                  | No atribuir desde el grupo actual por defecto                   |
+| ID  | Función requerida                                                                                                                           |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| R01 | Organizar periodos y cursos bajo responsabilidad docente y limitar el acceso a sus usuarios autorizados                                     |
+| R02 | Incorporar alumnos desde el padrón, revisar los datos y evitar duplicados o asociaciones al curso incorrecto                                |
+| R03 | Permitir al docente definir número y capacidad de grupos y abrir, ampliar o reabrir la ventana para todo el curso                           |
+| R04 | Permitir elegir y cambiar de grupo únicamente con ventana abierta y cupo disponible                                                         |
+| R05 | Relacionar cada actividad con el grupo y sus integrantes al momento de realizarla                                                           |
+| R06 | Registrar y corregir una nota de 0 a 20 por grupo y evaluación, conservando la información del cambio                                       |
+| R07 | Registrar puntos individuales y permitir corregir asignaciones sin perder el registro original                                              |
+| R08 | Mostrar a cada alumno sus puntos y notas grupales correspondientes al quedar registrados                                                    |
+| R09 | Recibir un reclamo por grupo y evaluación de cualquier participante de aquella actividad, y compartirlo con esos participantes y el docente |
+| R10 | Recibir un reclamo por movimiento de puntos, privado entre el alumno correspondiente y el docente                                           |
+| R11 | Mostrar el recorrido Pendiente → En revisión → Respondido, con decisión final y respuesta motivada del docente                              |
+| R12 | Avisar por correo al docente de cada nuevo reclamo mediante mensaje breve y enlace, sin resultados académicos ni texto del reclamo          |
+| R13 | Evitar un segundo reclamo sobre el mismo registro, incluso después de su respuesta; no admitir réplica ni reapertura del alumno             |
+| R14 | Exportar información por curso, con notas por alumno, puntos y cálculo individual según la regla de trabajo descrita en 5                   |
 
-Para el reintento se propone conservar un identificador de operación por intención del usuario. La misma identidad, identificador y contenido devolverían el resultado previo; reutilizar el identificador con contenido diferente se rechazaría. La retención del registro y el tratamiento de operaciones pendientes se concretarían antes de implementar. También se deberá definir el control de versiones ante dos correcciones simultáneas para no perder cambios.
+Estos requisitos expresan el alcance académico acordado. La validación de información y la atención de solicitudes forman parte de la solución sin desplazar el eje de registro y seguimiento de evaluaciones.
 
-## 5.5 Estados, eventos y tratamiento de errores
+## 4.5 Reglas de funcionamiento
 
-La evaluación se representa como definida, con registro parcial o conciliada. Una conciliación pierde vigencia si cambian datos relevantes. La operación se comunica como pendiente, exitosa, rechazada, fallida o de resultado incierto. «Incierto» describe que el cliente no conoce la confirmación; no significa que la base de datos haya guardado un estado inválido.
+- Una nota o un movimiento de puntos confirmado queda visible para sus destinatarios, sin publicación adicional.
+- Una nota no registrada permanece vacía o pendiente; cero es una calificación que el docente registra expresamente.
+- La nota y el reclamo grupal corresponden a los participantes de la actividad, aunque después cambien de grupo.
+- Los estudiantes eligen entre grupos configurados por el docente; no crean grupos ni son asignados automáticamente.
+- La reapertura habilita cambios para todo el curso, sujetos a cupo; no concede una excepción individual de selección.
+- Responder favorablemente un reclamo no cambia automáticamente una nota o un movimiento: el docente realiza la corrección que proceda.
+- El aviso por correo no sustituye la consulta del reclamo y su respuesta en la plataforma.
 
-Los eventos principales son definición de actividad, selección/traslado, guardado, corrección, rechazo, fallo, reintento y conciliación. Frente a un rechazo se mostraría una razón accionable; frente a un fallo se preservaría la entrada y se ofrecería recuperación segura; frente a una historia ambigua se solicitaría revisión docente. No se aceptaría un fallo como éxito ni se ocultarían faltantes mediante una excepción genérica.
+## 4.6 Condiciones de calidad
 
-## 5.6 Seguridad, privacidad y monitoreo previstos
+La información debe ser comprensible, permitir identificar pendientes y errores y conservar la privacidad de cada actor. Los recorridos deben poder realizarse con teclado, contar con etiquetas y mensajes claros y no comunicar estados solo por color. El registro repetido de una misma acción no debe producir duplicados. Ante un fallo se debe explicar si el registro fue confirmado o necesita revisión.
 
-Se propone denegación predeterminada, mínimo privilegio y controles de servidor más RLS; la interfaz no sería la frontera de seguridad. El alumno solo accedería a sus cursos, grupo vigente y puntos propios, sin notas grupales. Las correcciones con valores académicos permanecerían en almacenamiento restringido al docente del curso.
+## 4.7 Exclusiones
 
-Las señales operativas usarían identificadores opacos, tipo de evento, instante, resultado y categoría de error; no incluirían nombres, correos, notas o secretos y también tendrían acceso y retención restringidos. Los identificadores correlacionables no se consideran automáticamente anónimos. Proveedor, retención, responsable y umbrales de alerta quedan pendientes. Respaldos y restauración no se presuponen por elegir Supabase.
+No se incluye recepción de trabajos, plazos de entrega, contenidos de clase, asistencia, foros, mensajería general, evaluación automática del contenido, integración con el SUM, actas oficiales, apelaciones, correos al alumno o recordatorios automáticos. La petición de reabrir la ventana de grupos no se incorpora como una categoría adicional de reclamo en la plataforma.
 
-El prototipo documental P-01 representa interacciones; no ejecuta estos controles. Las pruebas SQL, de lógica, de navegador, accesibilidad, fallos y recuperación corresponden a la Parte II descrita en 06.
+La corrección individual excepcional de una nota grupal se mantiene fuera del alcance. El ajuste individual por puntos en el archivo exportado es una regla distinta, expresamente declarada como supuesto del equipo.
 
 ---
 
-# 6. Plan futuro de implementación, pruebas y evaluación
+# 5. Propuesta de solución
 
-## 6.1 Separación de entregas y cronograma tentativo
+## 5.1 Descripción general
 
-La guía fija dos hitos, no el calendario intermedio. La distribución siguiente es una propuesta del equipo, pendiente de acuerdo y fechas concretas.
+Se propone una plataforma en la que el docente registre una nota por grupo y evaluación y la información quede relacionada con los alumnos que participaron en la actividad. Así se busca reemplazar la búsqueda y anotación individual de una misma nota. Los alumnos consultarían sus resultados y podrían presentar reclamos con seguimiento dentro del mismo entorno.
 
-| Momento        | Actividad y producto previsto                                                                                       | Naturaleza                                                               |
-| -------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Hasta semana 8 | Diagnóstico documental, objetivos, alcance, requisitos, arquitectura, modelo, controles y prototipo documental P-01 | Parte I: análisis y diseño                                               |
-| Semana 8       | Maquetar informe, preparar PowerPoint y presentar el avance                                                         | Entrega requerida; no se afirma que PDF final o PowerPoint estén creados |
-| Semanas 9–10   | Confirmar reglas abiertas, preparar datos sintéticos y entorno aislado, concretar contratos y pruebas               | Plan de Parte II                                                         |
-| Semanas 11–12  | Implementar pertenencias temporales, actividades fechadas y registro/corrección controlados                         | Plan de Parte II                                                         |
-| Semanas 13–14  | Integrar conciliación y señales; probar permisos, fallos, concurrencia y accesibilidad                              | Plan de Parte II                                                         |
-| Semana 15      | Ejecutar comparación manual/plataforma, analizar indicadores y limitaciones                                         | Plan de Parte II                                                         |
-| Semana 16      | Consolidar resultados efectivamente obtenidos, informe y PowerPoint final                                           | Parte II: implementación, pruebas y evaluación                           |
+El funcionamiento se organiza en registro y seguimiento, con apoyo de la incorporación del padrón, el acceso autorizado y la selección de grupos. La exportación permite obtener la información del curso para uso posterior del docente.
 
-La historia temporal precede a la atribución de notas y esta precede a la conciliación. Las entradas académicas se deben verificar antes del recorrido central. Los estados de tareas del repositorio no representan avance académico de esta propuesta.
+## 5.2 Preparación del curso
 
-## 6.2 Estrategia de pruebas prevista para Parte II
+El docente seleccionaría periodo y curso e incorporaría el padrón de alumnos recibido del SUM. La revisión distinguiría datos aceptados, incompletos y repetidos antes de confirmar su incorporación. Esta carga habilita el acceso al curso; no importa calificaciones.
 
-- **Datos y seguridad:** restricciones de rango y curso, autorización por actor, acceso directo a datos, intervalos, capacidad, atomicidad y correcciones.
-- **Lógica de aplicación:** normalización de entradas, fechas y mapeo de errores y resultados.
-- **Recorrido de usuario:** definición de actividad, registro, corrección, fallo, reintento y conciliación; consulta estudiantil restringida.
-- **Revisión transversal:** teclado, foco, nombres accesibles, mensajes no dependientes del color, privacidad de señales y muestreo de tiempos.
+El docente definiría cuántos grupos habrá, su capacidad y la ventana de selección. Durante esa ventana, los alumnos elegirían y podrían cambiar de grupo si existe cupo. Si se necesita otra oportunidad, el docente puede ampliar o reabrir la selección para todo el curso. Esta reapertura no cambia la relación de los alumnos con actividades ya realizadas.
 
-Las pruebas usarían datos sintéticos y un entorno aislado. Para cada caso se registraría identificador, regla, entrada, resultado esperado, fecha, versión, entorno, observado y discrepancias. La matriz de 09 contiene casos diseñados, sin resultados de ejecución.
+## 5.3 Registro de evaluaciones
 
-## 6.3 Protocolo comparativo propuesto
+1. El docente identifica curso, actividad y fecha de realización.
+2. La plataforma muestra los grupos y participantes correspondientes a esa actividad.
+3. El docente registra una nota grupal entre 0 y 20.
+4. Se comprueban el curso, los permisos y la validez del dato.
+5. Al confirmarse, la nota queda disponible para los participantes de la actividad.
+6. El docente revisa las notas registradas y los campos pendientes. Si corrige un resultado, se conserva la información del cambio.
 
-Se prevé comparar registro y conciliación manual frente al flujo propuesto con la misma actividad y volumen de grupos. La preparación de periodos y la importación inicial quedan fuera del cronometraje principal, para no mezclar el núcleo con sus dependencias. Se conservarían iguales las entradas, las reglas y los casos de excepción.
+La actividad se evalúa fuera de la plataforma. Una nota pendiente no se interpreta como incumplimiento ni se sustituye por cero. Los puntos individuales se registran por separado y son visibles para el alumno correspondiente al confirmarse.
 
-Antes de medir se acordarían volumen, zona horaria, participantes, condiciones y entrenamiento equivalente. Se proponen al menos tres repeticiones por método, alternando el orden para reducir el efecto de aprendizaje y documentando limitaciones. Una muestra pequeña no permite generalizar resultados a toda la institución. Los escenarios de fallo se analizarían además por separado para no confundir tiempo normal con recuperación.
+## 5.4 Consulta y reclamos
 
-## 6.4 Indicadores a medir, no resultados
+Cada alumno consultaría sus puntos y las notas grupales que le corresponden. Para una nota grupal, cualquier participante puede presentar el reclamo en nombre del grupo de aquella actividad; los demás participantes históricos y el docente pueden consultar el mismo caso. Para puntos, únicamente el alumno afectado y el docente acceden al reclamo y su respuesta.
 
-| Indicador                       | Definición prevista                                                                                         | Instrumento futuro                               |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| Tiempo total                    | Mediana de minutos de registro y conciliación por evaluación                                                | Ficha de inicio/fin, volumen y condiciones       |
-| Cobertura de notas              | Grupos con nota válida / grupos esperados                                                                   | Conteo y detalle de faltantes                    |
-| Atención del proceso            | (Grupos con nota válida + grupos con excepción explícita) / grupos esperados, sin doble conteo              | Conciliación; informar excepciones separadamente |
-| Correcciones y duplicados       | Conteos y tasas separados por operaciones confirmadas; distinguir corrección académica de error de registro | Historia y clasificación de causas               |
-| Tiempo de conciliación          | Minutos de revisión final del curso, actividad, grupos y notas                                              | Ficha de tiempos y discrepancias                 |
-| Reintento seguro                | Casos reintentados con un único estado final correcto / casos de reintento ejecutados                       | Correlación de intentos y estado persistido      |
-| Detección de entradas inválidas | Casos inválidos rechazados y comunicados correctamente / casos inválidos previstos                          | Matriz esperado/observado                        |
-| Respuesta interactiva           | Percentil 95 del tiempo hasta confirmación visible, con volumen acordado                                    | Muestra registrada; excluir importaciones largas |
+El recorrido acordado es **Pendiente → En revisión → Respondido**. Al recibirse un reclamo se envía un correo al docente con aviso breve y enlace, sin notas, puntos ni texto del reclamo. El docente revisa, decide si corresponde mantener o corregir el registro y explica su decisión dentro de la plataforma.
 
-Se informaría «no aplicable» cuando un denominador sea cero. Los grupos esperados se definirían con participación histórica y las reglas acordadas, no simplemente contando grupos actuales. Las excepciones no se presentarían como calificaciones ni como éxito automático.
+Se admite un solo reclamo por grupo y evaluación y uno por movimiento de puntos. La respuesta es final: no se incluye réplica del alumno, reapertura ni una nueva solicitud sobre el mismo registro. La corrección, cuando proceda, es una actuación expresa del docente, no un efecto automático de responder.
 
-Las fuentes técnicas sugieren reducir 50 % la mediana de tiempo y alcanzar 2 segundos en el 95 % de confirmaciones. Se conservan solo como **metas candidatas por validar**, no compromisos comprobados. Detectar todos los casos definidos sería un criterio sobre esa batería, no garantía universal. No hay línea base ni mediciones académicas de Parte I que permitan afirmar mejoras.
+## 5.5 Correspondencia ante cambios de grupo
 
-## 6.5 Organización propuesta
+Si un alumno realizó una actividad con el grupo A y después pasó al B, conserva la nota que le corresponda por aquella actividad de A. También puede reclamarla en nombre de A y consultar su respuesta. Los integrantes de B no adquieren acceso a ese reclamo por compartir ahora grupo con él.
 
-Las fuentes contemplan cinco integrantes; nombres y asignaciones están pendientes.
+Esta regla preserva la relación entre trabajo, nota y participantes. Es una condición de coherencia del proceso, no su problema central. Si no se conoce la participación en una actividad, se requiere revisión docente en lugar de asumirla a partir del grupo actual.
 
-| Área                      | Parte I                                      | Parte II prevista                   |
-| ------------------------- | -------------------------------------------- | ----------------------------------- |
-| Dominio y coordinación    | Diagnóstico, alcance y consultas al docente  | Verificación de entradas y reglas   |
-| Experiencia               | Recorrido y representación P-01              | Interacciones y accesibilidad       |
-| Datos y seguridad         | Modelo e invariantes                         | Persistencia y autorización         |
-| Calidad                   | Casos y criterios diseñados                  | Pruebas y registro de discrepancias |
-| Evidencia y documentación | Plan, bibliografía e insumos de presentación | Señales, medición e informe final   |
+## 5.6 Exportación XLSX y aplicación de puntos
 
-Se propone revisión cruzada y cambios acotados conforme a la gobernanza del repositorio. Un check técnico o un despliegue no demostraría por sí solo eficacia del proceso académico.
+El docente podría descargar por curso las notas base de cada evaluación por alumno, sus puntos y el resultado individual calculado. Las notas se atribuyen según los participantes de cada actividad. Una nota sin registrar permanece vacía también en el archivo; mientras falten notas del conjunto de trabajos incluido, el promedio de cierre se mantiene pendiente.
 
-## 6.6 Guion de presentación de avance
+**Supuesto de trabajo del equipo:** como no se pudo confirmar con el profesor una regla de aplicación de puntos, se adopta una bonificación individual automática sobre los trabajos grupales al preparar la exportación. Esta regla es revisable y no se atribuye como una instrucción del docente.
 
-Preparar un PowerPoint con: problema y fuente del caso; objetivo y frontera; actores y reglas; proceso reportado y propuesto; arquitectura y modelo; recorrido P-01; controles y excepciones; entregables de Parte I y asuntos abiertos; plan hasta semana 16. Este guion no constituye un archivo PowerPoint ni una exposición ya realizada.
+- Los trabajos tienen igual peso.
+- Un punto aumenta una unidad de nota de un trabajo, sin que cada nota ajustada supere 20.
+- Los puntos se aplican una sola vez dentro del cálculo, donde exista margen. No se añade el saldo completo a cada trabajo ni directamente al promedio.
+- Se conservan las notas grupales originales y los resultados de los compañeros.
+- Si todos los trabajos alcanzan 20, el saldo restante es excedente sin efecto sobre la calificación; no se elimina del registro ni se convierte en otro beneficio.
+- Descargar solo calcula: no consume, descuenta ni modifica puntos. Con iguales datos y reglas, las exportaciones repetidas mantienen los mismos resultados académicos.
+- El promedio se muestra con dos decimales, redondeando únicamente el resultado final.
+
+Para un alumno con todas las notas del conjunto de trabajos registradas y saldo no negativo, el cálculo equivalente es:
+
+1. **Margen disponible:** sumar cuánto le falta a cada nota base para alcanzar 20.
+2. **Puntos aplicados:** tomar el menor valor entre el saldo de puntos y ese margen.
+3. **Promedio ajustado:** dividir la suma de notas base más los puntos aplicados entre el número de trabajos.
+4. **Excedente:** restar los puntos aplicados al saldo disponible.
+
+Ejemplo ilustrativo: notas base 20, 18 y 17, con dos puntos. El margen total es cinco; se aplican los dos puntos y el promedio ajustado es (20 + 18 + 17 + 2) / 3 = **19,00**. No hace falta elegir manualmente a qué trabajo asignarlos para obtener ese promedio, porque todos tienen el mismo peso.
+
+La salida propuesta distingue notas grupales base, promedio base, saldo, puntos aplicados, excedente y promedio ajustado. No se presentan notas individuales ajustadas por trabajo como definitivas hasta acordar cómo se mostraría su distribución. El archivo no constituye un acta oficial ni se envía al SUM.
+
+## 5.7 Validaciones y tratamiento de situaciones excepcionales
+
+| Situación                                     | Respuesta funcional esperada                                                                      |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Datos del padrón incompletos o repetidos      | Explicar los registros que requieren revisión y evitar duplicados                                 |
+| Acceso a otro curso o resultado ajeno         | Denegar la consulta o modificación                                                                |
+| Grupo lleno o ventana cerrada                 | Explicar por qué no se permite el cambio y mantener el grupo anterior                             |
+| Nota fuera de rango o dato no numérico        | Solicitar corrección sin confirmar una nota inválida                                              |
+| Nota vacía                                    | Mostrar pendiente, sin asignar cero                                                               |
+| Cambio de grupo posterior a la actividad      | Conservar los participantes originales para nota y reclamo                                        |
+| Segundo reclamo del mismo registro            | Mostrar el caso existente a sus destinatarios autorizados                                         |
+| Respuesta favorable a un reclamo              | Permitir corrección expresa por el docente y conservar su explicación                             |
+| Fallo al registrar o confirmar una acción     | Informar el estado y permitir comprobarlo sin repetir registros                                   |
+| Fallo del aviso por correo                    | Mantener el reclamo registrado; definir antes del desarrollo cómo se informa y reintenta el aviso |
+| Exportación con notas pendientes              | Conservar campos vacíos y no presentar el promedio como completo                                  |
+| Saldo negativo o regla de puntos no aplicable | Requerir definición de la regla antes de producir un ajuste no acordado                           |
+
+## 5.8 Beneficios esperados y límites
+
+Se espera reducir la repetición de búsquedas y anotaciones, facilitar la consulta privada de resultados y ofrecer un recorrido visible para los reclamos. Estos beneficios dependen de que alumnado, actividades y grupos estén correctamente relacionados y de que el docente mantenga los registros actualizados.
+
+La automatización no decide la calificación de un trabajo, no resuelve por sí sola un reclamo ni reemplaza el criterio académico. Las dimensiones para evaluar su contribución se plantean en el plan de desarrollo.
 
 ---
 
-# 7. Productos de Parte I, asuntos abiertos y conclusiones
+# 6. Plan de desarrollo, indicadores y equipo
 
-## 7.1 Productos documentales disponibles
+## 6.1 Orientación del desarrollo
 
-| Producto de análisis y diseño          | Artefacto identificable | Límite                                                          |
-| -------------------------------------- | ----------------------- | --------------------------------------------------------------- |
-| Caracterización y diagnóstico          | 01 y anexo A de 09      | Basado en relato documental, no observación de campo            |
-| Objetivos, alcance y requisitos        | 02 y 04                 | No equivalen a funciones construidas                            |
-| Arquitectura, modelo y controles       | 05 y anexos B–C de 09   | Consistencia de diseño, no seguridad verificada                 |
-| Prototipo documental de baja fidelidad | P-01, anexo D de 09     | Representación estática; no software ni validación con usuarios |
-| Plan de pruebas e indicadores          | 06 y anexos E–F de 09   | Sin ejecuciones ni valores observados                           |
-| Material para informe y presentación   | 10 y guion en 06        | Requiere maquetación y elaboración del PowerPoint               |
+El proyecto tiene como objetivo desarrollar una plataforma de gestión académica para el registro y seguimiento de las evaluaciones grupales en los cursos del docente del caso de estudio. El plan articula los cuatro objetivos específicos: analizar el proceso y sus necesidades, diseñar el funcionamiento, implementar las funciones previstas y evaluar su contribución mediante pruebas e indicadores acordados.
 
-Estos son los únicos tipos de «resultados» que se atribuyen a la semana 8. No se incluyen inventarios de migraciones, CI, despliegues o pruebas locales como resultados académicos.
+El desarrollo se organizará en torno a los siguientes recorridos funcionales:
 
-## 7.2 Decisiones y datos que deben confirmarse
+1. **Organización del curso y los grupos.** El docente define la cantidad de grupos, su capacidad y la ventana de selección. Los alumnos eligen y pueden cambiar de grupo mientras la ventana esté abierta y exista cupo. Una ampliación o reapertura habilita la selección para todo el curso. Se conserva la participación en cada actividad para atribuir correctamente sus notas y reclamos posteriores.
+2. **Registro y consulta de resultados.** El docente registra y corrige las notas grupales y los puntos individuales. Al confirmar el registro, cada alumno puede consultar inmediatamente sus propios puntos y las notas de las actividades en las que participó, sin una publicación adicional. Las notas sin registrar permanecen vacías o pendientes, no se convierten en cero.
+3. **Seguimiento de reclamos.** Cualquier participante de una actividad puede presentar el único reclamo de su grupo para esa evaluación; los participantes de esa actividad y el docente consultan el caso. Cada alumno puede reclamar sobre sus propios movimientos de puntos, de forma privada con el docente y con un único reclamo por movimiento. El recorrido es **Pendiente → En revisión → Respondido**. El docente fundamenta su decisión y realiza expresamente la corrección cuando corresponda. No se contempla réplica, reapertura ni otro reclamo sobre el mismo registro.
+4. **Aviso al docente.** Un nuevo reclamo genera un correo breve al docente responsable con un enlace para revisarlo en la plataforma, sin notas, puntos ni texto del reclamo. El seguimiento y la respuesta se mantienen en la plataforma.
+5. **Exportación por curso.** El docente obtiene un archivo XLSX con las notas correspondientes a cada alumno según su participación en las actividades y los datos de puntos. La descarga sirve de apoyo al docente y no supone una integración con el SUM.
 
-| Asunto                                  | Fuente y situación                                                                                   | Efecto sobre diseño y evaluación                                                                                               |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Diagnóstico del proceso manual          | Caso interno reportado; sin entrevistas o mediciones del equipo                                      | Confirmar actividades, dificultades reales y línea base antes de cuantificar beneficios                                        |
-| Fecha, hora y zona horaria              | Caso habla del día de actividad; especificación propone instantes                                    | Acordar precisión y desempate cuando actividad y traslado coinciden                                                            |
-| Traslados retroactivos                  | Regla de traslado existe; límites de retroactividad no están cerrados                                | Definir quién revisa impactos y qué historia puede corregirse                                                                  |
-| Nota vacía y precisión                  | Código de referencia admite vacío; especificación exige nota numérica válida                         | Se propone vacío como pendiente; confirmar decimales, redondeo y corrección concurrente                                        |
-| Grupos esperados y excepciones          | Diseño técnico permite conciliar con excepciones                                                     | Acordar grupos vacíos, alumnos sin grupo, grupos desactivados y autoridad para aceptar una excepción; evitar ocultar faltantes |
-| Identidad y padrón                      | Fuente histórica habla de acceso institucional; autorización se vincula por correo                   | Confirmar dominios admitidos, cambios de correo y campos reales del XLSX sin difundir datos personales                         |
-| Incorporación inicial por periodo/curso | Material técnico incluye importación por periodo y formularios por curso                             | Definir destino y coincidencias para evitar asociaciones al curso incorrecto                                                   |
-| Exportación                             | Documentación la describe como posterior; componente `group-grades-table.tsx` contiene descarga XLSX | No equiparar descarga técnica con exportación oficial ni incorporarla como obligación del trabajo                              |
-| CI y pruebas del repositorio            | Documentos de operación dicen que faltan; README y configuración técnica describen comprobaciones    | Son fuentes con actualización desigual; no trasladar su estado a resultados de Parte I ni afirmar su inexistencia              |
-| Excepción individual                    | Caso la prevé para después y especificación la excluye de Parte II                                   | Mantenerla fuera de esta propuesta; reconsiderar solo con cambio de alcance explícito                                          |
-| Criterio arquitectónico del curso       | Guía valora aplicar una tendencia arquitectónica                                                     | Confirmar si la aplicación full-stack con separación lógica satisface la expectativa de evaluación                             |
-| Fidelidad del prototipo                 | Guía titula Parte I «Diseño y prototipo» sin detallar formato                                        | Confirmar si P-01 es suficiente o se exige maqueta visual/interactiva; no afirmar cumplimiento definitivo                      |
-| Metas, calendario y equipo              | Valores técnicos candidatos, cinco áreas y semanas intermedias tentativas                            | Acordar volumen, umbrales, nombres, fechas y responsables antes de comprometerlos                                              |
+Para la exportación se adopta como **supuesto de trabajo del equipo, no confirmado por el profesor**, la aplicación automática de puntos a los trabajos grupales antes de obtener el promedio individual. Los trabajos tienen igual peso; cada punto aumenta una unidad de nota individual hasta un máximo de 20 por trabajo, aprovechando el margen disponible sin repetir puntos ni alterar las notas grupales base. Los puntos que excedan ese margen se conservan como excedente no aplicado.
 
-La especificación externa presenta requisitos como definidos y su checklist no contiene aclaraciones abiertas; eso no demuestra confirmación académica de estos puntos. Se conservan explícitamente como asuntos por validar y no se modifica la especificación.
+Exportar solo calcula: no consume ni modifica los puntos. Con los mismos datos y reglas, las descargas sucesivas deben conservar los mismos resultados académicos. Si faltan notas, permanecen vacías y no se presenta un promedio final ajustado como completo. El promedio de cierre se muestra con dos decimales y se redondea únicamente al final, conservando la precisión de los cálculos intermedios. El detalle definitivo de las columnas del archivo queda por precisar.
 
-## 7.3 Conclusiones de análisis y diseño
+## 6.2 Cronograma tentativo
 
-1. El caso documentado permite delimitar un proceso susceptible de automatización: registro, corrección y conciliación de evaluaciones grupales. La plataforma completa aporta contexto, pero no constituye el objeto íntegro del experimento.
-2. La pertenencia histórica y la fecha de actividad son necesarias en el modelo para explicar la atribución de notas ante traslados; consultar solo el grupo actual sería conceptualmente insuficiente.
-3. La separación de puntos, notas, autorizaciones y matrículas evita mezclar conceptos académicos con permisos e identidades. Esa separación fundamenta los requisitos, no demuestra una mejora ya conseguida.
-4. La arquitectura propuesta distribuye responsabilidades entre presentación, servidor y datos sin justificar un servicio adicional. Su adecuación operativa, seguridad y rendimiento deberán comprobarse en Parte II.
-5. El diseño de estados, controles, correcciones y reintentos aborda riesgos identificados y permite formular casos de prueba. No prueba que esos riesgos estén eliminados.
-6. La Parte I aporta documentos y una representación estática identificable. No establece eficacia medida, aceptación de usuarios, funcionamiento productivo ni cumplimiento definitivo del formato de prototipo requerido por el docente.
+La guía establece un hito de análisis, diseño y prototipo en la semana 8 y otro de implementación, pruebas y evaluación en la semana 16. Ambos forman parte del mismo proyecto de desarrollo; la distribución intermedia siguiente es una propuesta de organización, sujeta a las fechas y disponibilidad del equipo.
 
-## 7.4 Recomendaciones
+| Periodo       | Actividades previstas                                                                                                                                          | Producto esperado                                                     |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Semanas 1–4   | Analizar el proceso de evaluación grupal, identificar necesidades y delimitar objetivos, actores y alcance.                                                    | Diagnóstico y requisitos.                                             |
+| Semanas 5–7   | Diseñar la organización de grupos, el registro y consulta de resultados, los reclamos y la exportación; representar los recorridos en el prototipo documental. | Diseño funcional y prototipo documental.                              |
+| Semana 8      | Integrar el análisis y el diseño, revisar el prototipo y preparar el informe y la presentación de avance.                                                      | Entrega de análisis, diseño y prototipo prevista por la guía.         |
+| Semanas 9–10  | Desarrollar la organización de cursos y grupos, y el registro de notas y puntos con su consulta restringida.                                                   | Recorrido de registro y consulta.                                     |
+| Semanas 11–12 | Desarrollar el seguimiento de reclamos, el aviso por correo y la exportación con las reglas de cálculo acordadas.                                              | Recorridos de seguimiento y exportación.                              |
+| Semanas 13–14 | Probar los recorridos completos, revisar la correspondencia de resultados y corregir las dificultades encontradas.                                             | Registro de pruebas y ajustes.                                        |
+| Semana 15     | Realizar la evaluación con escenarios simulados comparables y analizar los indicadores y sus limitaciones.                                                     | Resultados de evaluación.                                             |
+| Semana 16     | Consolidar la plataforma, las pruebas, la evaluación y la presentación final.                                                                                  | Entrega de implementación, pruebas y evaluación prevista por la guía. |
 
-Confirmar primero las reglas temporales, la definición de grupos esperados y el tratamiento de excepciones. Revisar el prototipo con el docente y registrar futuras observaciones sin inventar aprobaciones. Antes de implementar, precisar contratos y criterios de aceptación; antes de medir, fijar el protocolo y las entradas equivalentes. Usar datos sintéticos, entorno aislado y evidencia con fecha, versión y limitaciones. En Parte II, reportar tanto fallos como aciertos y no confundir metas, checks de calidad o despliegues con mejoras del proceso.
+## 6.3 Evaluación e indicadores propuestos
 
-Completar carátula, nombres y referencias pendientes; maquetar el informe y elaborar el PowerPoint exigido por la guía. Ninguno de estos archivos de trabajo sustituye por sí solo esos entregables finales.
+La evaluación buscará determinar la contribución de la plataforma al registro y seguimiento de las evaluaciones grupales. Los indicadores siguientes son propuestas para acordar antes de la evaluación; no representan resultados obtenidos ni metas numéricas aprobadas.
+
+| Indicador propuesto                      | Qué se observará                                                                                                                               | Criterio de revisión                                                                                                                                                                            |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tiempo de registro                       | Tiempo necesario para registrar un mismo conjunto de evaluaciones grupales mediante un procedimiento manual simulado y mediante la plataforma. | Comparar las condiciones y los tiempos observados para explorar una posible reducción. Esta es una hipótesis del equipo, no una dificultad temporal cuantificada ni confirmada por el profesor. |
+| Correspondencia entre nota e integrantes | Coincidencia entre la nota de una actividad y los alumnos que participaron en ella, incluidos quienes después cambian de grupo.                | Contrastar los resultados con la relación de participantes prevista para cada actividad del escenario.                                                                                          |
+| Consulta restringida e inmediata         | Disponibilidad de notas y puntos tras confirmar su registro y delimitación de lo que puede consultar cada alumno.                              | Comprobar que no se requiere otra publicación y que cada alumno accede solo a sus puntos y a las notas que le corresponden.                                                                     |
+| Seguimiento de reclamos                  | Presentación, consulta, estados y respuesta de los reclamos grupales e individuales.                                                           | Revisar el recorrido Pendiente → En revisión → Respondido, la privacidad, la participación histórica, la restricción de duplicados y la decisión fundamentada del docente.                      |
+| Aviso por correo al docente              | Generación del aviso ante un nuevo reclamo y contenido del mensaje.                                                                            | Verificar destinatario, enlace y ausencia de datos académicos y del texto del reclamo; distinguir el envío de la entrega o lectura del correo.                                                  |
+| Exactitud de la exportación              | Correspondencia de las notas por alumno y de los resultados calculados con los casos preparados.                                               | Revisar aplicación automática de puntos, igual peso, máximo de 20 por trabajo, excedentes, ausencia de consumo, notas pendientes vacías y promedio con redondeo final a dos decimales.          |
+
+Se prepararán escenarios simulados con grupos, actividades, cambios de integrantes, notas, puntos y reclamos. Para cada caso se definirá previamente el resultado esperado y luego se registrarán lo observado y las diferencias. Se incluirán tanto recorridos habituales como situaciones con notas pendientes, trabajos en el máximo de calificación y puntos excedentes.
+
+La comparación del tiempo de registro utilizará las mismas entradas, cantidad de grupos y tareas en ambos procedimientos, con preparación equivalente para los participantes. Antes de realizarla se acordarán participantes, repeticiones, condiciones y forma de resumir los tiempos. No se dispone de una línea base histórica de tiempos ni de solicitudes o reclamos; por ello, la simulación no se presentará como una medición del desempeño anterior del docente. Los demás indicadores se revisarán contra los criterios funcionales de los escenarios, sin inventar reducciones de reclamos ni porcentajes de mejora.
+
+## 6.4 Organización del equipo
+
+Se prevé un equipo de cinco integrantes. Los nombres y la asignación personal de responsabilidades están pendientes; se proponen los siguientes roles funcionales:
+
+| Rol                                 | Responsabilidad principal                                                                                     | Integrante        |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------- |
+| Coordinación y análisis del proceso | Organizar el trabajo, mantener el alcance y reunir las necesidades y acuerdos del caso.                       | Nombre pendiente. |
+| Diseño funcional y prototipo        | Representar los recorridos del docente y del alumno y revisar su claridad y facilidad de uso.                 | Nombre pendiente. |
+| Registro y organización académica   | Desarrollar las funciones de cursos, grupos, participación, notas y puntos.                                   | Nombre pendiente. |
+| Seguimiento y comunicación          | Desarrollar la consulta de resultados, los reclamos y el aviso al docente.                                    | Nombre pendiente. |
+| Evaluación y documentación          | Coordinar las pruebas y los indicadores, revisar la exportación y consolidar el informe y las presentaciones. | Nombre pendiente. |
+
+Los roles organizan la responsabilidad principal, no el trabajo exclusivo de cada integrante. Se propone revisar en conjunto los recorridos completos y los resultados de evaluación, y ajustar la distribución de tareas según el avance.
+
+---
+
+# 7. Conclusiones y recomendaciones
+
+## 7.1 Conclusiones de análisis y diseño
+
+1. El análisis permite delimitar una propuesta orientada a desarrollar una plataforma de gestión académica para el registro y seguimiento de las evaluaciones grupales en los cursos del docente del caso de estudio. La consulta de resultados y la atención de reclamos concretan el seguimiento; la organización de grupos y la incorporación de alumnos lo habilitan. Los puntos individuales y la exportación completan el recorrido acordado.
+2. La correspondencia entre una evaluación y quienes participaron en ella es una regla central del diseño. Un cambio posterior de grupo no debe alterar las notas que corresponden al alumno ni el acceso al reclamo de aquella actividad. La elección estudiantil de grupos se desarrolla dentro de la capacidad y la ventana definidas por el docente; su reapertura habilita la selección para todo el curso.
+3. La consulta de resultados y el seguimiento de reclamos requieren reglas de visibilidad diferenciadas. Las notas y los puntos se hacen visibles al confirmar su registro, sin una publicación posterior. Los reclamos grupales se comparten con los participantes de la actividad, mientras que los reclamos de puntos permanecen entre el alumno y el docente. Los estados Pendiente, En revisión y Respondido permiten representar un recorrido con decisión final fundamentada del docente.
+4. La exportación distingue la nota grupal base de los resultados individuales derivados de los puntos. La aplicación automática propuesta conserva las notas base, respeta el máximo por trabajo y no consume puntos al descargar. Esta regla de cálculo se mantiene como supuesto del equipo, no como criterio confirmado por el profesor.
+5. El análisis, el diseño y el prototipo documental permiten organizar el funcionamiento previsto y orientar su desarrollo. Su contribución al proceso deberá evaluarse mediante pruebas y los indicadores propuestos en el apartado 6; estas conclusiones no establecen una reducción medida del tiempo de registro ni una eficacia comprobada de la plataforma.
+
+## 7.2 Recomendaciones y pendientes
+
+- Revisar con el equipo los recorridos y el prototipo documental. Mantener explícito y revisable el supuesto de aplicación de puntos, sin atribuirle confirmación del profesor, con quien no se dispuso de una nueva oportunidad de consulta.
+- Precisar el detalle de columnas de la exportación, el tratamiento de movimientos de puntos negativos o anulados y la cantidad de decimales admitida al registrar notas. Si se muestran notas ajustadas por trabajo, acordar una distribución automática reproducible de los puntos.
+- Definir cómo se informará al docente un fallo del aviso por correo y cómo podrá reconocer los reclamos pendientes desde la plataforma.
+- Acordar por qué medio se solicita un cambio de grupo después del cierre y si se necesita una intervención docente distinta de reabrir la selección para todo el curso, sin incorporarla por defecto al recorrido de reclamos académicos.
+- Concretar los escenarios, participantes y condiciones de evaluación. Contrastar los resultados con criterios acordados y, para el tiempo de registro, con un procedimiento manual simulado equivalente, sin atribuirle carácter de línea base histórica.
+- Completar los nombres y responsabilidades de los cinco integrantes, ajustar las fechas del cronograma y preparar el informe y las presentaciones correspondientes.
 
 ---
 
 # 8. Bibliografía y fichas de investigación
 
-## 8.1 Criterio editorial y alcance de la verificación
+## 8.1 Criterio de selección
 
-La Parte I (semana 8) presenta una propuesta no implementada: análisis, diseño y prototipo. La implementación, las pruebas y la evaluación se prevén para la semana 16. Una fuente bibliográfica puede fundamentar un concepto, pero no demuestra que el proyecto ya lo aplique o que haya obtenido resultados.
+Se incluyen fuentes pertinentes para comprender la automatización de actividades repetitivas, la gestión académica y la accesibilidad. Se distingue entre contenido consultado, presentaciones editoriales y fuentes candidatas: comprobar una referencia no equivale a haber leído toda la obra. Las reglas particulares de notas, grupos, puntos y reclamos proceden de los acuerdos del caso, no de la bibliografía externa.
 
-**Revisión web del 14 de octubre de 2026 mediante `fetch`:** se consultaron seis fuentes oficiales. En PostgreSQL, RFC 9110 y WCAG 2.2 se comprobó el contenido pertinente; en las dos publicaciones NIST se comprobaron la ficha editorial y el resumen, no los PDF completos ni cada control. El DOI de Benavides et al. devolvió HTTP 403. Las demás candidatas no se consultaron en esta revisión: no se consideran falsas, pero tampoco verificadas.
+Las fuentes de este capítulo respaldan únicamente las afirmaciones indicadas en sus fichas. No acreditan resultados del proyecto ni sustituyen la evaluación de su contribución al proceso académico.
 
-Las referencias comprobadas se presentan en APA 7 en 8.3. Las candidatas de 8.4 quedan fuera del respaldo afirmativo del marco hasta comprobar sus metadatos y el pasaje pertinente. No se asignan niveles de calidad solo por tener DOI ni se inventan páginas leídas. En APA 7, una fecha de recuperación es pertinente para contenido cambiante sin versión archivada; no es obligatoria para toda página sin fecha.
-
-## 8.2 Fichas de fuentes comprobadas
-
-| Fuente y tipo                                              | URL consultada                                                     | Comprobación efectiva                                                                                                                                                 | Uso permitido y límite                                                                                                                                                    |
-| ---------------------------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PostgreSQL, _Transactions_; documentación oficial          | https://www.postgresql.org/docs/current/tutorial-transactions.html | Contenido de la sec. 3.4: agrupación de cambios de todo o nada y reversión. La página consultada corresponde a PostgreSQL 18.                                         | Fundamenta transacciones; no prueba integridad del proyecto.                                                                                                              |
-| PostgreSQL, _Row security policies_; documentación oficial | https://www.postgresql.org/docs/current/ddl-rowsecurity.html       | Contenido de la sec. 5.9: restricciones por fila, políticas y excepciones para roles privilegiados. La página consultada corresponde a PostgreSQL 18.                 | Fundamenta RLS y sus límites; no acredita permisos implementados.                                                                                                         |
-| Fielding et al., RFC 9110; estándar                        | https://www.rfc-editor.org/rfc/rfc9110.html                        | Editores, título y junio de 2022; sec. 9.2.2 sobre idempotencia y secs. 17.7–17.9 sobre privacidad.                                                                   | Define el efecto pretendido de solicitudes repetidas; no prescribe el mecanismo de deduplicación de notas.                                                                |
-| Joint Task Force, NIST SP 800-53 Rev. 5; catálogo oficial  | https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final                 | Autor corporativo, título, septiembre de 2020, DOI y resumen sobre controles adaptables al riesgo. La ficha informa actualizaciones posteriores.                      | Respalda el contexto general de controles; AC-5, AC-6 y controles de auditoría requieren lectura específica antes de citarlos. No es certificación ni obligación peruana. |
-| Kent y Souppaya, NIST SP 800-92; guía oficial              | https://csrc.nist.gov/pubs/sp/800/92/final                         | Autores, título, septiembre de 2006, DOI y resumen sobre infraestructura y procesos de gestión de registros.                                                          | Respalda la necesidad de gestionar registros; las secs. 2–4 del PDF quedan por leer para afirmaciones detalladas.                                                         |
-| World Wide Web Consortium, WCAG 2.2; recomendación oficial | https://www.w3.org/TR/WCAG22/                                      | Título, versión publicada el 12 de diciembre de 2024, cuatro principios y criterios de teclado, foco, color, etiquetas, errores y estados; requisitos de conformidad. | Fundamenta criterios de diseño, no conformidad del prototipo ni de una futura implementación.                                                                             |
-
-## 8.3 Bibliografía comprobada en APA 7
-
-Fielding, R., Nottingham, M., & Reschke, J. (Eds.). (2022). _HTTP semantics_ (RFC 9110; STD 97). Internet Engineering Task Force. https://doi.org/10.17487/RFC9110
-
-Joint Task Force. (2020). _Security and privacy controls for information systems and organizations_ (NIST Special Publication 800-53 Rev. 5). National Institute of Standards and Technology. https://doi.org/10.6028/NIST.SP.800-53r5
-
-Kent, K., & Souppaya, M. (2006). _Guide to computer security log management_ (NIST Special Publication 800-92). National Institute of Standards and Technology. https://doi.org/10.6028/NIST.SP.800-92
-
-PostgreSQL Global Development Group. (s. f.-a). _Row security policies_. Recuperado el 14 de octubre de 2026, de https://www.postgresql.org/docs/current/ddl-rowsecurity.html
-
-PostgreSQL Global Development Group. (s. f.-b). _Transactions_. Recuperado el 14 de octubre de 2026, de https://www.postgresql.org/docs/current/tutorial-transactions.html
-
-World Wide Web Consortium. (2024, 12 de diciembre). _Web Content Accessibility Guidelines (WCAG) 2.2_. https://www.w3.org/TR/2024/REC-WCAG22-20241212/
-
-## 8.4 Candidatas pendientes de comprobación
-
-Los datos siguientes proceden del borrador previo. Su presentación sigue el formato APA 7, pero no equivale a comprobar autores, título, fecha, DOI ni correspondencia entre texto y afirmación. Deben verificarse antes de incorporarlas a la bibliografía utilizada.
-
-| Candidata                                          | Estado y comprobación necesaria                                                                                                              |
-| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Benavides et al. (2020)                            | Intento mediante DOI: HTTP 403; pendiente contrastar autores, metadatos y texto completo.                                                    |
-| Dumas et al. (2018)                                | Sin consulta en esta revisión; comprobar edición y pasajes sobre gestión por procesos.                                                       |
-| OECD (2023)                                        | Sin consulta; comprobar título completo y capítulos pertinentes.                                                                             |
-| Falchikov y Goldfinch (2000); Lejk y Wyvill (2001) | Sin consulta; comprobar metadatos, método y límites de la evaluación por pares. No justifican por sí solos la regla de nota grupal del caso. |
-| Sandhu et al. (1996)                               | Sin consulta; comprobar metadatos y definición del modelo RBAC.                                                                              |
-| Bertolino (2007)                                   | Sin consulta; comprobar publicación y pasajes sobre pruebas.                                                                                 |
-| Hilton et al. (2016); Bacchelli y Bird (2013)      | Sin consulta; comprobar resultados y límites de generalización antes de atribuir beneficios.                                                 |
-| Ley N.º 29733                                      | Sin consulta; comprobar enlace, texto oficial vigente, artículos pertinentes y aplicabilidad.                                                |
-| Decreto Supremo N.º 016-2024-JUS                   | No se dispone de enlace específico verificado; localizar norma y PDF oficiales. La portada de El Peruano no identifica el documento.         |
-
-Bacchelli, A., & Bird, C. (2013). Expectations, outcomes, and challenges of modern code review. En _2013 35th International Conference on Software Engineering_ (pp. 712–721). IEEE. https://doi.org/10.1109/ICSE.2013.6606617
-
-Benavides, L. M. C., Tamayo Arias, J. A., Arango Serna, M. D., Branch Bedoya, J. W., & Burgos, D. (2020). Digital transformation in higher education institutions: A systematic literature review. _Sensors, 20_(11), Artículo 3291. https://doi.org/10.3390/s20113291
-
-Bertolino, A. (2007). Software testing research: Achievements, challenges, dreams. En _Future of Software Engineering (FOSE ’07)_ (pp. 85–103). IEEE. https://doi.org/10.1109/FOSE.2007.25
-
-Congreso de la República del Perú. (2011). _Ley N.º 29733, Ley de Protección de Datos Personales_. https://www.gob.pe/institucion/congreso-de-la-republica/normas-legales/243470-29733
-
-Dumas, M., La Rosa, M., Mendling, J., & Reijers, H. A. (2018). _Fundamentals of business process management_ (2.ª ed.). Springer. https://doi.org/10.1007/978-3-662-56509-4
-
-Falchikov, N., & Goldfinch, J. (2000). Student peer assessment in higher education: A meta-analysis comparing peer and teacher marks. _Review of Educational Research, 70_(3), 287–322. https://doi.org/10.3102/00346543070003287
-
-Hilton, M., Tunnell, T., Huang, K., Marinov, D., & Dig, D. (2016). Usage, costs, and benefits of continuous integration in open-source projects. En _Proceedings of the 31st IEEE/ACM International Conference on Automated Software Engineering_ (pp. 426–437). ACM. https://doi.org/10.1145/2970276.2970358
-
-Lejk, M., & Wyvill, M. (2001). Peer assessment of contributions to a group project: A comparison of holistic and category-based approaches. _Assessment & Evaluation in Higher Education, 26_(1), 61–72. https://doi.org/10.1080/02602930020022291
-
-Ministerio de Justicia y Derechos Humanos. (2024). _Decreto Supremo N.º 016-2024-JUS_. [Entrada candidata: título completo y URL oficial pendientes de comprobación].
-
-OECD. (2023). _OECD digital education outlook 2023: Towards an effective digital education ecosystem_. OECD Publishing. https://doi.org/10.1787/c74f03de-en
-
-Sandhu, R. S., Coyne, E. J., Feinstein, H. L., & Youman, C. E. (1996). Role-based access control models. _Computer, 29_(2), 38–47. https://doi.org/10.1109/2.485845
-
-### Documentación técnica por seleccionar
-
-Las páginas de Next.js, Supabase, restricciones de PostgreSQL y herramientas de GitHub se incorporarán solo si son necesarias para explicar el diseño. Quedan pendientes de selección y consulta. Explican mecanismos técnicos, no beneficios académicos ni implementación efectiva de la propuesta.
-
-## 8.5 Guía del curso y referencias internas de dominio
-
-### Guía del curso 2026-2
+## 8.2 Bibliografía utilizada
 
 _Automatizacion y control de software: Guía del trabajo final del curso_. (s. f.). [Guía de curso en PDF proporcionada por el usuario; sin autor identificado].
 
-Se leyó directamente el PDF adjunto `Trabajo Final Automatizacion y Control de Software 2026-2.pdf`, mediante extracción de sus dos páginas. La p. 1 describe el propósito y las capacidades del trabajo completo; la p. 2 distingue Parte I de semana 8 y Parte II de semana 16, establece la estructura del informe final y exige informe y PowerPoint en ambas entregas. El documento no especifica la fidelidad del prototipo. No se inventan autor, institución editora ni fecha de publicación; 2026-2 identifica el curso en el nombre del archivo, no una fecha editorial comprobada.
+Dumas, M., La Rosa, M., Mendling, J., & Reijers, H. A. (2018). _Fundamentals of business process management_ (2.ª ed.). Springer. https://doi.org/10.1007/978-3-662-56509-4
 
-### Fuentes internas como referencia de dominio
+UNESCO. (s. f.). _Technology in education: A tool on whose terms?_ [Presentación del Informe GEM 2023]. Recuperado el 15 de octubre de 2026, de https://www.unesco.org/gem-report/en/technology
 
-| Documento del proyecto                                                                                   | Función en la propuesta                                                               | Límite                                                                      |
-| -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `docs/01-definicion/caso-evaluacion-grupal.md`                                                           | Contextualizar el problema académico descrito por el proyecto.                        | No sustituye evidencia externa ni datos de evaluación.                      |
-| `docs/01-definicion/glosario.md` y `specs/001-manage-group-evaluation/spec.md`                           | Rastrear actores, alcance y reglas de nota grupal, puntos individuales y pertenencia. | Es referencia de dominio; sus reglas requieren validación con responsables. |
-| `docs/02-diseno/modelo-datos.md` y `specs/001-manage-group-evaluation/data-model.md`                     | Relacionar los conceptos con decisiones de diseño propuestas.                         | No acredita controles implementados, probados o eficaces.                   |
-| `docs/03-calidad-y-operacion/indicadores-y-ci-cd.md` y `specs/001-manage-group-evaluation/quickstart.md` | Relacionar criterios y planificación de evaluación futura.                            | Las metas no son resultados medidos.                                        |
+World Wide Web Consortium. (2024, 12 de diciembre). _Web Content Accessibility Guidelines (WCAG) 2.2_. https://www.w3.org/TR/2024/REC-WCAG22-20241212/
 
-Estos documentos se identifican por sus rutas existentes; no se les inventan autores o fechas. Su inclusión sirve para trazabilidad interna, no para presentarlos como antecedentes académicos independientes.
+## 8.3 Fichas de fuentes consultadas
 
-## 8.6 Plantilla para nuevas fichas
+### Ficha 1. Gestión por procesos y automatización
 
-| Campo                     | Contenido por registrar                                                        |
-| ------------------------- | ------------------------------------------------------------------------------ |
-| Tema y concepto           | Concepto concreto que se pretende fundamentar.                                 |
-| Referencia APA 7          | Autores, fecha, título y publicación contrastados con la fuente.               |
-| Tipo y procedencia        | Libro, artículo, estándar, norma o documentación oficial; editorial o entidad. |
-| DOI/URL                   | Identificador y enlace específico consultado.                                  |
-| Estado                    | Contenido comprobado, solo metadatos/resumen, acceso fallido o sin consulta.   |
-| Fecha y medio de consulta | Fecha efectiva y medio utilizado; no registrar intentos fallidos como lectura. |
-| Pasaje pertinente         | Página o sección realmente consultada; para cita textual, localizador exacto.  |
-| Afirmación y límites      | Qué respalda y qué no permite concluir sobre el proyecto.                      |
-| Aplicación al caso        | Problema, ventaja esperada, desventaja y condición de recomendación.           |
-| Pendientes                | Lectura completa, actualización, metadatos o revisión de aplicabilidad.        |
+- **Fuente:** Dumas et al. (2018).
+- **Tipo:** libro académico; consulta de su presentación editorial en Springer.
+- **Enlace consultado:** https://link.springer.com/book/10.1007/978-3-662-56509-4
+- **Consulta:** 15 de octubre de 2026.
+- **Contenido comprobado:** autores, año, segunda edición, editorial y DOI; secciones «About this book» y «Bibliographic information». La presentación describe un ciclo que incluye identificación, modelado, análisis, rediseño, automatización y seguimiento de procesos.
+- **Aporte al marco:** contextualiza la automatización como parte de la revisión de un proceso, no como simple traslado de información a una pantalla (sección 3.1).
+- **Aplicación al caso:** examinar la identificación de integrantes y la repetición individual de una misma nota como actividades relacionadas que pueden reorganizarse.
+- **Límite:** no se consultaron los capítulos completos. La presentación no demuestra ahorros de tiempo, reducción de errores ni efectos específicos en evaluaciones grupales. La descripción del procedimiento con Excel proviene del solicitante.
+
+### Ficha 2. Tecnología y gestión educativa
+
+- **Fuente:** UNESCO (s. f.), página de presentación del Informe GEM 2023.
+- **Tipo:** presentación institucional de un informe educativo.
+- **Enlace consultado:** https://www.unesco.org/gem-report/en/technology
+- **Consulta:** 15 de octubre de 2026.
+- **Contenido comprobado:** apartado introductorio. La página identifica la gestión del sistema educativo entre los ámbitos de posible contribución de la tecnología y señala tres condiciones generales: acceso, gobernanza y regulación, y preparación docente.
+- **Aporte al marco:** sitúa el uso de tecnología al servicio de necesidades educativas y advierte que sus beneficios dependen de condiciones de uso (sección 3.2).
+- **Aplicación al caso:** justificar una plataforma centrada en el registro y seguimiento, con responsabilidades y destinatarios definidos.
+- **Límite:** se consultó la presentación, no el informe completo. Se emplea «s. f.» porque la página no muestra una fecha editorial inequívoca; 2023 corresponde al informe presentado. No respalda efectos medidos en este proyecto ni permite equiparar consulta de notas con mejora del aprendizaje.
+
+### Ficha 3. Accesibilidad de la información y de los recorridos
+
+- **Fuente:** World Wide Web Consortium (2024).
+- **Tipo:** recomendación internacional de accesibilidad.
+- **Enlace consultado:** https://www.w3.org/TR/2024/REC-WCAG22-20241212/
+- **Consulta:** 15 de octubre de 2026.
+- **Contenido comprobado:** introducción y cuatro principios; criterios 1.4.1 (uso del color), 2.1.1 (teclado), 2.4.7 (foco visible), 3.2.3 (navegación consistente), 3.3.1 (identificación de errores) y 3.3.2 (etiquetas o instrucciones); requisitos de conformidad para páginas y procesos completos, secciones 5.2.2 y 5.2.3.
+- **Aporte al marco:** fundamenta información perceptible, interacción operable y mensajes comprensibles (sección 3.7).
+- **Aplicación al caso:** identificar los estados de reclamos con texto, facilitar la navegación y explicar los errores al registrar información.
+- **Límite:** los criterios orientan el diseño y su revisión; no constituyen evidencia de conformidad de la plataforma. La propia recomendación reconoce que no cubre todas las necesidades de todas las personas.
+
+## 8.4 Fuentes del caso y acuerdos funcionales
+
+La descripción del proceso actual se basa en el **relato del solicitante**: identificación de integrantes y registro de la nota uno por uno en Excel, junto con la necesidad de consultar resultados y solicitar su revisión. No se atribuye esta información a una entrevista formal con el docente, a observación directa ni a mediciones de tiempo.
+
+El documento `development/PLAN-REFINAMIENTO-PARTE-I.md` conserva las decisiones utilizadas en el marco:
+
+| Apartados | Aporte al caso                                                                                                      |
+| --------- | ------------------------------------------------------------------------------------------------------------------- |
+| 3         | Problema, pregunta y objetivos acordados.                                                                           |
+| 4         | Consulta inmediata, participantes históricos, privacidad, estados de reclamos, decisión docente y aviso por correo. |
+| 5         | Exportación y supuesto de puntos, límites, excedentes, ausencia de consumo y redondeo.                              |
+| 4         | Configuración de grupos, cambios sujetos a cupo y reapertura para todo el curso.                                    |
+
+Estos acuerdos son fuentes internas del caso, no antecedentes académicos independientes. En particular, la aplicación de puntos al preparar la exportación es un **supuesto de trabajo acordado con el solicitante**, no una regla confirmada por el profesor. Tampoco se presenta como beneficio comprobado de una práctica pedagógica.
+
+La guía del curso fue leída en sus dos páginas: la primera describe el propósito del proyecto y ejemplos de automatización; la segunda establece los hitos, la estructura del informe final y la entrega de informe y PowerPoint. No identifica autor ni fecha de publicación. El periodo 2026-2 corresponde al curso indicado en el nombre del archivo, no a una fecha editorial comprobada.
+
+## 8.5 Fuentes candidatas pendientes
+
+Las siguientes referencias se conservan únicamente como líneas de investigación pertinentes. Sus datos proceden del borrador previo y deben contrastarse antes de incorporarlas como respaldo del marco. No se les atribuyen conclusiones.
+
+| Candidata                                                                                                                                                  | Pertinencia y comprobación pendiente                                                                                                                                                                                                      |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Benavides et al. (2020), _Digital transformation in higher education institutions: A systematic literature review_. DOI: https://doi.org/10.3390/s20113291 | Puede ampliar el contexto de gestión digital en educación superior. El borrador registra un acceso fallido; falta contrastar la autoría completa, los metadatos y los pasajes aplicables. No se usa para afirmar beneficios del proyecto. |
+| Ley peruana N.º 29733, Ley de Protección de Datos Personales, y su reglamento aprobado por Decreto Supremo N.º 016-2024-JUS                                | Pertinentes para revisar el tratamiento de información académica personal. Falta comprobar los textos oficiales vigentes, los artículos aplicables y las obligaciones concretas del caso. No se afirma cumplimiento legal.                |
+
+Para ampliar el fundamento de prototipado, facilidad de uso o evaluación de la solución se deberá seleccionar una fuente específica y leer el contenido pertinente antes de citarla. No se añaden referencias genéricas solo para aumentar la cantidad de entradas.
+
+## 8.6 Criterios para completar nuevas fichas
+
+Cada nueva ficha registrará: referencia contrastada, tipo de fuente, enlace específico, fecha de consulta, sección o página leída, concepto respaldado, aplicación al caso y límites. Si solo se consulta un resumen o una ficha editorial, se indicará expresamente. Los intentos fallidos de acceso no se registrarán como lecturas y las citas textuales requerirán un localizador exacto.
 
 ---
 
-# 9. Anexos de análisis, diseño y prototipo
+# 9. Anexos: procesos, prototipo e instrumentos
 
-Estos anexos contienen artefactos documentales de semana 8 e instrumentos previstos para semana 16. Ningún ejemplo sintético corresponde a un alumno, nota real, ejecución o validación con usuarios.
-
-## Anexo A. Modelos del proceso
-
-### Proceso reportado — reconstrucción documental
+## Anexo A. Proceso actual descrito en el caso
 
 ```mermaid
 flowchart TB
-    A[Recibir padrón de alumnos del SUM] --> B[Preparar registros del curso]
-    B --> C[Organizar grupos en registro separado]
-    C --> D[Realizar actividad grupal]
-    D --> E[Anotar nota grupal en XLSX]
-    E --> F[Conciliar grupos y notas manualmente]
-    P[Puntos individuales en registro separado] -. No son notas .-> F
-    T[Cambios de grupo o correcciones] --> F
+    A[Recibir padrón del SUM] --> B[Preparar plantilla de notas en XLSX]
+    C[Estudiantes forman sus grupos] --> D[Docente revisa trabajo e identifica integrantes]
+    B --> D
+    D --> E[Buscar a cada integrante en el archivo]
+    E --> F[Anotar individualmente la misma nota]
+    F --> G{Quedan integrantes}
+    G -->|Sí| E
+    G -->|No| H[Continuar con otra evaluación]
 ```
 
-El orden es una reconstrucción de análisis que debe confirmarse con el docente; no se observó una ejecución de campo.
+El diagrama sintetiza el relato transmitido por el responsable del proyecto. La información de puntos permanecía en el registro docente, sin un medio individual de consulta durante el ciclo. No se dispone de una medición del tiempo de este recorrido.
 
-### Flujo propuesto
+## Anexo B. Registro y seguimiento propuestos
 
 ```mermaid
 flowchart TB
-    A[Curso y alumnado autorizados] --> B[Pertenencias de grupo identificadas]
-    B --> C[Definir actividad y fecha]
-    C --> D[Resolver grupos históricos aplicables]
-    D --> E[Ingresar nota grupal]
-    E --> F{Permiso, curso y nota válidos}
-    F -->|No| G[Explicar rechazo sin cambio]
+    A[Curso y alumnado incorporados] --> B[Docente configura grupos y ventana]
+    B --> C[Alumnos eligen grupo con cupo]
+    C --> D[Docente identifica actividad y participantes]
+    D --> E[Registra una nota por grupo]
+    E --> F{Registro válido}
+    F -->|No| G[Explicar qué debe corregirse]
     G --> E
-    F -->|Sí| H[Confirmar registro y conservar evidencia]
-    H --> I{Respuesta confirmada}
-    I -->|No| J[Consultar resultado o reintentar misma intención]
-    J --> H
-    I -->|Sí| K[Revisar notas y faltantes]
-    K --> L{Todos atendidos o excepción aceptada}
-    L -->|No| E
-    L -->|Sí| M[Registrar conciliación docente]
+    F -->|Sí| H[Mostrar nota a sus participantes]
+    H --> I[Alumno consulta su resultado]
+    I --> J{Solicita revisión}
+    J -->|Sí| K[Registrar reclamo único y avisar al docente]
+    K --> L[Docente revisa y responde]
+    L --> M[Participantes consultan respuesta final]
+    J -->|No| N[Continuar seguimiento]
 ```
 
-## Anexo B. Trazabilidad de la propuesta
+Los puntos individuales siguen un recorrido de registro, consulta y reclamo privado. El docente puede exportar el curso sin que la descarga modifique los registros originales.
 
-| Necesidad                         | Requisito de 04 | Diseño                                            | Caso futuro | Objetivo |
-| --------------------------------- | --------------- | ------------------------------------------------- | ----------- | -------- |
-| Acceso solo a curso autorizado    | R1–R2           | Responsabilidad docente, autorización y matrícula | C01–C02     | OE2–OE4  |
-| Atribución correcta ante traslado | R3–R4           | Intervalos e instante de actividad                | C05–C07     | OE3–OE4  |
-| Registro y corrección coherentes  | R5, R7          | Nota única e historia de cambios                  | C03–C05     | OE3–OE4  |
-| Recuperación sin duplicar         | R6              | Identificador de intención y estados              | C08–C09     | OE4      |
-| Revisión completa                 | R8              | Conteos y excepciones explícitas                  | C10         | OE3–OE4  |
-| Puntos distintos de notas         | R9              | Entidades y consultas separadas                   | C02, C11    | OE2–OE3  |
-| Evaluación reproducible posterior | R10             | Protocolo y ficha futura                          | C01–C12     | OE5      |
+## Anexo C. Prototipo documental P-01
 
-El diagnóstico y modelo manual sustentan OE1; esta matriz conecta sus necesidades con los demás entregables. Los FR de `specs/` sirven de referencia técnica más amplia, no de listado de logros.
+**Formato:** representación textual estática de baja fidelidad. **Propósito:** mostrar los recorridos de registro, consulta, reclamo y exportación. Las pantallas siguientes son el artefacto disponible, no capturas de una plataforma operativa ni evidencia de validación con usuarios.
 
-## Anexo C. Modelo conceptual y secuencia de reintento
-
-```mermaid
-erDiagram
-    PERIODO ||--o{ CURSO : organiza
-    DOCENTE ||--o{ CURSO : responde
-    CURSO ||--o{ AUTORIZACION : habilita
-    AUTORIZACION ||--o| MATRICULA : vincula
-    ALUMNO ||--o{ MATRICULA : posee
-    AUTORIZACION ||--o{ MOVIMIENTO_PUNTOS : registra
-    CURSO ||--o{ GRUPO : organiza
-    MATRICULA ||--o{ PERTENENCIA : conserva
-    GRUPO o|--o{ PERTENENCIA : identifica
-    CURSO ||--o{ EVALUACION : define
-    EVALUACION ||--o{ NOTA_GRUPAL : recibe
-    GRUPO ||--o{ NOTA_GRUPAL : obtiene
-    NOTA_GRUPAL ||--o{ CORRECCION : conserva
-    EVALUACION ||--o{ CONCILIACION : revisa
-    EVALUACION ||--o{ EXCEPCION : explica
-```
-
-El diagrama expresa relaciones propuestas, no tablas construidas; las restricciones adicionales están en 05.
-
-```mermaid
-sequenceDiagram
-    actor D as Docente
-    participant P as Presentación propuesta
-    participant S as Servidor propuesto
-    participant B as Datos propuestos
-    D->>P: Solicitar guardar nota
-    P->>S: Identificador de intención y datos
-    S->>B: Validar y confirmar operación
-    B-->>S: Resultado estable
-    S--xP: Confirmación perdida en escenario hipotético
-    D->>P: Reintentar
-    P->>S: Mismo identificador y contenido
-    S->>B: Recuperar o repetir de forma segura
-    B-->>S: Resultado sin segundo efecto
-    S-->>P: Mostrar resultado definitivo
-```
-
-## Anexo D. P-01 — Prototipo documental de baja fidelidad
-
-**Artefacto identificable:** este anexo, pantallas textuales P1–P4 y recorrido guiado. **Formato:** representación estática, no clicable. **Finalidad:** comunicar distribución de información, decisiones y estados del recorrido docente. No se ejecuta código, no se conecta a datos, no implementa permisos ni se ha validado con usuarios. Su suficiencia como prototipo de semana 8 debe confirmarse con el docente.
-
-### P1. Contexto y definición de actividad
+### P1. Registro docente
 
 ```text
-EVALUACIONES GRUPALES — REPRESENTACIÓN, NO APLICACIÓN
-Periodo: [periodo de ejemplo]   Curso: [curso de ejemplo]
-Actividad: [Actividad A]       Realización: [fecha, hora y zona]
-[Revisar grupos históricos]    [Continuar a registro]
-Aviso: una fecha modificada requiere revisar atribuciones afectadas.
+CURSO: [curso de ejemplo]      PERIODO: [periodo]
+Evaluación: [Trabajo 1]        Realización: [fecha de actividad]
+Grupo de la actividad | Participantes | Nota base | Estado
+Grupo A               | [lista]       | [18]      | Registrada
+Grupo B               | [lista]       | [  ]      | Pendiente
+[Guardar nota] [Revisar correcciones]
+Una nota guardada queda visible para sus participantes.
+Una celda vacía no equivale a cero.
 ```
 
-### P2. Matriz docente de registro
+### P2. Consulta del alumno
 
 ```text
-Actividad A | Instante académico: [por definir]
-Grupo histórico | Participantes en esa actividad | Nota | Estado
-Grupo A         | [conteo]                       | [ ]  | Pendiente
-Grupo B         | [conteo]                       | [ ]  | Pendiente
-[Guardar intención]  [Consultar correcciones]  [Revisar faltantes]
-Ayuda: valor de 0 a 20; vacío no es cero. Los puntos no se muestran aquí.
+MIS RESULTADOS — [curso]
+Actividad | Grupo en la actividad | Nota base | Revisión
+Trabajo 1 | Grupo A               | 18        | [Presentar reclamo]
+Trabajo 2 | Grupo B               | Pendiente | —
+MIS PUNTOS
+Movimiento | Puntos | Descripción | Revisión
+[registro] | 2      | [motivo]    | [Presentar reclamo]
+Solo se muestran resultados que corresponden a este alumno.
 ```
 
-### P3. Error, incertidumbre y corrección
+### P3. Presentación y seguimiento del reclamo
 
 ```text
-Rechazo: «La nota debe ser un número entre 0 y 20». [Volver al campo]
-Incertidumbre: «No se recibió confirmación». [Consultar] [Reintentar]
-Corrección: valor anterior [ ] → valor propuesto [ ]
-Participantes: los del grupo en la actividad, no los miembros actuales.
-[Confirmar corrección]  [Cancelar]
+SOLICITAR REVISIÓN
+Registro: [Trabajo 1, Grupo A / movimiento propio de puntos]
+Descripción del desacuerdo: [texto del alumno]
+[Enviar reclamo]
+
+SEGUIMIENTO
+Presentado por: [alumno]     Estado: Pendiente / En revisión / Respondido
+Respuesta del docente: [decisión y motivo]
 ```
 
-Los mensajes representan estados alternativos, no una pantalla que los mostraría simultáneamente. El reintento conservaría la intención; la corrección sería una intención nueva.
+Los estados representan momentos distintos del recorrido. Un reclamo grupal es compartido por los participantes de aquella actividad; uno de puntos es privado entre el alumno y el docente. El caso existente se consulta en lugar de abrir otro. Tras la respuesta final no hay réplica ni reapertura.
 
-### P4. Conciliación
+### P4. Bandeja docente
 
 ```text
-Grupos esperados [ ] | Con nota [ ] | Faltantes [ ] | Excepciones [ ]
-Detalle de faltantes: [grupo y motivo pendiente]
-Excepción: [categoría y justificación con acceso restringido]
-[Volver a registrar] [Solicitar conciliación]
-Aviso: no se declara conciliada con faltantes inexplicados.
+RECLAMOS DEL CURSO
+Registro cuestionado | Tipo   | Presentado por | Estado
+Trabajo 1, Grupo A   | Grupal | [alumno]       | Pendiente
+[Movimiento]         | Puntos | [alumno]       | En revisión
+[Revisar]
+Decisión y fundamento: [respuesta docente]
+[Marcar en revisión] [Responder]
+La corrección del registro, si corresponde, se realiza expresamente.
 ```
 
-### Recorrido ilustrativo, no ejecutado
+### P5. Preparación de la exportación
 
-Con identidades ficticias, se plantea un alumno en Grupo A durante Actividad A y trasladado después al Grupo B. P1 fija el instante de la actividad; P2 representa su participación histórica en A; P3 muestra cómo se explicaría una corrección tardía de A; P4 representa la revisión final. También se recorre conceptualmente un rechazo de rango y una confirmación perdida. No se asignan resultados observados a estos escenarios.
+```text
+EXPORTAR CURSO — [curso]
+Alumno | T1 base | T2 base | T3 base | Promedio base | Puntos
+[alumno] | 20    | 18      | 17      | 18,33         | 2
+Puntos aplicados: 2 | Excedente: 0 | Promedio ajustado: 19,00
+[Descargar XLSX]
+Las notas pendientes permanecen vacías.
+Descargar no consume puntos ni cambia las notas base.
+```
 
-El prototipo no representa toda la plataforma, la importación, el panel estudiantil, exportaciones ni excepciones individuales. No prueba usabilidad, accesibilidad, seguridad o rendimiento; permite discutir el diseño y detectar preguntas antes de construir.
+Las columnas son una propuesta de presentación, no un formato definitivo. El cálculo usa la regla de puntos adoptada como supuesto del equipo; no muestra una nota final del curso. El ejemplo es ficticio y sus operaciones son ilustrativas.
 
-## Anexo E. Matriz de pruebas futuras — sin ejecutar
+### Recorrido ilustrativo
 
-| Caso | Condición que se probaría en Parte II                                | Resultado esperado, no observado                                        |
-| ---- | -------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| C01  | Docente ajeno o sesión ausente                                       | Denegación sin datos del curso                                          |
-| C02  | Alumno autorizado consulta sus datos e intenta leer notas            | Solo curso, grupo y puntos propios; sin notas                           |
-| C03  | Nota 0, 20, vacía, negativa, mayor que 20 o no numérica              | Aceptar límites; no confirmar inválidas ni vacío como nota              |
-| C04  | Grupo y actividad de cursos distintos                                | Rechazo sin cambios                                                     |
-| C05  | Traslado posterior y corrección tardía                               | Mantener participantes históricos y conservar corrección                |
-| C06  | Actividad y traslado del mismo día                                   | Aplicar regla temporal acordada                                         |
-| C07  | Fecha modificada o historia insuficiente                             | Revisar impacto o solicitar revisión, sin inferencias silenciosas       |
-| C08  | Respuesta perdida y mismo reintento                                  | Un solo efecto y resultado recuperable                                  |
-| C09  | Identificador repetido con otro contenido o correcciones simultáneas | Rechazo de reutilización y conflicto controlado sin pérdida de historia |
-| C10  | Faltantes y excepciones en conciliación                              | Conteos explicables; no cierre con faltantes inexplicados               |
-| C11  | Puntos asignados o anulados                                          | No alterar notas ni borrar movimiento original                          |
-| C12  | Selección fuera de ventana o concurrencia por último cupo            | Rechazo controlado sin exceder capacidad                                |
+El docente registra 18 para el grupo A en Trabajo 1. Un participante consulta la nota y presenta un reclamo en nombre de ese grupo. El docente recibe el aviso, revisa el caso y responde. Si el alumno se trasladó después al grupo B, mantiene la consulta del Trabajo 1 y del reclamo con los participantes originales de A. La exportación reúne las notas correspondientes a cada actividad, no las del grupo vigente para todos los trabajos.
 
-Añadir en Parte II resultados observados, pasos, datos sintéticos y referencias de evidencia, no rellenar esas columnas en semana 8.
+## Anexo D. Trazabilidad de necesidades y objetivos
 
-## Anexo F. Instrumentos previstos
+| Necesidad                                   | Requisitos de 4 | Representación o instrumento         | Objetivos relacionados |
+| ------------------------------------------- | --------------- | ------------------------------------ | ---------------------- |
+| Evitar búsqueda y anotación repetitiva      | R05–R06         | Proceso actual, flujo propuesto y P1 | OE1, OE2, OE3, OE4     |
+| Incorporar alumnos y organizar grupos       | R01–R04         | Descripción de preparación en 5      | OE1, OE2, OE3          |
+| Consultar resultados propios                | R07–R08         | P2 y casos C02–C03                   | OE2, OE3, OE4          |
+| Atender desacuerdos con privacidad y estado | R09–R13         | P3–P4 y casos C04–C08                | OE2, OE3, OE4          |
+| Obtener información del curso               | R14             | P5 y casos C09–C12                   | OE2, OE3, OE4          |
 
-**Ficha futura por ejecución:** caso; fecha; versión; entorno aislado; datos sintéticos; zona horaria; pasos; esperado; observado; tiempos; discrepancias; operación correlacionada; señales restringidas; limitaciones; responsable. Todos los campos de observación están por recoger.
+## Anexo E. Casos de comprobación previstos
 
-**Ficha comparativa:** método manual/plataforma; actividad; grupos esperados; orden y repetición; inicio/fin de registro; inicio/fin de conciliación; notas válidas; faltantes; excepciones; errores de registro; correcciones académicas; duplicados; casos de reintento; limitaciones. Fórmulas en 06.
+| Caso | Situación                                              | Resultado esperado                                                           |
+| ---- | ------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| C01  | Registro de una nota válida y de valores fuera de 0–20 | Confirmar solo valores válidos y explicar rechazos                           |
+| C02  | Nota o puntos recién registrados                       | Consulta inmediata solo por sus destinatarios                                |
+| C03  | Nota vacía frente a nota cero                          | Distinguir pendiente de calificación cero                                    |
+| C04  | Reclamo grupal después de un cambio de grupo           | Acceso de participantes de la actividad, no de nuevos integrantes            |
+| C05  | Reclamo sobre movimiento de puntos                     | Privacidad entre alumno titular y docente                                    |
+| C06  | Segundo reclamo por el mismo registro                  | Mostrar el caso existente, incluso si ya fue respondido                      |
+| C07  | Revisión y respuesta docente                           | Recorrido acordado, sin réplica ni corrección automática                     |
+| C08  | Nuevo reclamo y aviso por correo                       | Aviso al docente con enlace y sin información académica ni texto del reclamo |
+| C09  | Notas 20, 18 y 17; dos puntos                          | Promedio ajustado 19,00; notas base y saldo sin cambios                      |
+| C10  | Notas 20, 20 y 20; dos puntos                          | Promedio 20,00; dos puntos excedentes sin efecto                             |
+| C11  | Alguna nota pendiente y exportación repetida           | Campo vacío, promedio de cierre pendiente y ausencia de consumo de puntos    |
+| C12  | Notas 18, 16 y 17; un punto                            | Promedio ajustado 17,33, sin redondeos intermedios                           |
+| C13  | Cambio de grupo con ventana abierta y cupo             | Cambio permitido; resultados anteriores conservados                          |
+| C14  | Grupo lleno o ventana cerrada                          | Cambio impedido con explicación; reapertura aplicable a todo el curso        |
+| C15  | Archivo de alumnos con datos incompletos o repetidos   | Identificar lo que requiere revisión y evitar duplicados                     |
 
-**Revisión futura transversal:** teclado, foco, etiquetas y errores; separación de puntos/notas; ausencia de información personal o secretos en evidencia compartida; aislamiento del entorno; alcance de señales y recuperación. No es un checklist aprobado.
+Esta matriz describe resultados esperados para la evaluación; no contiene resultados observados.
 
-## Anexo G. Fuentes y preparación de entrega
+## Anexo F. Instrumentos para la evaluación
 
-Bibliografía, fuentes internas y estado de comprobación: 08. Asuntos por validar: 07. Material integrado: 10. Guion para elaborar PowerPoint: 06. Los inventarios técnicos y pruebas del repositorio no se adjuntan como resultados académicos de Parte I.
+**Ficha de registro:** caso; fecha; escenario; actor; pasos; resultado esperado; resultado observado; discrepancias; evidencia sin información personal; responsable.
+
+**Ficha de tiempo de registro:** procedimiento manual simulado o plataforma; conjunto de grupos e integrantes; notas de entrada; preparación previa; inicio; fin; duración; errores detectados; repetición; limitaciones. No se compararán tiempos de recepción o evaluación del contenido de trabajos.
+
+**Ficha de seguimiento:** resultado consultado; destinatarios permitidos; reclamo presentado; estados; respuesta; aviso al docente; comprobación de privacidad y duplicados. La ausencia de un medio anterior equivalente no se convertirá en una tasa histórica inventada.
+
+**Lista de revisión de claridad:** etiquetas comprensibles, estados con texto, navegación por teclado, diferencia entre pendiente y cero y acceso restringido a los resultados y reclamos correspondientes.
