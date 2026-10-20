@@ -8,6 +8,8 @@ Antes de implementar, verificar lo existente y conservar lo que pase los criteri
 
 **Rol:** R1 · **Revisor:** R3 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-01
 
+**GitHub:** [#38](https://github.com/NickSalA/portfolio-course/issues/38) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
+
 - [ ] Contrastar las capacidades existentes con el supuesto del equipo y registrar lo reutilizable y las brechas.
 - [ ] Acordar el tratamiento de saldos negativos y movimientos anulados, sin deducir reglas no confirmadas.
 - [ ] Concretar precisión de notas y puntos, conservando el redondeo solo del promedio final ajustado a dos decimales.
@@ -21,6 +23,8 @@ Antes de implementar, verificar lo existente y conservar lo que pase los criteri
 ### EXP-02 · Cálculo puro de saldo y promedio ajustado
 
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EXP-01, EVA-04
+
+**GitHub:** [#39](https://github.com/NickSalA/portfolio-course/issues/39) · **Asignado:** @MathiMomos · **Revisión propuesta:** @fabrizio25504
 
 - [ ] Verificar el cálculo existente y preparar desde M2 pruebas con entradas sintéticas según las decisiones de EXP-01.
 - [ ] Implementar una operación pura para n trabajos completos de igual peso y saldo no negativo: margen = suma de (20 − nota base), aplicados = mínimo entre saldo y margen y excedente = saldo − aplicados.
@@ -36,6 +40,8 @@ Antes de implementar, verificar lo existente y conservar lo que pase los criteri
 
 **Rol:** R5 · **Revisor:** R2 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EXP-02
 
+**GitHub:** [#40](https://github.com/NickSalA/portfolio-course/issues/40) · **Asignado:** @Forex549 · **Revisión propuesta:** @RobertoPizarro
+
 - [ ] Verificar y reutilizar la generación XLSX existente que cumpla el contrato y las columnas acordadas en EXP-01.
 - [ ] Obtener notas de cada alumno según participantes históricos de cada actividad, no desde el grupo actual ni inventando pertenencias.
 - [ ] Integrar el cálculo puro y las columnas acordadas, manteniendo notas pendientes vacías, cero explícito y promedio final ajustado pendiente cuando corresponda.
@@ -49,6 +55,8 @@ Antes de implementar, verificar lo existente y conservar lo que pase los criteri
 ### EXP-04 · QA de descarga, cálculo, privacidad y repetición
 
 **Rol:** R4 · **Revisor:** R1 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EXP-03
+
+**GitHub:** [#41](https://github.com/NickSalA/portfolio-course/issues/41) · **Asignado:** @fabrizio25504 · **Revisión propuesta:** @NickSalA
 
 - [ ] Preparar desde M1–M2 una matriz sintética con notas completas, pendientes, cero, límite 20, saldo cero, margen agotado y excedentes.
 - [ ] Contrastar cálculo y XLSX con resultados esperados, incluyendo precisión final y tratamiento acordado de negativos y anulados.

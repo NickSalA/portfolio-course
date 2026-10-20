@@ -4,7 +4,7 @@
 
 El catálogo activo está en **[docs/backlog/](../backlog/README.md)**. Allí se mantienen las fichas, el [índice por integrante](../backlog/por-integrante.md), la [asignación por milestone](../backlog/milestones.md) y la correspondencia con los BK anteriores. Este documento conserva las reglas de preparación, seguimiento y cierre; no duplica el listado de issues.
 
-Las fichas son propuestas locales asignadas a R1–R5, no Issues remotas creadas ni nombramientos personales. Cuando se trasladen a GitHub se registrarán sus URLs reales y se mantendrá una única referencia de estado por trabajo, sin numeración inventada.
+Las 44 fichas están [creadas y asignadas en GitHub](../backlog/github.md) con sus URLs reales. Estado de ejecución y asignación se actualizan en la Issue vinculada, conservando el ID local y sin mantener listas divergentes. La creación no declara completados sus criterios.
 
 El alcance procede del [caso vigente](../01-definicion/caso-evaluacion-grupal.md) y de los acuerdos en [development/](../../development/PLAN-REFINAMIENTO-PARTE-I.md). Las especificaciones históricas son antecedente, no un paso obligatorio antes de desarrollar. BK-01 queda fuera de la ejecución activa.
 
@@ -17,7 +17,7 @@ La fuente de organización es [Equipo y flujo de trabajo](equipo-y-flujo-de-trab
 - Si el revisor propuesto también escribió el cambio, debe designarse otro integrante.
 - No se aprueba un PR propio. La integración respeta la constitución y los checks aplicables.
 - Las responsabilidades pueden ajustarse al planificar la semana, dejando constancia en la ficha y el índice por integrante.
-- Nombres, usuarios y horas disponibles deben confirmarse antes de comprometer la carga. Igualar cantidades de issues no demuestra equilibrio de esfuerzo.
+- Los usuarios de R1–R5 ya están confirmados y asignados; los nombres personales y las horas disponibles deben completarse antes de comprometer la carga. Igualar cantidades de issues no demuestra equilibrio de esfuerzo.
 
 ## 3. Planificación por hitos
 

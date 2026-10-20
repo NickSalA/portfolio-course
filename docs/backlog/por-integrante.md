@@ -4,6 +4,8 @@
 
 ## R1 — Tech Lead, facilitación y dominio
 
+**Usuario asignado:** [@NickSalA](https://github.com/NickSalA).
+
 **11 issues como responsable.** Revisión y apoyo no se incluyen en ese conteo.
 
 | Issue | Trabajo | Milestone | Revisor |
@@ -22,6 +24,8 @@
 
 ## R2 — Experiencia e interfaces
 
+**Usuario asignado:** [@RobertoPizarro](https://github.com/RobertoPizarro).
+
 **9 issues como responsable.** Revisión y apoyo no se incluyen en ese conteo.
 
 | Issue | Trabajo | Milestone | Revisor |
@@ -38,6 +42,8 @@
 
 ## R3 — Datos, reglas y seguridad
 
+**Usuario asignado:** [@MathiMomos](https://github.com/MathiMomos).
+
 **8 issues como responsable.** Revisión y apoyo no se incluyen en ese conteo.
 
 | Issue | Trabajo | Milestone | Revisor |
@@ -53,6 +59,8 @@
 
 ## R4 — Calidad y evaluación
 
+**Usuario asignado:** [@fabrizio25504](https://github.com/fabrizio25504).
+
 **7 issues como responsable.** Revisión y apoyo no se incluyen en ese conteo.
 
 | Issue | Trabajo | Milestone | Revisor |
@@ -66,6 +74,8 @@
 | [DOC-04](07-documentacion-y-entrega.md#doc-04--consolidar-resultados-y-documentación-de-m4) | Consolidar resultados y documentación de M4 | M4 | R3 |
 
 ## R5 — Seguimiento, comunicaciones y operación
+
+**Usuario asignado:** [@Forex549](https://github.com/Forex549).
 
 **9 issues como responsable.** Revisión y apoyo no se incluyen en ese conteo.
 

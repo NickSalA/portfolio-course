@@ -6,6 +6,8 @@
 
 **Rol:** R1 · **Revisor:** R5 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-01, BASE-06, BASE-07, BASE-08, GRP-05, EXP-01
 
+**GitHub:** [#47](https://github.com/NickSalA/portfolio-course/issues/47) · **Asignado:** @NickSalA · **Revisión propuesta:** @Forex549
+
 - [ ] Reunir aportes de los cinco sobre verificación, cambios y pruebas de acceso, padrón y grupos.
 - [ ] Actualizar reglas, diseño y estado cuando corresponda; registrar decisiones pendientes.
 - [ ] Documentar demostración del hito, bloqueos y acciones para M2.
@@ -17,6 +19,8 @@
 ### DOC-02 · Consolidar documentación y revisión de M2
 
 **Rol:** R2 · **Revisor:** R1 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** DOC-01, EVA-06
+
+**GitHub:** [#48](https://github.com/NickSalA/portfolio-course/issues/48) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @NickSalA
 
 - [ ] Reunir recorridos y evidencias de registro, consulta, permisos, pendientes y correcciones.
 - [ ] Actualizar representación de pantallas y descripción funcional si cambió lo previsto.
@@ -30,6 +34,8 @@
 
 **Rol:** R5 · **Revisor:** R2 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** DOC-02, REC-07, EXP-04
 
+**GitHub:** [#49](https://github.com/NickSalA/portfolio-course/issues/49) · **Asignado:** @Forex549 · **Revisión propuesta:** @RobertoPizarro
+
 - [ ] Reunir evidencias de reclamos, aviso y descarga, con participación de sus responsables.
 - [ ] Documentar reglas finales de salida y el supuesto del equipo para puntos, sin atribuirlo al profesor.
 - [ ] Registrar fallos de servicios externos y pendientes para integración y evaluación.
@@ -41,6 +47,8 @@
 ### DOC-04 · Consolidar resultados y documentación de M4
 
 **Rol:** R4 · **Revisor:** R3 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** DOC-03, QA-05
+
+**GitHub:** [#50](https://github.com/NickSalA/portfolio-course/issues/50) · **Asignado:** @fabrizio25504 · **Revisión propuesta:** @MathiMomos
 
 - [ ] Reunir pruebas, resultados de evaluación y correcciones aportadas por el equipo.
 - [ ] Relacionar issues con evidencia, versión y limitaciones; no convertir automáticamente todos sus estados en Done.
@@ -54,6 +62,8 @@
 
 **Rol:** R1 · **Revisor:** R4 · **Milestone:** Entrega posterior · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** DOC-04
 
+**GitHub:** [#51](https://github.com/NickSalA/portfolio-course/issues/51) · **Asignado:** @NickSalA · **Revisión propuesta:** @fabrizio25504
+
 - [ ] Distribuir entre los cinco los aportes y consolidar problema, objetivos, caso y resultados documentados.
 - [ ] Actualizar conclusiones y recomendaciones según evidencia; completar carátula, referencias y anexos.
 - [ ] Comprobar consistencia entre secciones fuente e integrado y producir el archivo final.
@@ -66,6 +76,8 @@
 
 **Rol:** R2 · **Revisor:** R1 · **Milestone:** Entrega posterior · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** DOC-04
 
+**GitHub:** [#52](https://github.com/NickSalA/portfolio-course/issues/52) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @NickSalA
+
 - [ ] Preparar guion y PowerPoint coherentes con problema, objetivos, recorridos y resultados documentados.
 - [ ] Incorporar recursos legibles y ejemplos sintéticos, sin datos académicos reales.
 - [ ] Revisar con el informe final antes de cerrar y definir participación de los cinco.
@@ -77,6 +89,8 @@
 ### ENT-03 · Ensayar y comprobar el paquete de entrega
 
 **Rol:** R5 · **Revisor:** R4 · **Milestone:** Entrega posterior · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** ENT-01, ENT-02
+
+**GitHub:** [#53](https://github.com/NickSalA/portfolio-course/issues/53) · **Asignado:** @Forex549 · **Revisión propuesta:** @fabrizio25504
 
 - [ ] Realizar un ensayo con los cinco, recorrido sintético y alternativa de demostración preparada.
 - [ ] Comprobar archivos, enlaces, legibilidad, consistencia y ausencia de información privada.

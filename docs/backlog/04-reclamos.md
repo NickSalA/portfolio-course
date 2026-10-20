@@ -8,6 +8,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-04
 
+**GitHub:** [#31](https://github.com/NickSalA/portfolio-course/issues/31) · **Asignado:** @MathiMomos · **Revisión propuesta:** @fabrizio25504
+
 - [ ] Verificar el modelo y los permisos existentes frente a ambos tipos de reclamo y registrar brechas.
 - [ ] Relacionar el reclamo grupal con grupo y evaluación históricos, y el individual con el movimiento de puntos; conservar quién lo presentó.
 - [ ] Restringir el acceso grupal a participantes históricos y docente responsable, y el individual al titular y docente responsable.
@@ -20,6 +22,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 ### REC-02 · Presentación de ambos tipos de reclamo
 
 **Rol:** R5 · **Revisor:** R3 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-01
+
+**GitHub:** [#32](https://github.com/NickSalA/portfolio-course/issues/32) · **Asignado:** @Forex549 · **Revisión propuesta:** @MathiMomos
 
 - [ ] Verificar y reutilizar las operaciones de presentación que cumplan el caso vigente.
 - [ ] Permitir presentar el reclamo grupal a cualquier participante de aquella actividad, en nombre del grupo.
@@ -34,6 +38,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 **Rol:** R5 · **Revisor:** R4 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-02
 
+**GitHub:** [#33](https://github.com/NickSalA/portfolio-course/issues/33) · **Asignado:** @Forex549 · **Revisión propuesta:** @fabrizio25504
+
 - [ ] Verificar e implementar el recorrido Pendiente → En revisión → Respondido.
 - [ ] Autorizar únicamente al docente responsable a revisar y emitir una respuesta motivada.
 - [ ] Impedir réplica, reapertura y nueva solicitud sobre el mismo registro tras responder.
@@ -46,6 +52,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 ### REC-04 · Interfaz estudiantil para presentar y consultar
 
 **Rol:** R2 · **Revisor:** R4 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-02, REC-03
+
+**GitHub:** [#34](https://github.com/NickSalA/portfolio-course/issues/34) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @fabrizio25504
 
 - [ ] Verificar y conservar las interfaces existentes que cumplan ambos recorridos.
 - [ ] Integrar presentación desde la nota histórica o el movimiento propio con identificación clara del registro.
@@ -60,6 +68,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 **Rol:** R5 · **Revisor:** R2 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-03
 
+**GitHub:** [#35](https://github.com/NickSalA/portfolio-course/issues/35) · **Asignado:** @Forex549 · **Revisión propuesta:** @RobertoPizarro
+
 - [ ] Verificar la bandeja y el detalle existentes antes de completar sus brechas.
 - [ ] Mostrar los reclamos de los cursos autorizados, diferenciando tipo y estado.
 - [ ] Presentar registro histórico, autor, motivo y respuesta, e integrar revisión y respuesta motivada.
@@ -73,6 +83,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 **Rol:** R5 · **Revisor:** R1 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-02, BASE-08
 
+**GitHub:** [#36](https://github.com/NickSalA/portfolio-course/issues/36) · **Asignado:** @Forex549 · **Revisión propuesta:** @NickSalA
+
 - [ ] Verificar el mecanismo disponible y preparar su configuración segura desde M1–M2, sin imponer una biblioteca nueva ni documentar secretos.
 - [ ] Generar por nuevo reclamo un aviso breve al docente responsable con enlace que requiera autorización, sin notas, puntos ni texto de la solicitud.
 - [ ] Conservar el reclamo aunque falle el aviso y registrar el resultado técnico sin contenido sensible.
@@ -85,6 +97,8 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 ### REC-07 · QA de reclamos y correo
 
 **Rol:** R4 · **Revisor:** R3 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-04, REC-05, REC-06
+
+**GitHub:** [#37](https://github.com/NickSalA/portfolio-course/issues/37) · **Asignado:** @fabrizio25504 · **Revisión propuesta:** @MathiMomos
 
 - [ ] Preparar desde M1–M2 escenarios sintéticos de ambos tipos, participantes históricos y actores ajenos.
 - [ ] Ejecutar presentación, consulta, revisión y respuesta final en ambas interfaces.

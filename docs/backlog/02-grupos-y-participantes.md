@@ -6,6 +6,8 @@
 
 **Rol:** R2 · **Revisor:** R1 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-04
 
+**GitHub:** [#18](https://github.com/NickSalA/portfolio-course/issues/18) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @NickSalA
+
 - [ ] Verificar las funciones docentes existentes de grupos y selección.
 - [ ] Permitir definir número, capacidad y ventana del curso con validaciones comprensibles.
 - [ ] Incluir ampliación o reapertura para todo el curso, sin permisos individuales de selección.
@@ -17,6 +19,8 @@
 ### GRP-02 · Conservar la historia de pertenencia a grupos
 
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-03, BASE-06
+
+**GitHub:** [#19](https://github.com/NickSalA/portfolio-course/issues/19) · **Asignado:** @MathiMomos · **Revisión propuesta:** @fabrizio25504
 
 - [ ] Definir cómo registrar pertenencias y su orden temporal, incluidos alumnos sin grupo.
 - [ ] Incorporar cambios de datos aditivos sin inventar pertenencias anteriores desconocidas.
@@ -31,6 +35,8 @@
 
 **Rol:** R1 · **Revisor:** R3 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** GRP-01, GRP-02
 
+**GitHub:** [#20](https://github.com/NickSalA/portfolio-course/issues/20) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
+
 - [ ] Verificar la operación existente y completar el mantenimiento de historia en todos los caminos de cambio.
 - [ ] Comprobar ventana, matrícula propia, curso y cupo antes de confirmar.
 - [ ] Probar concurrencia por el último cupo, repetición de selección y sincronización posterior de matrícula.
@@ -42,6 +48,8 @@
 ### GRP-04 · Completar la selección de grupo del alumno
 
 **Rol:** R2 · **Revisor:** R4 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** GRP-03, BASE-07
+
+**GitHub:** [#21](https://github.com/NickSalA/portfolio-course/issues/21) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @fabrizio25504
 
 - [ ] Mostrar grupo vigente, opciones con cupo y condición de ventana.
 - [ ] Permitir elección y cambio con estados de confirmación y errores accesibles.
@@ -55,6 +63,8 @@
 
 **Rol:** R4 · **Revisor:** R1 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** GRP-04, GRP-06
 
+**GitHub:** [#22](https://github.com/NickSalA/portfolio-course/issues/22) · **Asignado:** @fabrizio25504 · **Revisión propuesta:** @NickSalA
+
 - [ ] Ejecutar casos de ventana cerrada/abierta/reabierta y grupo lleno.
 - [ ] Comprobar un alumno en A antes y B después de una actividad.
 - [ ] Registrar esperado/observado, fallos y correcciones necesarias con sus autores.
@@ -66,6 +76,8 @@
 ### GRP-06 · Definir actividades y resolver sus participantes
 
 **Rol:** R1 · **Revisor:** R3 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** GRP-02, BASE-04
+
+**GitHub:** [#23](https://github.com/NickSalA/portfolio-course/issues/23) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
 
 - [ ] Identificar actividad, curso y fecha de realización, sin gestionar recepción ni plazos de tareas.
 - [ ] Acordar orden de eventos coincidentes y revisión de un cambio de fecha que afecte participantes.

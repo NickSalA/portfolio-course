@@ -6,6 +6,8 @@
 
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** GRP-06, BASE-03
 
+**GitHub:** [#24](https://github.com/NickSalA/portfolio-course/issues/24) · **Asignado:** @MathiMomos · **Revisión propuesta:** @fabrizio25504
+
 - [ ] Verificar nota única por grupo/evaluación y coincidencia de curso y docente.
 - [ ] Admitir 0–20 y distinguir nota pendiente de cero explícito.
 - [ ] Conservar valor anterior/nuevo, responsable y momento de las correcciones confirmadas.
@@ -19,6 +21,8 @@
 
 **Rol:** R1 · **Revisor:** R3 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-06
 
+**GitHub:** [#25](https://github.com/NickSalA/portfolio-course/issues/25) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
+
 - [ ] Revisar asignación de puntos, destinatario y consulta del historial existentes.
 - [ ] Mantener saldo derivado y corrección por anulación o ajuste que preserve el original.
 - [ ] Probar que registrar puntos no modifica notas grupales ni resultados de otros alumnos.
@@ -30,6 +34,8 @@
 ### EVA-03 · Completar la matriz docente de notas y pendientes
 
 **Rol:** R2 · **Revisor:** R4 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-01, BASE-07
+
+**GitHub:** [#26](https://github.com/NickSalA/portfolio-course/issues/26) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @fabrizio25504
 
 - [ ] Presentar curso, actividad y grupos/participantes correspondientes.
 - [ ] Mostrar nota guardada, corrección y pendiente sin confundir vacío con cero.
@@ -43,6 +49,8 @@
 
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-01, EVA-02, GRP-02
 
+**GitHub:** [#27](https://github.com/NickSalA/portfolio-course/issues/27) · **Asignado:** @MathiMomos · **Revisión propuesta:** @fabrizio25504
+
 - [ ] Diseñar el permiso de consulta estudiantil según participantes de la actividad y puntos propios.
 - [ ] Sustituir la denegación antigua mediante cambios nuevos y comprobados; no restaurar una lectura basada solo en grupo actual.
 - [ ] Probar alumno trasladado, nuevo integrante, curso ajeno, docente ajeno y sesión ausente por acceso directo.
@@ -54,6 +62,8 @@
 ### EVA-05 · Mostrar notas y puntos propios en el panel del alumno
 
 **Rol:** R2 · **Revisor:** R4 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-04, BASE-07
+
+**GitHub:** [#28](https://github.com/NickSalA/portfolio-course/issues/28) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @fabrizio25504
 
 - [ ] Mostrar actividad, nota grupal base y relación con el grupo de la actividad.
 - [ ] Mantener consulta de puntos y movimientos propios, separada de calificaciones.
@@ -67,6 +77,8 @@
 
 **Rol:** R4 · **Revisor:** R1 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-03, EVA-05, EVA-07
 
+**GitHub:** [#29](https://github.com/NickSalA/portfolio-course/issues/29) · **Asignado:** @fabrizio25504 · **Revisión propuesta:** @NickSalA
+
 - [ ] Ejecutar registro/corrección docente y consulta del alumno con límites 0/20 y pendiente.
 - [ ] Probar alumnos de actividades anteriores, nuevo grupo y acceso ajeno.
 - [ ] Contrastar puntos visibles con sus movimientos sin alterar notas.
@@ -78,6 +90,8 @@
 ### EVA-07 · Integrar recuperación de guardados sin duplicación
 
 **Rol:** R1 · **Revisor:** R3 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-01, EVA-02, GRP-03
+
+**GitHub:** [#30](https://github.com/NickSalA/portfolio-course/issues/30) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
 
 - [ ] Comprobar fallos antes/después de confirmar y repetición de acciones de grupos, notas y puntos.
 - [ ] Permitir verificar el resultado sin duplicar registros o correcciones.

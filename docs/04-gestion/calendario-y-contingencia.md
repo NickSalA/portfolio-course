@@ -1,6 +1,6 @@
 # Calendario, hitos y contingencia
 
-> **Fuente única del calendario de ejecución.** Este documento establece periodos, puntos de control, dependencias y contingencia. Los criterios funcionales de cada hito están en [milestones](milestones.md); el [backlog por hito](../backlog/milestones.md) asigna las fichas y el [índice por integrante](../backlog/por-integrante.md) muestra su responsable. No se han creado milestones ni Issues en GitHub desde estos documentos.
+> **Fuente única del calendario de ejecución.** Este documento establece periodos, puntos de control, dependencias y contingencia. Los criterios funcionales de cada hito están en [milestones](milestones.md); el [backlog por hito](../backlog/milestones.md) asigna las fichas y el [índice por integrante](../backlog/por-integrante.md) muestra su responsable. Las cinco milestones y 44 issues están [creadas y asignadas en GitHub](../backlog/github.md), sin vencimientos hasta acordar fechas.
 >
 > Referencias: [caso vigente](../01-definicion/caso-evaluacion-grupal.md) · [acuerdos consolidados](../../development/PLAN-REFINAMIENTO-PARTE-I.md) · [equipo](equipo-y-flujo-de-trabajo.md) · [controles operativos](../03-calidad-y-operacion/controles-operativos.md) · [entregables del curso](../05-entregables/trabajo-final.md).
 

@@ -1,6 +1,6 @@
 # Equipo y flujo de trabajo
 
-> **Composición confirmada:** cinco integrantes. **Organización propuesta:** responsabilidades primarias, suplencias y revisión cruzada ajustadas a los hitos M1–M4. Los nombres, usuarios y disponibilidad se completarán antes de repartir el backlog; las asignaciones de este documento no son nombramientos personales ya acordados.
+> **Composición confirmada:** cinco integrantes. **Organización propuesta:** responsabilidades primarias, suplencias y revisión cruzada ajustadas a los hitos M1–M4. Los usuarios R1–R5 fueron confirmados por el solicitante y las issues están asignadas en GitHub. Quedan pendientes los nombres completos, la disponibilidad y las estimaciones; las revisiones propuestas deben ser independientes de la autoría efectiva.
 >
 > Relacionados: [calendario y contingencia](calendario-y-contingencia.md) · [milestones](milestones.md) · [backlog por integrante](../backlog/por-integrante.md) · [gestión del backlog](backlog-y-responsabilidades.md) · [caso vigente](../01-definicion/caso-evaluacion-grupal.md).
 
@@ -10,13 +10,13 @@
 
 No se copian nombres, seis roles ni cargas del proyecto utilizado como referencia. La distribución deberá contrastarse con la experiencia y las horas disponibles de estas cinco personas.
 
-| Identificador | Responsabilidad primaria propuesta             | Integrante    | Usuario GitHub | Disponibilidad semanal |
-| ------------- | ---------------------------------------------- | ------------- | -------------- | ---------------------- |
-| R1            | Tech Lead, facilitación, dominio e integración | Por completar | Por completar  | Por acordar            |
-| R2            | Experiencia e interfaces docente y estudiantil | Por completar | Por completar  | Por acordar            |
-| R3            | Datos, reglas académicas y seguridad           | Por completar | Por completar  | Por acordar            |
-| R4            | Calidad, pruebas y evaluación                  | Por completar | Por completar  | Por acordar            |
-| R5            | Seguimiento, comunicaciones y operación        | Por completar | Por completar  | Por acordar            |
+| Identificador | Responsabilidad primaria propuesta             | Integrante    | Usuario GitHub  | Disponibilidad semanal |
+| ------------- | ---------------------------------------------- | ------------- | --------------- | ---------------------- |
+| R1            | Tech Lead, facilitación, dominio e integración | Por completar | @NickSalA       | Por acordar            |
+| R2            | Experiencia e interfaces docente y estudiantil | Por completar | @RobertoPizarro | Por acordar            |
+| R3            | Datos, reglas académicas y seguridad           | Por completar | @MathiMomos     | Por acordar            |
+| R4            | Calidad, pruebas y evaluación                  | Por completar | @fabrizio25504  | Por acordar            |
+| R5            | Seguimiento, comunicaciones y operación        | Por completar | @Forex549       | Por acordar            |
 
 Estos roles no son cinco departamentos ni impiden desarrollar tareas de otra área. Cada historia tendrá una persona responsable y una revisora distinta. La documentación y las pruebas del cambio son responsabilidad de su autor, con apoyo de los roles especializados.
 
@@ -182,11 +182,11 @@ Las versiones siguen SemVer conforme a la constitución. No se fijan etiquetas p
 
 ### 10. Acuerdos por completar antes de asignar el backlog
 
-- Nombres y usuarios de las cinco personas y correspondencia con R1–R5.
+- Completar nombres personales si se necesitan para el informe; la correspondencia de usuarios R1–R5 ya está confirmada en la tabla.
 - Disponibilidad semanal y experiencia para ajustar el reparto propuesto.
 - Quién mantiene permisos del repositorio e integra PR aprobados, sin autorrevisión.
 - Canal de coordinación y modalidad de los puntos de control semanales.
 - Estado real de ramas, protecciones y CI respecto del flujo documentado.
 - Responsables y revisores por historia, estimaciones y suplencia efectiva ante ausencias.
 
-No se ejecutan cambios remotos, nombramientos o asignaciones automáticamente al redactar este documento.
+Las asignaciones de issues se realizaron por solicitud expresa del responsable y están registradas en [GitHub](../backlog/github.md). No se configuran ramas, protecciones o automatizaciones de tablero por redactar este documento.

@@ -4,6 +4,8 @@
 
 ## M1
 
+**GitHub:** [M1. Curso y participantes preparados](https://github.com/NickSalA/portfolio-course/milestone/1).
+
 **16 issues.**
 
 | Issue | Resultado | Responsable | Dependencias |
@@ -27,6 +29,8 @@
 
 ## M2
 
+**GitHub:** [M2. Registro y consulta de resultados](https://github.com/NickSalA/portfolio-course/milestone/2).
+
 **8 issues.**
 
 | Issue | Resultado | Responsable | Dependencias |
@@ -41,6 +45,8 @@
 | [DOC-02](07-documentacion-y-entrega.md#doc-02--consolidar-documentación-y-revisión-de-m2) | Consolidar documentación y revisión de M2 | R2 | DOC-01, EVA-06 |
 
 ## M3
+
+**GitHub:** [M3. Reclamos y exportación integrados](https://github.com/NickSalA/portfolio-course/milestone/3).
 
 **11 issues.**
 
@@ -60,6 +66,8 @@
 
 ## M4
 
+**GitHub:** [M4. Sistema evaluado y cierre del desarrollo](https://github.com/NickSalA/portfolio-course/milestone/4).
+
 **6 issues.**
 
 | Issue | Resultado | Responsable | Dependencias |
@@ -72,6 +80,8 @@
 | [DOC-04](07-documentacion-y-entrega.md#doc-04--consolidar-resultados-y-documentación-de-m4) | Consolidar resultados y documentación de M4 | R4 | DOC-03, QA-05 |
 
 ## Entrega posterior
+
+**GitHub:** [Entrega posterior. Informe y presentación](https://github.com/NickSalA/portfolio-course/milestone/5).
 
 **3 issues.**
 

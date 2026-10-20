@@ -6,6 +6,8 @@
 
 **Rol:** R2 · **Revisor:** R4 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-05, REC-04, REC-05, EXP-03
 
+**GitHub:** [#42](https://github.com/NickSalA/portfolio-course/issues/42) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @fabrizio25504
+
 - [ ] Recorrer con teclado registro, consulta, presentación/atención de reclamo y descarga.
 - [ ] Revisar foco, etiquetas, mensajes de error y estados identificados con texto.
 - [ ] Comprobar distinción pendiente/cero, resultado base/ajustado y decisión final del reclamo.
@@ -17,6 +19,8 @@
 ### QA-02 · Integrar privacidad, integridad y recuperación
 
 **Rol:** R3 · **Revisor:** R4 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-07, REC-07, EXP-04
+
+**GitHub:** [#43](https://github.com/NickSalA/portfolio-course/issues/43) · **Asignado:** @MathiMomos · **Revisión propuesta:** @fabrizio25504
 
 - [ ] Repetir matriz docente/alumno, curso propio/ajeno y participante histórico/nuevo integrante.
 - [ ] Probar accesos directos, solicitudes duplicadas, cambio de grupo y correcciones posteriores.
@@ -31,6 +35,8 @@
 
 **Rol:** R5 · **Revisor:** R1 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-06, EXP-03
 
+**GitHub:** [#44](https://github.com/NickSalA/portfolio-course/issues/44) · **Asignado:** @Forex549 · **Revisión propuesta:** @NickSalA
+
 - [ ] Documentar configuración de prueba, requisitos de ejecución y tratamiento de fallo de correo sin secretos.
 - [ ] Preparar conjunto sintético para demostrar registro, cambio de grupo, consulta, reclamo y XLSX.
 - [ ] Comprobar qué se puede ejecutar y qué depende de un servicio externo; registrar limitaciones y responsable.
@@ -44,6 +50,8 @@
 
 **Rol:** R4 · **Revisor:** R1 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** QA-01, QA-02, QA-03
 
+**GitHub:** [#45](https://github.com/NickSalA/portfolio-course/issues/45) · **Asignado:** @fabrizio25504 · **Revisión propuesta:** @NickSalA
+
 - [ ] Acordar participantes, repeticiones, conjunto de datos y condiciones antes de medir.
 - [ ] Comparar tiempo de registro con un procedimiento manual simulado equivalente, sin cronometrar la evaluación del contenido de trabajos.
 - [ ] Revisar consulta, reclamos, correo y exportación contra sus criterios, sin inventar una línea base histórica de seguimiento.
@@ -56,6 +64,8 @@
 ### QA-05 · Cerrar integración y pendientes del sistema
 
 **Rol:** R1 · **Revisor:** R4 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** QA-04
+
+**GitHub:** [#46](https://github.com/NickSalA/portfolio-course/issues/46) · **Asignado:** @NickSalA · **Revisión propuesta:** @fabrizio25504
 
 - [ ] Revisar criterios M1–M4 y asignar a sus autores la corrección de los defectos encontrados.
 - [ ] Comprobar nuevamente los recorridos afectados y registrar qué permanece pendiente.
