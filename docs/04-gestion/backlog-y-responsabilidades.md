@@ -8,6 +8,8 @@ La [constitución](../../.specify/memory/constitution.md) y [`CONTRIBUTING.md`](
 
 ## Backlog funcional vigente
 
+**Planificación en revisión:** primero se acordarán los [hitos M1–M4](milestones.md) y el [calendario y contingencia](calendario-y-contingencia.md); después se reorganizarán las historias. La lista siguiente es provisional y no asigna todavía trabajo a semanas. Los acuerdos actuales y `development/` orientan el alcance: actualizar las especificaciones históricas no es condición para comenzar.
+
 Este backlog traduce los acuerdos del [caso](../01-definicion/caso-evaluacion-grupal.md) en resultados verificables. Los IDs **BK-01–BK-24** identifican historias locales de esta revisión; no son IDs de GitHub ni reemplazan los T001–T074 anteriores. No se crearon Issues ni un Project remoto.
 
 **Estado inicial de todas las historias: Backlog.** Esto significa trabajo por refinar, verificar o completar; no que toda capacidad deba construirse de cero. Si existe código candidato, primero se verifica y se conserva lo que cumpla. No se trasladan checks de tareas antiguas como aceptación de este alcance.
@@ -16,18 +18,18 @@ Las prioridades y la secuencia son propuestas de planificación. Los responsable
 
 ### Preparación y decisiones
 
-| ID    | Historia o resultado                                                        | Prioridad | Criterio de aceptación mínimo                                                                                                                                                                         | Dependencias | Área propuesta           |
-| ----- | --------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------ |
-| BK-01 | Sincronizar especificación, plan, contratos y tareas con el alcance vigente | High      | Matriz de cambios para consulta histórica, reclamos, correo, exportación y ventana general; resolver FR-027/028/032 y exclusiones antiguas sin borrar evidencia; revisión de criterios y trazabilidad | Ninguna      | Coordinación y dominio   |
-| BK-02 | Cerrar reglas pendientes de cálculo, temporalidad y salida                  | High      | Registrar decisión o exclusión explícita para saldos negativos, movimientos anulados, precisión de notas, eventos coincidentes y columnas XLSX; no atribuir el supuesto de puntos al profesor         | Ninguna      | Coordinación y dominio   |
-| BK-03 | Verificar capacidades heredadas y preparar pruebas aisladas                 | High      | Inventario por historia, datos sintéticos y comandos con fecha/versión; constatar qué ya funciona y qué falta, sin usar producción; no confundir configuración de tests con cobertura                 | BK-01        | Calidad                  |
-| BK-04 | Consolidar recorrido y prototipo docente/alumno                             | High      | Representar registro, consulta inmediata, reclamo grupal/individual, respuesta y exportación; distinguir pendiente de cero y evitar publicación separada                                              | BK-01        | Aplicación y experiencia |
+| ID    | Historia o resultado                                                                              | Prioridad | Criterio de aceptación mínimo                                                                                                                                                                 | Dependencias | Área propuesta           |
+| ----- | ------------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------ |
+| BK-01 | Referencia histórica: posible actualización de especificaciones, fuera de la planificación activa | High      | ID conservado como antecedente; no bloquea historias ni exige reescribir `specs/`. Si se retoma, requerirá acuerdo independiente y preservará evidencia                                       | Ninguna      | Coordinación y dominio   |
+| BK-02 | Cerrar reglas pendientes de cálculo, temporalidad y salida                                        | High      | Registrar decisión o exclusión explícita para saldos negativos, movimientos anulados, precisión de notas, eventos coincidentes y columnas XLSX; no atribuir el supuesto de puntos al profesor | Ninguna      | Coordinación y dominio   |
+| BK-03 | Verificar capacidades heredadas y preparar pruebas aisladas                                       | High      | Inventario por historia, datos sintéticos y comandos con fecha/versión; constatar qué ya funciona y qué falta, sin usar producción; no confundir configuración de tests con cobertura         | Ninguna      | Calidad                  |
+| BK-04 | Consolidar recorrido y prototipo docente/alumno                                                   | High      | Representar registro, consulta inmediata, reclamo grupal/individual, respuesta y exportación; distinguir pendiente de cero y evitar publicación separada                                      | Ninguna      | Aplicación y experiencia |
 
 ### Entradas, grupos y registro
 
 | ID    | Historia o resultado                                  | Prioridad | Criterio de aceptación mínimo                                                                                                                                                                      | Dependencias        | Área propuesta           |
 | ----- | ----------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------------ |
-| BK-05 | Acceder solo a cursos y recursos autorizados          | High      | Sesión no basta como permiso; docente no opera cursos ajenos; alumno solo accede a sus recursos; denegación directa y por interfaz sin filtrar datos                                               | BK-01, BK-03        | Datos y seguridad        |
+| BK-05 | Acceder solo a cursos y recursos autorizados          | High      | Sesión no basta como permiso; docente no opera cursos ajenos; alumno solo accede a sus recursos; denegación directa y por interfaz sin filtrar datos                                               | BK-03               | Datos y seguridad        |
 | BK-06 | Preparar periodo/curso e incorporar el padrón         | High      | Importación de alumnos válidos, explicación de incompletos/repetidos y vinculación correcta; repetir no duplica alumnos o matrículas; no importar notas                                            | BK-05               | Coordinación y dominio   |
 | BK-07 | Configurar grupos, capacidad y ventana por curso      | High      | Docente define número/cupo; alumno elige o cambia con ventana abierta y cupo; rechazar fuera de ventana o último cupo concurrente sin exceder capacidad                                            | BK-05, BK-06        | Aplicación y experiencia |
 | BK-08 | Reabrir selección para todo el curso                  | Medium    | Docente amplía/reabre; cualquier alumno del curso puede cambiar con cupo; no permisos individuales ni solicitudes de traslado añadidas al módulo de reclamos                                       | BK-07               | Aplicación y experiencia |
@@ -60,7 +62,7 @@ Las prioridades y la secuencia son propuestas de planificación. Los responsable
 
 ### Secuencia y paralelismo
 
-1. BK-01 y BK-02 pueden refinarse en paralelo; habilitan especificación y reglas de cálculo coherentes.
+1. BK-02 concreta reglas pendientes conforme al caso y los acuerdos; BK-01 queda como antecedente, no una dependencia. La secuencia se ajustará a M1–M4 antes de comprometer tareas.
 2. BK-03 y BK-04 preparan pruebas y recorrido. BK-05–BK-11 verifican o completan las entradas y el registro. La historia temporal precede a la consulta de notas, reclamos y exportación.
 3. BK-12 protege mutaciones. BK-13 habilita consulta; BK-14 y BK-15 pueden desarrollarse en paralelo contra permisos comunes. BK-16–BK-18 completan atención y aviso.
 4. BK-19–BK-20 pueden avanzar en paralelo al flujo de reclamos una vez disponibles las reglas y notas históricas.
@@ -68,16 +70,16 @@ Las prioridades y la secuencia son propuestas de planificación. Los responsable
 
 ### Cambios frente a `specs/001-manage-group-evaluation/`
 
-| Planificación anterior                                 | Acuerdo vigente y trabajo de transición                                                                                                       |
-| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| FR-032 niega consulta de notas al alumno               | BK-01/BK-13: permitir solo notas históricamente correspondientes; la prueba antigua de denegación es evidencia histórica, no aceptación nueva |
-| FR-028 separa puntos sin cálculo académico             | BK-02/BK-19: mantener registros distintos y aplicar el supuesto individual solo al exportar                                                   |
-| Notificaciones y exportación fuera del alcance         | BK-18/BK-20: incluir el aviso específico al docente y descarga XLSX, no notificación general ni actas oficiales                               |
-| Traslado directo docente fuera de ventana              | BK-08: reapertura general acordada, sin obligar a un traslado directo adicional                                                               |
-| Sin reclamos                                           | BK-14–BK-17: tipos, destinatarios, unicidad, estados y decisión final                                                                         |
-| T001–T006 marcadas completas y otras tareas pendientes | BK-03: preservar estados históricos y verificar qué evidencia sigue siendo aplicable; no reiniciar ni cerrar tareas por equivalencia nominal  |
+| Planificación anterior                                 | Acuerdo vigente y trabajo de transición                                                                                                      |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR-032 niega consulta de notas al alumno               | BK-13: permitir solo notas históricamente correspondientes; la prueba antigua de denegación es evidencia histórica, no aceptación nueva      |
+| FR-028 separa puntos sin cálculo académico             | BK-02/BK-19: mantener registros distintos y aplicar el supuesto individual solo al exportar                                                  |
+| Notificaciones y exportación fuera del alcance         | BK-18/BK-20: incluir el aviso específico al docente y descarga XLSX, no notificación general ni actas oficiales                              |
+| Traslado directo docente fuera de ventana              | BK-08: reapertura general acordada, sin obligar a un traslado directo adicional                                                              |
+| Sin reclamos                                           | BK-14–BK-17: tipos, destinatarios, unicidad, estados y decisión final                                                                        |
+| T001–T006 marcadas completas y otras tareas pendientes | BK-03: preservar estados históricos y verificar qué evidencia sigue siendo aplicable; no reiniciar ni cerrar tareas por equivalencia nominal |
 
-Hasta completar BK-01, no se debe ejecutar el antiguo `tasks.md` como si cubriera estos cambios. Este backlog es la entrada para actualizar los artefactos de especificación, no un contrato técnico que los sustituya. Tampoco cambia las normas de la constitución.
+El antiguo `tasks.md` es un antecedente y no cubre automáticamente los acuerdos nuevos. Su actualización no bloquea el trabajo: el caso vigente, los acuerdos consolidados y la planificación por hitos guían la reorganización del backlog. Se mantienen las normas de la constitución.
 
 ## Responsabilidades para cinco integrantes
 
