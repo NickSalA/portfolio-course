@@ -15,6 +15,6 @@ Consulta [`portfolio-coursse/README.md`](portfolio-coursse/README.md) para insta
 
 ## Calidad y colaboración
 
-Los PR hacia `main` ejecutan CI: lint, typecheck y build. Al integrar cambios en `main`, semantic-release puede crear una versión y un GitHub Release según los mensajes Conventional Commits. La publicación de una versión no implica despliegue de la aplicación.
+Los PR hacia `develop` y `main` ejecutan CI (lint, typecheck y build) y CodeQL (análisis de JavaScript/TypeScript). Codex puede revisar los PR si se conecta el repositorio y se habilita la revisión en su configuración; consulta [`CONTRIBUTING.md`](CONTRIBUTING.md#revisión-de-código). Al integrar cambios en `main`, semantic-release puede crear una versión y un GitHub Release según los mensajes Conventional Commits. La publicación de una versión no implica despliegue de la aplicación.
 
 Antes de trabajar, revisa [`CONTRIBUTING.md`](CONTRIBUTING.md) y la [documentación del proyecto](docs/README.md). La configuración de protección de ramas y aprobaciones se administra en GitHub; no queda definida únicamente por los archivos del repositorio.

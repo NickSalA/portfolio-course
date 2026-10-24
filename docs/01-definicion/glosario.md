@@ -1,35 +1,45 @@
-# Glosario académico
+# Glosario del dominio académico
 
-Términos del dominio observables en el código y las migraciones actuales. Este glosario describe
-conceptos; las políticas de desarrollo se encuentran en la [constitución](../../.specify/memory/constitution.md).
+Vocabulario del [alcance vigente](caso-evaluacion-grupal.md). Define conceptos del producto objetivo, no afirma su implementación. El estado del código y las decisiones técnicas pertenecen a [diseño](../02-diseno/modelo-datos.md) y [evaluación](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md).
 
-| Término                           | Significado                                                                                                                                                                                                                                     |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cuenta autenticada                | Identidad verificada por Supabase Auth mediante Google; no concede acceso académico por sí misma.                                                                                                                                               |
-| Docente                           | Cuenta con rol docente autorizada para gestionar sus cursos.                                                                                                                                                                                    |
-| Alumno autorizado                 | Correo asociado por el docente a un curso mediante `authorized_students`, aun si la persona no ha iniciado sesión.                                                                                                                              |
-| Matrícula                         | Vínculo de una cuenta autenticada con un curso en `course_students`, con estado de acceso y grupo opcional.                                                                                                                                     |
-| Periodo académico                 | Año y semestre que agrupan cursos; su estado puede ser `draft`, `upcoming`, `current` o `closed`.                                                                                                                                               |
-| Curso                             | Oferta académica de un docente dentro de un periodo.                                                                                                                                                                                            |
-| Grupo                             | Subdivisión opcional de un curso con capacidad; el alumno puede seleccionarlo durante una ventana habilitada.                                                                                                                                   |
-| Movimiento de puntos              | Variación de puntos vinculada a una autorización; puede existir antes del primer inicio de sesión del alumno. Si se asignó por error, el docente puede anular el movimiento sin borrar el registro.                                             |
-| Anulación de puntos               | Cambio de `is_voided` a `true` para conservar el movimiento histórico y excluirlo del saldo; el esquema actual no guarda quién ni cuándo lo anuló.                                                                                              |
-| Saldo de puntos                   | Suma derivada de movimientos no anulados; representa puntos individuales, pero no equivale a una nota individual.                                                                                                                               |
-| Evaluación de curso               | Evaluación asociada a un curso, como `T1`, `T2` o `T3`, según el esquema actual.                                                                                                                                                                |
-| Nota grupal                       | Calificación asociada a un grupo y una evaluación, entre 0 y 20; solo el docente del curso la gestiona; la interfaz no la muestra al alumno. `0029` retira el permiso de lectura estudiantil de `0028`, pendiente de verificar en cada entorno. |
-| Pertenencia histórica             | Grupo al que pertenecía una matrícula el día de la actividad; regla acordada, aún no persistida por el sistema.                                                                                                                                 |
-| Corrección individual justificada | Excepción docente para una evaluación y un alumno cuya nota difiere de la grupal, con motivo y conservación de la nota del grupo; aún no implementada.                                                                                          |
+| Término                           | Significado                                                                                                                                                      |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Identidad autenticada             | Persona cuya identidad se ha comprobado; no concede por sí misma acceso a un curso                                                                               |
+| Docente responsable               | Persona autorizada para administrar los registros académicos de sus cursos y decidir la resolución de reclamos                                                   |
+| Alumno autorizado                 | Persona habilitada previamente para acceder a un curso, aun antes de vincular su cuenta                                                                          |
+| Matrícula                         | Vínculo de un alumno con un curso en la plataforma; no representa una matrícula oficial realizada en el SUM                                                      |
+| Periodo académico                 | Año y término bajo los que se organizan cursos                                                                                                                   |
+| Curso                             | Unidad académica de un periodo bajo responsabilidad docente                                                                                                      |
+| Padrón                            | Relación inicial de alumnos; el XLSX recibido del SUM no incluye notas para importar                                                                             |
+| Grupo                             | Organización de alumnos de un curso con capacidad definida por el docente                                                                                        |
+| Ventana de selección              | Periodo durante el que los alumnos pueden elegir o cambiar de grupo con cupo; puede reabrirse para todo el curso                                                 |
+| Participante de una actividad     | Alumno que pertenecía al grupo cuando se realizó la actividad, aunque haya cambiado después                                                                      |
+| Pertenencia histórica             | Relación del alumno con un grupo en el momento de una actividad; determina notas, correcciones y acceso al reclamo grupal                                        |
+| Evaluación grupal                 | Actividad de un curso para la que el docente registra una calificación por grupo; la plataforma no recibe el entregable ni lo evalúa automáticamente             |
+| Nota grupal base                  | Calificación de 0 a 20 asociada a grupo y evaluación, que corresponde a sus participantes históricos                                                             |
+| Nota pendiente                    | Ausencia de calificación registrada; se mantiene vacía y no equivale a cero                                                                                      |
+| Registro confirmado               | Resultado guardado que queda visible de inmediato a sus destinatarios, sin publicación posterior separada                                                        |
+| Corrección grupal                 | Cambio docente de una nota base, conservando explicación del cambio y participantes de la actividad                                                              |
+| Movimiento de puntos              | Asignación individual de puntos, distinta de una nota grupal, sobre la que su titular puede reclamar                                                             |
+| Anulación de puntos               | Corrección que conserva el movimiento original y lo excluye del saldo, sin borrarlo                                                                              |
+| Saldo de puntos                   | Total derivado de movimientos aplicables; el tratamiento de saldos negativos requiere definición para el cálculo de exportación                                  |
+| Reclamo grupal                    | Solicitud única por grupo y evaluación, que cualquier participante presenta en nombre del grupo de aquella actividad y consultan esos participantes y el docente |
+| Reclamo individual de puntos      | Solicitud única por movimiento propio, privada entre el alumno titular y el docente                                                                              |
+| Seguimiento de evaluaciones       | Consulta de resultados propios y del estado y respuesta de reclamos; no implica seguimiento integral del aprendizaje                                             |
+| Estado de reclamo                 | Momento del recorrido Pendiente → En revisión → Respondido; la respuesta docente es final y no admite réplica, reapertura ni otro caso sobre el mismo registro   |
+| Aviso de reclamo                  | Correo breve al docente responsable ante una nueva solicitud, con enlace y sin nota, puntos o texto del reclamo; no equivale a su respuesta ni prueba lectura    |
+| Exportación del curso             | Descarga XLSX por alumno y curso para uso docente, sin integración con el SUM ni carácter de acta oficial                                                        |
+| Puntos aplicados                  | Parte del saldo aprovechable en el cálculo individual de exportación, hasta el margen de las notas base; no es un descuento del saldo                            |
+| Excedente no aplicado             | Puntos que no producen aumento porque los trabajos ya alcanzaron el máximo; permanecen registrados sin otro beneficio                                            |
+| Promedio ajustado                 | Promedio individual de trabajos de igual peso tras aplicar puntos hasta un máximo de 20 por trabajo; se muestra a dos decimales con redondeo solo al final       |
+| Corrección individual excepcional | Sustitución justificada de la nota grupal para un alumno; fuera del alcance y diferente del cálculo automático por puntos                                        |
 
-**Distinción importante:** la autorización previa, la matrícula autenticada y la identidad de
-Google son registros distintos. Los puntos están asociados a la autorización, mientras las
-notas actuales se asocian a grupo y evaluación. La regla deseada es conservar para cada alumno las
-notas obtenidas antes de un cambio de grupo y asignarle las posteriores del nuevo grupo; el esquema
-actual no conserva esa atribución histórica. La fecha de la actividad determina el grupo y la
-corrección individual justificada es una excepción para una etapa posterior. Véase el
-[diseño propuesto](../02-diseno/modelo-datos.md) antes de ampliar ese modelo.
+## Distinciones que deben mantenerse
 
-Fuentes: [modelo de datos](../02-diseno/modelo-datos.md),
-[sincronización de autorizaciones](../../portfolio-coursse/lib/academic/authorize-current-user.ts),
-[migración de puntos](../../portfolio-coursse/supabase/migrations/0018_points_belong_to_authorizations.sql)
-y [migraciones de notas](../../portfolio-coursse/supabase/migrations/0028_group_evaluations_and_grades.sql)
-y [permisos de notas](../../portfolio-coursse/supabase/migrations/0029_restrict_group_grades_to_teachers.sql).
+- Autorizar un alumno no es lo mismo que autenticar su cuenta o vincular su matrícula.
+- El grupo actual no determina retrospectivamente quién realizó una actividad.
+- Una nota pendiente y una nota cero no son equivalentes.
+- Puntos y notas base son registros diferentes. Su aplicación académica en la exportación es un **supuesto del equipo**, no una regla confirmada por el profesor.
+- Exportar calcula; no consume puntos ni modifica las notas grupales originales.
+- Responder un reclamo no modifica automáticamente el resultado cuestionado; la corrección exige actuación docente expresa.
+- Reabrir la selección de grupos no equivale a reabrir un reclamo.
