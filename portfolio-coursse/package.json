@@ -10,7 +10,8 @@
 		"typecheck": "next typegen && tsc --noEmit",
 		"test": "vitest run",
 		"test:e2e": "playwright test",
-		"test:db": "supabase test db"
+		"test:db": "supabase test db",
+		"test:node": "node --test lib/**/*.test.mjs"
 	},
 	"dependencies": {
 		"@supabase/ssr": "^0.12.5",
