@@ -142,12 +142,32 @@ exception when others then
   if sqlerrm <> 'group_selection_closed' then raise; end if;
 end $$;
 
+-- A window that already ended stays closed.
+select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true);
+select public.configure_course_group_selection(
+  current_setting('qa.course_a_id')::bigint,
+  (now() at time zone 'America/Lima')::date - 3, '00:00',
+  (now() at time zone 'America/Lima')::date - 1, '00:00');
+
+select set_config('request.jwt.claim.sub', 'f4000000-0000-4000-8000-000000000004', true);
+do $$
+begin
+  perform public.select_course_group(current_setting('qa.enrollment_s2_id')::bigint, current_setting('qa.group_a2_id')::bigint);
+  raise exception 'FAIL: selection accepted after the window closed';
+exception when others then
+  if sqlerrm <> 'group_selection_closed' then raise; end if;
+end $$;
+
+-- Reopening applies to the whole course.
 select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true);
 select public.configure_course_group_selection(
   current_setting('qa.course_a_id')::bigint,
   (now() at time zone 'America/Lima')::date - 1, '00:00',
   (now() at time zone 'America/Lima')::date + 1, '00:00');
+-- RLS blocks direct group updates for authenticated users, so set up capacity as owner.
+reset role;
 update public.groups set capacity = 1 where id = current_setting('qa.group_a2_id')::bigint;
+set local role authenticated;
 
 select set_config('request.jwt.claim.sub', 'f4000000-0000-4000-8000-000000000004', true);
 do $$
@@ -167,8 +187,9 @@ begin
   end;
 end $$;
 
-select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true);
+reset role;
 update public.groups set capacity = 2 where id = current_setting('qa.group_a2_id')::bigint;
+set local role authenticated;
 
 select set_config('request.jwt.claim.sub', 'f4000000-0000-4000-8000-000000000004', true);
 do $$
@@ -179,7 +200,7 @@ begin
     raise exception 'FAIL: open window selection not applied';
   end if;
 end $$;
-\echo 'PASS GRP-05: closed window, full group and foreign group rejected; open window applies'
+\echo 'PASS GRP-05: no/ended window, full group and foreign group rejected; reopened window applies'
 
 rollback;
 \echo 'PASS: all synthetic fixtures rolled back'
