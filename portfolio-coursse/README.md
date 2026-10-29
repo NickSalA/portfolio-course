@@ -49,7 +49,7 @@ pnpm test:e2e
 pnpm build
 ```
 
-`pnpm test:db` y `pnpm test:e2e` son pruebas de integración: requieren Supabase local iniciado y restablecido con las migraciones actuales. La configuración de Playwright rechaza cualquier `NEXT_PUBLIC_SUPABASE_URL` cuyo host no sea `localhost` o `127.0.0.1`; no se deben ejecutar pruebas destructivas contra producción. La instalación inicial de Playwright puede requerir `pnpm exec playwright install chromium`.
+`pnpm test:db` ejecuta las pruebas SQL de capacidades y RLS con `psql` dentro del contenedor local de Supabase; requiere Docker y Supabase iniciado con las migraciones actuales. No necesita la CLI de Supabase instalada en el PATH ni ejecuta pgTAP. `pnpm test:db:pending` ejecuta por separado los requisitos pendientes y actualmente debe fallar. `pnpm test:e2e` también requiere Supabase local iniciado con las migraciones actuales. La configuración de Playwright rechaza cualquier `NEXT_PUBLIC_SUPABASE_URL` cuyo host no sea `localhost` o `127.0.0.1`; no se deben ejecutar pruebas destructivas contra producción. La instalación inicial de Playwright puede requerir `pnpm exec playwright install chromium`.
 
 Para cada ejecución del proceso académico, registra en `../docs/automatizaciones/gestion-evaluacion-grupal/evaluacion.md` la fecha, versión o PR, entorno local, fixture sintético, resultado esperado y observado, y referencias seguras a errores o señales. No copies claves, correos reales, nombres reales ni calificaciones en logs o evidencia pública. Un check aprobado demuestra únicamente el comportamiento que ejecutó; no prueba por sí solo producción, monitoreo, respaldos o mejora frente al proceso manual.
 

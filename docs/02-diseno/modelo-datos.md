@@ -5,7 +5,7 @@ La fuente ejecutable del esquema es la secuencia de
 han versionado desde `0001` hasta `0029`. La evidencia histórica registra su aplicación local
 con `db reset --local`; esta actualización solo inspeccionó archivos y no repitió esa ejecución.
 Las pruebas de RLS con identidades sintéticas están en
-[`supabase/tests/group_grades_rls.sql`](../../portfolio-coursse/supabase/tests/group_grades_rls.sql);
+[`supabase/qa/group_grades_rls.sql`](../../portfolio-coursse/supabase/qa/group_grades_rls.sql);
 esto **no** certifica la aplicación en un entorno remoto.
 
 | Entidad               | Relación principal                                                                                                                                   |
