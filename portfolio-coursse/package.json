@@ -1,37 +1,39 @@
 {
-	"name": "portfolio-coursse",
-	"version": "0.1.0",
-	"private": true,
-	"scripts": {
-		"dev": "next dev",
-		"build": "next build",
-		"start": "next start",
-		"lint": "eslint",
-		"typecheck": "next typegen && tsc --noEmit",
-		"test": "vitest run",
-		"test:e2e": "playwright test",
-		"test:db": "supabase test db"
-	},
-	"dependencies": {
-		"@supabase/ssr": "^0.12.5",
-		"@supabase/supabase-js": "^2.112.4",
-		"next": "16.3.0",
-		"react": "19.2.8",
-		"react-dom": "19.2.8",
-		"xlsx": "^0.18.5"
-	},
-	"devDependencies": {
-		"@playwright/test": "^1.64.0",
-		"@tailwindcss/postcss": "^4.3.3",
-		"@types/node": "^20.19.43",
-		"@types/react": "^19.2.18",
-		"@types/react-dom": "^19.2.5",
-		"eslint": "^9.39.5",
-		"eslint-config-next": "16.3.0",
-		"semantic-release": "^25.0.9",
-		"tailwindcss": "^4.3.3",
-		"typescript": "^5.9.3",
-		"vitest": "^5.0.3"
-	},
-	"packageManager": "pnpm@11.20.0"
+    "name": "portfolio-coursse",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "eslint",
+        "typecheck": "next typegen && tsc --noEmit",
+        "test": "vitest run",
+        "test:e2e": "playwright test",
+        "test:db": "node scripts/test-db.mjs",
+        "test:db:pending": "node scripts/test-db.mjs --pending",
+        "test:node": "node --test lib/**/*.test.mjs"
+    },
+    "dependencies": {
+        "@supabase/ssr": "^0.12.5",
+        "@supabase/supabase-js": "^2.112.4",
+        "next": "16.3.0",
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "xlsx": "^0.18.5"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.64.0",
+        "@tailwindcss/postcss": "^4.3.3",
+        "@types/node": "^20.19.43",
+        "@types/react": "^19.2.18",
+        "@types/react-dom": "^19.2.5",
+        "eslint": "^9.39.5",
+        "eslint-config-next": "16.3.0",
+        "semantic-release": "^25.0.9",
+        "tailwindcss": "^4.3.3",
+        "typescript": "^5.9.3",
+        "vitest": "^5.0.3"
+    },
+    "packageManager": "pnpm@11.20.0"
 }

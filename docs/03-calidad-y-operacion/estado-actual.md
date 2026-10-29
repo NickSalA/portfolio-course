@@ -22,7 +22,7 @@ de pruebas. Hay configuración local, no certificación de su funcionamiento.
 Las [migraciones SQL](../../portfolio-coursse/supabase/migrations/) definen políticas RLS y
 funciones para proteger operaciones académicas. La evidencia histórica documenta aplicación de
 `0001`–`0029` mediante `db reset --local` en la instancia local. No se repitió aquí. La prueba reproducible
-[`group_grades_rls.sql`](../../portfolio-coursse/supabase/tests/group_grades_rls.sql) pasó
+[`group_grades_rls.sql`](../../portfolio-coursse/supabase/qa/group_grades_rls.sql) pasó
 con identidades sintéticas: alumno sin lectura, docentes restringidos a sus propios cursos,
 modificación permitida al docente responsable e inserción entre cursos rechazada. Los fixtures
 se revierten al final. Esto **no prueba la aplicación remota** ni despliegue. En

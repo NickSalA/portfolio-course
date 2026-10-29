@@ -128,7 +128,7 @@ pnpm test:e2e
 pnpm build
 ```
 
-Las pruebas de base y navegador requieren Supabase local. Si Playwright pide el navegador, ejecuta `pnpm exec playwright install chromium`. No se dan por aprobadas las comprobaciones solo porque sus comandos existan.
+Las pruebas de base y navegador requieren Supabase local. `pnpm test:db` ejecuta las pruebas psql de capacidades y RLS en el contenedor Docker local; no requiere la CLI en el PATH ni ejecuta pgTAP. `pnpm test:db:pending` ejecuta los requisitos pendientes por separado y actualmente debe fallar. Si Playwright pide el navegador, ejecuta `pnpm exec playwright install chromium`. No se dan por aprobadas las comprobaciones solo porque sus comandos existan.
 
 | Problema                            | Revisión rápida                                                                     |
 | ----------------------------------- | ----------------------------------------------------------------------------------- |

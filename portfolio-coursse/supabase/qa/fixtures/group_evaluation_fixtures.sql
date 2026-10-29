@@ -1,5 +1,14 @@
 -- Synthetic fixtures for local group-evaluation tests.
 -- Include after BEGIN; callers own ROLLBACK. Never use against production.
+-- After BEGIN create temporary table qa_fixture_transaction () on commit drop.
+\set ON_ERROR_STOP on
+do $$
+begin
+  if to_regclass('pg_temp.qa_fixture_transaction') is null then
+    raise exception 'Fixtures require a caller-owned transaction and qa_fixture_transaction marker';
+  end if;
+end;
+$$;
 
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password,
