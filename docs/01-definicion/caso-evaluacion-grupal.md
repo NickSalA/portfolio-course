@@ -59,14 +59,18 @@ Cada nuevo reclamo genera un aviso por correo al docente con mensaje breve y enl
 El responsable no pudo confirmar con el profesor la aplicación de puntos y acuerda como **supuesto de trabajo revisable**:
 
 1. Trabajos de igual peso y notas grupales base preservadas.
-2. Un punto aumenta una unidad de nota individual en un trabajo, máximo 20 por trabajo; aplicación automática, sin reutilizar el punto en otros trabajos del mismo cálculo.
-3. Los puntos que exceden el margen total se conservan como excedente sin efecto académico adicional.
+2. Un punto positivo aumenta una unidad de nota individual y un punto negativo la reduce una unidad; cada nota ajustada queda entre 0 y 20. La aplicación es automática y no reutiliza puntos en otros trabajos del mismo cálculo.
+3. Los puntos que exceden el margen hasta 20 o hasta 0 quedan como excedente con signo y sin efecto académico adicional; el saldo registrado se conserva. Si el margen es fraccionario puede aplicarse una fracción del último punto, sin crear movimientos fraccionarios.
 4. La exportación solo calcula: no descuenta, consume ni modifica puntos. Repetirla con iguales entradas conserva los resultados.
 5. Con notas pendientes no se presenta un promedio final ajustado completo. Con notas completas, se muestra con dos decimales, redondeando solo el resultado final.
 
 Para un alumno, con n trabajos completos y saldo no negativo: margen = suma de (20 − nota base); aplicados = mínimo entre saldo y margen; promedio ajustado = (suma de notas base + aplicados) / n; excedente = saldo − aplicados. Esta equivalencia no fija una distribución por trabajo para mostrar en columnas. El promedio es del componente de trabajos grupales, no necesariamente del curso completo.
 
-La salida inicial distingue notas base, promedio base, saldo, puntos aplicados, excedente y promedio ajustado. Precisión de notas, saldos negativos, movimientos anulados y columnas definitivas deben concretarse antes de implementar el cálculo. No se añade un ajuste individual manual ni una fórmula no acordada.
+Para saldo negativo, con suma de notas base `S`, los aplicados son `max(saldo, -S)`; el excedente es `saldo - aplicados` y el promedio ajustado es `(S + aplicados) / n`. Se usan solo movimientos activos, de importe entero no nulo; los anulados quedan excluidos del saldo, pero conservan su historia. No se modifican notas grupales ni puntos y el ajuste afecta solo al resultado individual.
+
+La salida propuesta contiene una fila por alumno con nombre, correo, notas base por actividad, promedio base, saldo, puntos aplicados, excedente y promedio ajustado. Las notas base admiten hasta dos decimales y están entre 0 y 20; pendiente se representa con una celda vacía y cero como número. Con una nota pendiente o sin trabajos, saldo permanece visible y ambos promedios, aplicados y excedente quedan vacíos. Los promedios se muestran con dos decimales, pero el cálculo usa la precisión completa, sin redondeos intermedios; el ajustado final se redondea al centésimo más próximo, con empate hacia arriba (`13,505 → 13,51`). No se muestra una distribución de puntos por trabajo ni se infiere historia desde el grupo actual.
+
+Estas decisiones fueron confirmadas en la conversación por R1, quien se identificó como @NickSalA e informó de aceptación de R3; no se ha verificado una aprobación en GitHub. Siguen siendo un **supuesto revisable del equipo**, no confirmado por el profesor. El cálculo y XLSX integrado corresponden a EXP-02 #39 y EXP-03 #40; registrar las reglas no acredita que ya funcionen. Véanse [especificación](../../specs/001-export-decisions/spec.md) y [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md).
 
 ## Exclusiones y evaluación
 
@@ -76,4 +80,4 @@ Se evaluarán registro y seguimiento con casos sintéticos. El tiempo se contras
 
 ## Relación con especificaciones anteriores
 
-`specs/001-manage-group-evaluation/` sigue representando la planificación anterior. Deben sincronizarse requisitos, contratos, pruebas y tareas antes de implementar los cambios: consulta estudiantil, reclamos, correo, exportación con puntos y reapertura general. Esa sincronización es una tarea explícita del backlog; no se renumeran FR ni se reinterpreta evidencia anterior para declarar cumplido el nuevo alcance.
+`specs/001-manage-group-evaluation/` sigue representando la planificación anterior. La sincronización de requisitos, contratos, pruebas y tareas históricas debe revisarse en su trabajo correspondiente; la ficha vigente de EXP-01 no la exige como dependencia para comenzar. No se renumeran FR ni se reinterpreta evidencia anterior para declarar cumplido el nuevo alcance.

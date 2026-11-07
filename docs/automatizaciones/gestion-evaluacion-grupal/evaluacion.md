@@ -11,6 +11,31 @@ Este documento registra evidencia ejecutada para la Parte II. Una capacidad pres
 - Plan: [`../../../specs/001-manage-group-evaluation/plan.md`](../../../specs/001-manage-group-evaluation/plan.md)
 - Tareas: [`../../../specs/001-manage-group-evaluation/tasks.md`](../../../specs/001-manage-group-evaluation/tasks.md)
 - Guía de validación: [`../../../specs/001-manage-group-evaluation/quickstart.md`](../../../specs/001-manage-group-evaluation/quickstart.md)
+- EXP-01 #38: [especificación](../../../specs/001-export-decisions/spec.md), [plan](../../../specs/001-export-decisions/plan.md), [tareas](../../../specs/001-export-decisions/tasks.md) y [guía](../../../specs/001-export-decisions/quickstart.md).
+
+## EXP-01 #38: decisiones y evidencia documental
+
+**Fuente y revisión:** R1 se identificó en la conversación como @NickSalA y confirmó las reglas de [EXP-01](../../backlog/05-exportacion.md); comunicó que R3 las revisó y aceptó, y que la revisión completa se realizará en el PR. Es un reporte de R1, no una aprobación independiente comprobada en GitHub; no se dispone aquí de fecha ni comentario de R3. El profesor no confirmó la fórmula. Seguimiento actualizado en archivos locales únicamente; GitHub no se modificó.
+
+**Contraste BASE-01 — inspección estática:** la generación XLSX existente es candidata a reutilización, no aceptación funcional. `portfolio-coursse/components/teacher/grades/group-grades-table.tsx` exporta por grupo, integrantes actuales, valores locales potencialmente no guardados y pendientes `-`; `portfolio-coursse/components/teacher/points/export-points-button.tsx` suma movimientos activos y exporta puntos por separado. Falta salida individual integrada con historia y cálculo (#39, #40 y GRP-06 #23). La nota se almacena como `numeric(4,2)`, pero la acción actual no rechaza explícitamente entradas con más de dos decimales y la interfaz usa paso 0,1; adecuación de entrada corresponde al responsable de notas (EVA-01 #24). Las funciones de exportación inspeccionadas no escriben saldo ni notas; no se verificó repetición ni descarga. Los anulados se conservan en la base y se excluyen del saldo actual; visibilidad explicativa es seguimiento EVA-02/03 (#25/#26).
+
+**Ejemplos esperados preparados** para #39/#41: no equivalen a pruebas ejecutadas del cálculo o del XLSX. Con datos sintéticos y fórmula documentada:
+
+| Notas base | Saldo | Aplicados | Excedente |  Promedio base | Ajustado |
+| ---------- | ----: | --------: | --------: | -------------: | -------: |
+| 10, 18     |    15 |        12 |         3 |          14,00 |    20,00 |
+| 10, 10, 11 |     1 |         1 |         0 | 10,33 (visual) |    10,67 |
+| 0, 1       |    −3 |        −1 |        −2 |           0,50 |     0,00 |
+| 19,50      |     1 |      0,50 |      0,50 |          19,50 |    20,00 |
+| 0,25       |    −1 |     −0,25 |     −0,75 |           0,25 |     0,00 |
+| 20, 20     |     3 |         0 |         3 |          20,00 |    20,00 |
+| 0, 20      |     0 |         0 |         0 |          10,00 |    10,00 |
+
+Otros esperados: +3 activo y −1 anulado dan saldo 3, conservando ambos registros; con `10, pendiente` y saldo 3, el saldo se muestra y los promedios, aplicados y excedente quedan vacíos; sin trabajos y saldo 3 ocurre lo mismo, sin división. El cero explícito no es pendiente. El promedio ajustado final `13,505` se muestra `13,51`; no usar el promedio base visualizado para calcular.
+
+**Comprobaciones de esta revisión:** el agente contrastó código, migraciones, backlog y ejemplos; un cálculo con `Decimal` imprimió los cinco resultados de la tabla y el empate esperado, pero el proceso terminó con código 2 por `Cannot set tty process group`, por lo que no se presenta como suite aprobada. No se ejecutaron descarga, interfaz, aplicación del cálculo o recorrido visual. Para aceptación de implementación siguen #39, #40, #41 y GRP-06 #23; la restricción y pruebas de notas corresponden a EVA-01 #24. El inventario BASE-01 se mantiene histórico, sin editarlo como evidencia nueva.
+
+**Comprobaciones documentales adicionales:** `git diff --check` devolvió código interno 0 (el lanzador emitió después el error de TTY). Un chequeo local de rutas Markdown en este archivo, el caso y el backlog encontró cuatro enlaces históricos rotos a `specs/001-manage-group-evaluation/` (spec, plan, tareas y guía); los enlaces de EXP-01 existen. Queda pendiente recuperar o corregir esas referencias históricas, a cargo de DOC-01 #47; no se alteró ni inventó la documentación histórica.
 
 ## Vocabulario de estado
 
@@ -43,7 +68,7 @@ consulta BK-13, reapertura BK-08, reclamos BK-14–BK-17, correo BK-18 y cálcul
 | Aviso docente de reclamo — §4 y §6                  | Acordada; missing                                          | Correo solo al docente por reclamo nuevo: aviso breve y enlace, sin notas, puntos ni texto. Sin avisos al alumno, recordatorios o escalamiento. Reclamo persiste ante fallo; recuperación por definir.                                                                                                                                                                                                           |
 | XLSX histórico por curso — §5                       | Acordada; present-unverified parcial                       | Existe descarga XLSX en `components/teacher/grades/group-grades-table.tsx` basada en grupos y miembros actuales; falta verificar/completar salida por alumno con participación histórica y puntos individuales. No confundir importación de padrón con exportación. Sin consumo/modificación del saldo, bases o compañeros; iguales entradas, iguales resultados académicos. No acta oficial ni integración SUM. |
 | Cálculo individual con puntos — §5–6                | Supuesto explícito del equipo; pendiente                   | Igual peso, +1 unidad por punto, distribución automática una sola vez, cap 20 por trabajo. Para `n` notas completas y saldo no negativo: `aplicados = min(saldo, suma(20 - base_i))`; `promedio = (suma(bases) + aplicados) / n`. No sumar saldo a cada trabajo ni otra vez al promedio; conservar excedente sin efecto.                                                                                         |
-| Pendientes y precisión XLSX — §5–6                  | Acordada con decisiones abiertas                           | Pendiente en blanco; cero explícito; sin promedio final ajustado completo si falta nota del conjunto incluido; solo redondeo final a dos decimales. No inventar reparto visible por trabajo. Definir columnas, datos mínimos, saldo negativo, movimientos incluidos y precisión de notas base.                                                                                                                   |
+| Pendientes y precisión XLSX — §5–6                  | Decisiones EXP-01 documentadas; implementación pendiente   | Pendiente en blanco; cero explícito; sin promedio final ajustado completo si falta nota del conjunto incluido; solo redondeo final a dos decimales. No inventar reparto visible por trabajo. Las decisiones sobre columnas, negativos, anulados y precisión se registran en el caso vigente; requieren implementación y comprobación en #39/#40.                                                                 |
 
 También quedan abiertos orden temporal de actividad/cambio coincidentes, reconstrucción de
 historia incierta con revisión docente y protocolo de evaluación (participantes, escenarios y

@@ -20,7 +20,7 @@ Antes de implementar, verificar lo existente y conservar lo que pase los criteri
 
 **Aceptación:** el caso registra decisiones explícitas sobre negativos, anulados, precisión y columnas, con ejemplos verificables y revisión de R3. Se preservan igual peso, límite 20, cálculo sin consumo y condición de supuesto del equipo. Una decisión sin resolver permanece como bloqueo, no como regla implícita.
 
-**Documentación:** actualizar [caso vigente](../01-definicion/caso-evaluacion-grupal.md) con las decisiones acordadas y [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md) con ejemplos esperados, identificados como preparación y no como pruebas ejecutadas.
+**Seguimiento local EXP-01:** reglas y ejemplos registrados en el [caso vigente](../01-definicion/caso-evaluacion-grupal.md) y la [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md). R1 (@NickSalA) confirmó las decisiones e informó de aceptación de R3; no se verificó una aprobación independiente en GitHub ni se actualizó el issue remoto. R1 indica que la revisión completa de R3 tendrá lugar en el PR; mantener el estado local hasta verificar esa revisión. El chequeo documental encontró referencias históricas ausentes cuyo seguimiento corresponde a DOC-01 #47. Implementación y validación funcional siguen en EXP-02 #39, EXP-03 #40, EXP-04 #41 y GRP-06 #23; la precisión de entrada de notas se sigue en EVA-01 #24. No se modifica el inventario histórico.
 
 ### EXP-02 · Cálculo puro de saldo y promedio ajustado
 
