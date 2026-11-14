@@ -12,12 +12,14 @@
         "test:e2e": "playwright test",
         "test:db": "node scripts/test-db.mjs",
         "test:db:pending": "node scripts/test-db.mjs --pending",
+        "test:mail": "node scripts/test-mail.mjs",
         "test:node": "node --test lib/**/*.test.mjs"
     },
     "dependencies": {
         "@supabase/ssr": "^0.12.5",
         "@supabase/supabase-js": "^2.112.4",
         "next": "16.3.0",
+        "nodemailer": "^10.5.0",
         "react": "19.2.8",
         "react-dom": "19.2.8",
         "xlsx": "^0.18.5"
@@ -26,6 +28,7 @@
         "@playwright/test": "^1.64.0",
         "@tailwindcss/postcss": "^4.3.3",
         "@types/node": "^20.19.43",
+        "@types/nodemailer": "^8.0.2",
         "@types/react": "^19.2.18",
         "@types/react-dom": "^19.2.5",
         "eslint": "^9.39.5",

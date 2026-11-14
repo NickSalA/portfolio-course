@@ -120,14 +120,20 @@
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). No se encontró aviso académico implementado; correo de Supabase Auth no equivale al aviso de reclamos. Preparar proveedor y política de fallo/reintento sin duplicar REC-06.
 
-**Rol:** R5 · **Revisor:** R1 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** Ninguno
+**Rol:** R5 · **Revisor:** R1 · **Milestone:** M1 · **Prioridad:** Alta · **Estado:** In review · **Bloqueado por:** Ninguno
 
 **GitHub:** [#17](https://github.com/NickSalA/portfolio-course/issues/17) · **Asignado:** @Forex549 · **Revisión propuesta:** @NickSalA
 
-- [ ] Elegir y documentar el medio de envío compatible con el entorno, requisitos de remitente, costo y límites si corresponde.
-- [ ] Preparar destinatario de prueba autorizado y credenciales fuera del repositorio.
-- [ ] Acordar aviso breve con enlace y tratamiento de error, sin contenido académico o texto del reclamo.
+- [x] Elegir y documentar el medio de envío compatible con el entorno, requisitos de remitente, costo y límites si corresponde.
+- [x] Preparar destinatario de prueba autorizado y credenciales fuera del repositorio (`portfolio-coursse/.env.local` con `SMTP_USER`, `SMTP_PASS` y `MAIL_TEST_TO`, y ejecutar `pnpm test:mail`).
+- [x] Acordar aviso breve con enlace y tratamiento de error, sin contenido académico o texto del reclamo.
 
 **Aceptación:** configuración de prueba disponible o bloqueo explícito con responsable antes de M3; el envío real ligado al reclamo se implementa en REC-06, no se duplica aquí.
 
-**Documentación:** variables de ejemplo sin valores secretos y condiciones de operación del aviso.
+**Documentación:** variables de ejemplo sin valores secretos en [`portfolio-coursse/.env.example`](../../portfolio-coursse/.env.example) y condiciones de operación en [aviso-por-correo.md](../03-calidad-y-operacion/aviso-por-correo.md).
+
+**Avance y evidencia (local, no sincronizado con GitHub):**
+- Se contrastó con el código actual: no existía cliente SMTP ni variables de correo; se incorporó `nodemailer` (`lib/mail/config.ts`, `lib/mail/notice-template.ts`, `lib/mail/send-test-notice.ts` y `scripts/test-mail.mjs`).
+- Pruebas unitarias con transporte simulado ejecutadas (`vitest run`): `portfolio-coursse/tests/unit/mail-config.test.ts` (6/6 aprobadas) y `test-harness.test.ts` (2/2 aprobadas); `eslint` y `next typegen && tsc --noEmit` sin errores.
+- Prueba de envío SMTP en vivo ejecutada con `corepack pnpm test:mail` usando credenciales locales en `.env.local` (fuera de Git): correo de prueba enviado con éxito a `gianca.0603@gmail.com` (`messageId=<03bbabb5-05e3-e2e0-705b-50b97b003477@gmail.com>`).
+- Pendiente de seguimiento: revisión del PR en GitHub por R1 (`@NickSalA`) y conexión al flujo real de reclamos en `REC-06` (`#36`).
