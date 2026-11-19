@@ -22,6 +22,7 @@ export function CourseStudentImportForm({
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [result, submit, pending] = useActionState(importStudents, {});
     const [showResult, setShowResult] = useState(false);
+    const [importerKey, setImporterKey] = useState(0);
     const [students, setStudents] = useState<Student[]>([]);
     const mappedStudents = students.map((student) => ({
         ...student,
@@ -38,7 +39,11 @@ export function CourseStudentImportForm({
             </button>
             <dialog
                 ref={dialogRef}
+                onCancel={(event) => {
+                    if (pending) event.preventDefault();
+                }}
                 onClose={() => {
+                    setImporterKey((key) => key + 1);
                     setStudents([]);
                     setShowResult(false);
                 }}
@@ -76,7 +81,10 @@ export function CourseStudentImportForm({
                         </div>
                         <button
                             type="button"
-                            onClick={() => dialogRef.current?.close()}
+                            onClick={() => {
+                                if (!pending) dialogRef.current?.close();
+                            }}
+                            disabled={pending}
                             aria-label="Cerrar"
                             className="grid size-9 place-items-center rounded-lg border border-border text-lg text-muted"
                         >
@@ -88,6 +96,8 @@ export function CourseStudentImportForm({
                     )}
                     <div className="mt-6">
                         <CsvImporter
+                            key={importerKey}
+                            disabled={pending}
                             onValidated={(rows) => {
                                 setShowResult(false);
                                 setStudents(rows);
@@ -107,7 +117,11 @@ export function CourseStudentImportForm({
                             <div className="mt-6 flex justify-end gap-3">
                                 <button
                                     type="button"
-                                    onClick={() => dialogRef.current?.close()}
+                                    onClick={() => {
+                                        if (!pending)
+                                            dialogRef.current?.close();
+                                    }}
+                                    disabled={pending}
                                     className="rounded-xl border border-border px-4 py-2 text-sm font-medium"
                                 >
                                     Cancelar

@@ -76,7 +76,7 @@ export async function importStudents(
     if (periodError || !period)
         return { error: "No se pudo consultar el periodo seleccionado." };
 
-    const { data, error } = await supabase.rpc("import_period_students", {
+    const { data, error } = await supabase.rpc("import_period_students_v2", {
         target_period_id: period.id,
         students,
     });

@@ -50,26 +50,26 @@ declare
     {"index":12,"status":"duplicate","reason":"duplicate_in_payload"}
   ]'::jsonb;
 begin
-  actual := public.import_period_students(target_period_id => current_setting('qa.period_id')::bigint, students => payload);
+  actual := public.import_period_students_v2(target_period_id => current_setting('qa.period_id')::bigint, students => payload);
   if actual <> expected then raise exception 'FAIL BASE-05: unexpected result %', actual; end if;
-  actual := public.import_period_students(current_setting('qa.period_id')::bigint, payload);
+  actual := public.import_period_students_v2(current_setting('qa.period_id')::bigint, payload);
   expected := jsonb_set(jsonb_set(expected, '{0,status}', '"existing"'), '{0,reason}', '"already_authorized"');
   expected := jsonb_set(jsonb_set(expected, '{4,status}', '"existing"'), '{4,reason}', '"already_authorized"');
   expected := jsonb_set(jsonb_set(expected, '{6,status}', '"existing"'), '{6,reason}', '"already_authorized"');
   if actual <> expected then raise exception 'FAIL BASE-05: repeat result %', actual; end if;
-  if public.import_period_students(current_setting('qa.period_id')::bigint, '[]') <> '[]'::jsonb then
+  if public.import_period_students_v2(current_setting('qa.period_id')::bigint, '[]') <> '[]'::jsonb then
     raise exception 'FAIL BASE-05: empty payload';
   end if;
   begin
-    perform public.import_period_students(current_setting('qa.period_id')::bigint, null);
+    perform public.import_period_students_v2(current_setting('qa.period_id')::bigint, null);
     raise exception 'FAIL BASE-05: null payload accepted';
   exception when raise_exception then if sqlerrm <> 'invalid_students_payload' then raise; end if; end;
   begin
-    perform public.import_period_students(-1, '[]');
+    perform public.import_period_students_v2(-1, '[]');
     raise exception 'FAIL BASE-05: missing period accepted';
   exception when raise_exception then if sqlerrm <> 'period_not_available' then raise; end if; end;
-  if to_regprocedure('public.import_authorized_students(bigint,jsonb)') is not null then
-    raise exception 'FAIL BASE-05: legacy RPC remains';
+  if to_regprocedure('public.import_authorized_students(bigint,jsonb)') is null then
+    raise exception 'FAIL BASE-05: legacy RPC missing';
   end if;
 end $$;
 
@@ -77,12 +77,12 @@ select set_config('request.jwt.claim.sub', 'f3000000-0000-4000-8000-000000000003
 do $$
 begin
   begin
-    perform public.import_period_students(current_setting('qa.period_id')::bigint, '[]');
+    perform public.import_period_students_v2(current_setting('qa.period_id')::bigint, '[]');
     raise exception 'FAIL BASE-05: student accepted';
   exception when raise_exception then if sqlerrm <> 'not_teacher' then raise; end if; end;
   perform set_config('request.jwt.claim.sub', '', true);
   begin
-    perform public.import_period_students(current_setting('qa.period_id')::bigint, '[]');
+    perform public.import_period_students_v2(current_setting('qa.period_id')::bigint, '[]');
     raise exception 'FAIL BASE-05: anonymous identity accepted';
   exception when raise_exception then if sqlerrm <> 'not_teacher' then raise; end if; end;
 end $$;
@@ -108,5 +108,46 @@ begin
     raise exception 'FAIL BASE-05: enrollments changed';
   end if;
 end $$;
-\echo 'PASS BASE-05: row outcomes, isolation, idempotency and existing data'
+-- Published APIs remain callable and retain their result shapes and upsert behavior.
+set local role authenticated;
+select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true) \g /dev/null
+do $$
+declare n integer; counts record; result jsonb; payload jsonb;
+begin
+  select public.import_authorized_students(current_setting('qa.course_a_id')::bigint,
+    '[{"email":" QA-STUDENT-1@example.test ","full_name":"Legacy update"}]') into n;
+  if n <> 1 then raise exception 'FAIL BASE-05: legacy course count %', n; end if;
+  if not exists (select 1 from public.authorized_students where course_id = current_setting('qa.course_a_id')::bigint
+    and email = 'qa-student-1@example.test' and full_name = 'Legacy update' and status = 'active') then
+    raise exception 'FAIL BASE-05: legacy normalized conflict upsert';
+  end if;
+  select * into counts from public.import_period_students(current_setting('qa.period_id')::bigint,
+    '[{"course_name":"QA course A","email":"legacy-period@example.test"}]');
+  if counts.imported_students <> 1 or counts.created_courses <> 0 then
+    raise exception 'FAIL BASE-05: legacy period result %', counts;
+  end if;
+  begin
+    perform public.import_authorized_students(current_setting('qa.course_b_id')::bigint, '[]');
+    raise exception 'FAIL BASE-05: legacy foreign course accepted';
+  exception when raise_exception then if sqlerrm <> 'not_course_teacher' then raise; end if; end;
+  select jsonb_agg(jsonb_build_object('course_name', 'QA course A', 'email',
+    'large-' || (i % 1000) || '@example.test') order by i) into payload from generate_series(1, 5000) i;
+  result := public.import_period_students_v2(current_setting('qa.period_id')::bigint, payload);
+  if jsonb_array_length(result) <> 5000
+    or (select count(*) from jsonb_array_elements(result) x where x->>'status' = 'imported') <> 1000
+    or (select count(*) from jsonb_array_elements(result) x where x->>'status' = 'duplicate') <> 4000
+    or result->0->>'index' <> '0' or result->4999->>'index' <> '4999' then
+    raise exception 'FAIL BASE-05: large ordered batch';
+  end if;
+end $$;
+reset role;
+do $$
+begin
+  if has_function_privilege('anon', 'public.import_period_students_v2(bigint,jsonb)', 'EXECUTE')
+    or has_function_privilege('anon', 'public.import_period_students(bigint,jsonb)', 'EXECUTE')
+    or has_function_privilege('anon', 'public.import_authorized_students(bigint,jsonb)', 'EXECUTE') then
+    raise exception 'FAIL BASE-05: anonymous RPC grant';
+  end if;
+end $$;
+\echo 'PASS BASE-05: v2, legacy contracts, isolation and large batch'
 rollback;

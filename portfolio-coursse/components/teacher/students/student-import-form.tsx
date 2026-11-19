@@ -21,6 +21,7 @@ export function StudentImportForm({
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [result, submit, pending] = useActionState(importStudents, {});
     const [showResult, setShowResult] = useState(false);
+    const [importerKey, setImporterKey] = useState(0);
     const pathname = usePathname();
     const [students, setStudents] = useState<Student[]>([]);
     const [courseNames, setCourseNames] = useState<Record<string, string>>({});
@@ -71,7 +72,7 @@ export function StudentImportForm({
     }
 
     function closeDialog() {
-        dialogRef.current?.close();
+        if (!pending) dialogRef.current?.close();
     }
 
     return (
@@ -86,7 +87,12 @@ export function StudentImportForm({
 
             <dialog
                 ref={dialogRef}
+                onCancel={(event) => {
+                    if (pending) event.preventDefault();
+                }}
                 onClose={() => {
+                    setShowResult(false);
+                    setImporterKey((key) => key + 1);
                     setStudents([]);
                     setCourseNames({});
                     setPreviewPage(0);
@@ -131,6 +137,7 @@ export function StudentImportForm({
                         <button
                             type="button"
                             onClick={closeDialog}
+                            disabled={pending}
                             aria-label="Cerrar importación"
                             className="grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-surface-muted text-lg text-muted transition hover:border-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                         >
@@ -142,7 +149,11 @@ export function StudentImportForm({
                         <ImportResults result={result} />
                     )}
                     <div className="mt-6">
-                        <CsvImporter onValidated={receiveStudents} />
+                        <CsvImporter
+                            key={importerKey}
+                            disabled={pending}
+                            onValidated={receiveStudents}
+                        />
                     </div>
 
                     {students.length > 0 && (
@@ -165,6 +176,7 @@ export function StudentImportForm({
                                                 {code}
                                             </span>
                                             <input
+                                                disabled={pending}
                                                 value={courseNames[code] ?? ""}
                                                 onChange={(event) =>
                                                     setCourseNames(
@@ -265,6 +277,7 @@ export function StudentImportForm({
                                 <button
                                     type="button"
                                     onClick={closeDialog}
+                                    disabled={pending}
                                     className="rounded-xl border border-border bg-surface-muted px-4 py-3 text-sm font-medium text-muted transition hover:border-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                                 >
                                     Cancelar
