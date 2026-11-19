@@ -1,10 +1,12 @@
--- Red acceptance checks for EVA-04 (#27) and GRP-02 (#19).
+-- Acceptance checks for student results (EVA-04 #27), activity participation (GRP-06 #23),
+-- and grade preservation during group adjustment (GRP-02 #19).
 -- Run with psql as the fixture owner; every failed/NULL result raises an error.
 -- Requires qa/fixtures.sql and its qa_participation expected-truth table.
 
 -- BASE-01 contrasted with migrations 0021/0028/0029, student/get-dashboard.ts
--- and teacher/grades/actions.ts: student grades and production history have no
--- supported interface yet. These adapters are deliberately BLOCKED, not table
+-- and teacher/grades/actions.ts: student grade access and activity participation still need
+-- their own interfaces. The interval query alone does not resolve a dated activity.
+-- These adapters remain deliberately BLOCKED, not table
 -- reads claiming EVA-04 compliance. No UI/navigation/usability validation here.
 \set ON_ERROR_STOP on
 begin;
@@ -31,7 +33,7 @@ begin
 end;
 $$;
 
--- ADAPTER CONTRACT for GRP-02/GRP-06 production participation records/resolver.
+-- ADAPTER CONTRACT for the GRP-06 resolver built on GRP-02 membership history.
 -- Run as fixture owner and normalize actual persisted/resolved participation
 -- for course A. It must use production records created by supported fixture
 -- operations BEFORE S1 moves, never qa_participation (the oracle only).
@@ -40,7 +42,7 @@ returns table (enrollment_id bigint, student_id uuid, group_id bigint,
                evaluation_id bigint)
 language plpgsql security invoker as $$
 begin
-  raise exception 'BLOCKED GRP-02 #19 / GRP-06 #23: production history adapter undefined';
+  raise exception 'BLOCKED GRP-06 #23: activity participant resolver undefined';
 end;
 $$;
 
@@ -119,9 +121,9 @@ begin
     union all
     (select * from qa_participation except all select * from actual)
   ) into matches;
-  insert into qa_result values ('GRP-02', 'recorded participation survives S1 move', matches, null);
+  insert into qa_result values ('GRP-06', 'recorded participation survives S1 move', matches, null);
 exception when others then
-  insert into qa_result values ('GRP-02', 'recorded participation survives S1 move', false, sqlerrm);
+  insert into qa_result values ('GRP-06', 'recorded participation survives S1 move', false, sqlerrm);
 end;
 $$;
 
@@ -161,7 +163,7 @@ from qa_result order by issue, scenario;
 do $$
 begin
   if exists (select 1 from qa_result where passed is not true) then
-    raise exception 'Pending requirements failed or blocked; see qa_result output (EVA-04 #27, GRP-02 #19, GRP-06 #23)';
+    raise exception 'Pending requirements failed or blocked; see qa_result output';
   end if;
 end;
 $$;

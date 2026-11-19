@@ -71,6 +71,14 @@ función adicional obligatoria de traslado directo docente.
    Revisar **todas** las escrituras de `course_students.group_id`, incluida la sincronización
    desde autorizaciones: ninguna debe modificar el grupo sin mantener la historia. Impedir que
    se borren grupos con atribuciones históricas necesarias para explicar notas.
+   **GRP-02, migración 0039.** `academic_access.group_membership_history` guarda intervalos
+   `[inicio, fin)` en `timestamptz`. Registra las matrículas existentes coherentes desde el
+   instante de migración. Una consulta anterior o sin intervalo devuelve historial desconocido.
+   La RPC `student_group_membership_at` permite al docente responsable consultar grupo conocido,
+   activo sin grupo o inactivo. Los cambios de grupo y estado se registran con la matrícula en la
+   misma transacción. Una resincronización sin cambio conserva el intervalo. Los grupos con
+   referencias e historial académico se conservan aunque sean excedentes al ajustar capacidad.
+
 3. Resolver el grupo aplicable por matrícula y fecha de actividad, independientemente de cuándo
    se haya guardado o corregido la nota. Mantener la nota grupal como fuente: una corrección del
    grupo antiguo debe alcanzar a sus miembros de esa actividad.
