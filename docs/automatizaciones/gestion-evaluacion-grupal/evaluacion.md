@@ -13,6 +13,30 @@ Este documento registra evidencia ejecutada para la Parte II. Una capacidad pres
 - Guía de validación: [`../../../specs/001-manage-group-evaluation/quickstart.md`](../../../specs/001-manage-group-evaluation/quickstart.md)
 - EXP-01 #38: [especificación](../../../specs/001-export-decisions/spec.md), [plan](../../../specs/001-export-decisions/plan.md), [tareas](../../../specs/001-export-decisions/tasks.md) y [guía](../../../specs/001-export-decisions/quickstart.md).
 
+## BASE-03 #12 · Acceso académico por recurso
+
+**Fecha** 2026-11-18 · **Versión** rama `feature/base-03-acceso-academico`, migración `0030` · **Entorno** Supabase aislado en Docker, PostgreSQL 17 y Node 24. [Especificación](../../../specs/002-acceso-academico/spec.md) · [Plan](../../../specs/002-acceso-academico/plan.md) · [Tareas](../../../specs/002-acceso-academico/tasks.md).
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Suites SQL de BASE-02 y RLS de notas | Alumno ve recursos propios; alumno sin autorización o sesión y docente ajeno quedan denegados. Los permisos legítimos de notas y puntos se conservan. | Ambas suites pasaron con identidades sintéticas y rollback. |
+| Identidad y revocación con sesión abierta | Otra clase de sesión carece de acceso académico. La baja retira acceso y la reactivación válida conserva matrícula y grupo. | Casos aprobados en SQL, sin volver a sincronizar entre baja y consulta. |
+| Opciones de grupo | Capacidad y ocupación; nombres durante la ventana; respuesta sin correos. | Casos aprobados en SQL. |
+| Actualización `0029 → 0030` y API local | Conservar una matrícula previa inconsistente sin darle acceso. El alumno autorizado ve su curso y las consultas sin sesión quedan vacías. | Actualización y consultas HTTP aprobadas con sesiones sintéticas y datos temporales. |
+| Comprobaciones de aplicación | Lint, tipos, pruebas unitarias y compilación sin errores. | ESLint, TypeScript, 8 pruebas Vitest y build de Next.js con Turbopack aprobados. |
+| Rutas de la aplicación sin sesión | Docente y alumno son redirigidos al login. | Las dos rutas respondieron con HTTP 307 y destino `/login` usando el build local. |
+
+**Pendientes**. OAuth real y recorridos visuales docente/alumno quedan por ejecutar con las credenciales Google de desarrollo. Los datos y sesiones sintéticos comprueban la base y la API, pero no el intercambio de código con Google. El responsable de Supabase debe verificar los proveedores del entorno desplegado antes de aplicar la migración allí. El ciclo completo de incorporación queda en BASE-06 #15 y la consulta de notas históricas queda en EVA-04 #27. El inventario BASE-01 conserva su carácter histórico.
+
+### Revisión del PR #57
+
+**Fecha** 2026-11-18 · **Entorno** Supabase local, PostgreSQL 17 y Node 24 · **Migración** `0031_academic_access_review.sql`.
+
+- **Identidad del padrón y puntos.** La combinación de curso y correo canónico de una autorización es inmutable desde su creación. Una corrección de identidad requiere una autorización nueva y la baja de la anterior. Los puntos y las matrículas existentes conservan su titularidad. El caso SQL comprobó el rechazo de una reasignación y el alta de una cuenta con autorización previa. También verificó que un compañero del mismo curso queda excluido de los puntos ajenos.
+- **Ingreso y cupos.** El callback reintenta la sincronización una vez cuando la primera respuesta no encuentra matrícula. Dos pruebas unitarias verificaron el resultado del reintento. En SQL se comprobó que una matrícula sin identidad vigente no ocupa cupo y que el resultado coincide entre las opciones de grupo y la selección.
+- **Contraste con las migraciones vigentes.** `0006` ya hace que la comprobación de titularidad docente invoque el control de rol e identidad. `0029` elimina la lectura estudiantil de notas grupales. `0004` crea solo el perfil en el alta Auth. `0007` ya obliga a normalizar el correo y garantiza la unicidad por curso. Las suites locales de capacidades y RLS de notas pasaron tras aplicar `0031`.
+- **Seguimiento.** La preasignación de grupos durante la sincronización corresponde a GRP-03 #20 y BASE-06 #15. El inicio real con Google y la configuración desplegada siguen pendientes en #12. El inventario histórico permanece como referencia de contraste.
+
 ## EXP-01 #38: decisiones y evidencia documental
 
 **Fuente y revisión:** R1 se identificó en la conversación como @NickSalA y confirmó las reglas de [EXP-01](../../backlog/05-exportacion.md); comunicó que R3 las revisó y aceptó, y que la revisión completa se realizará en el PR. Es un reporte de R1, no una aprobación independiente comprobada en GitHub; no se dispone aquí de fecha ni comentario de R3. El profesor no confirmó la fórmula. Seguimiento actualizado en archivos locales únicamente; GitHub no se modificó.

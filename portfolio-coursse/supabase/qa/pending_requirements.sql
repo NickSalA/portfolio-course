@@ -64,6 +64,7 @@ grant insert on qa_result to authenticated;
 -- S2: exactly A1/T1=15 and A1/T2=NULL (a row, not absent or zero).
 -- S4: course B student must see no course A rows.
 set local role authenticated;
+select set_config('request.jwt.claims', '{"amr":[{"method":"oauth"}]}', true) \g /dev/null
 do $$
 declare
   subject uuid;

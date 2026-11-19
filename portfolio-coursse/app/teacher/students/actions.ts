@@ -23,15 +23,13 @@ export async function deactivateStudentAuthorization(formData: FormData) {
 	const course = value(formData, "course");
 	const path = `/teacher/students?period=${encodeURIComponent(period)}&course=${encodeURIComponent(course)}`;
 	if (!Number.isInteger(authorizationId)) redirect(path);
-	const { error } = await supabase
+	const { data: updated, error } = await supabase
 		.from("authorized_students")
 		.update({ status: "inactive" })
-		.eq("id", authorizationId);
-	if (error) redirect(`${path}&error=deactivate`);
-	await supabase
-		.from("course_students")
-		.update({ status: "inactive" })
-		.eq("authorized_student_id", authorizationId);
+		.eq("id", authorizationId)
+		.select("id")
+		.maybeSingle();
+	if (error || !updated) redirect(`${path}&error=deactivate`);
 	revalidatePath("/teacher/students");
 	revalidatePath("/student");
 	redirect(path);
@@ -43,15 +41,13 @@ export async function reactivateStudentAuthorization(formData: FormData) {
 	const period = value(formData, "period");
 	const path = `/teacher/settings?period=${encodeURIComponent(period)}`;
 	if (!Number.isInteger(authorizationId)) redirect(path);
-	const { error } = await supabase
+	const { data: updated, error } = await supabase
 		.from("authorized_students")
 		.update({ status: "active" })
-		.eq("id", authorizationId);
-	if (error) redirect(`${path}&error=restore-student`);
-	await supabase
-		.from("course_students")
-		.update({ status: "active" })
-		.eq("authorized_student_id", authorizationId);
+		.eq("id", authorizationId)
+		.select("id")
+		.maybeSingle();
+	if (error || !updated) redirect(`${path}&error=restore-student`);
 	revalidatePath("/teacher/students");
 	revalidatePath("/teacher/settings");
 	revalidatePath("/student");
