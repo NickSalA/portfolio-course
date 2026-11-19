@@ -39,7 +39,11 @@ try {
     docker(["cp", `${fixtures}/.`, `${container}:${directory}`]);
     const scripts = pending
         ? ["pending_requirements.sql"]
-        : ["current_capabilities.sql", "group_grades_rls.sql"];
+        : [
+              "current_capabilities.sql",
+              "group_grades_rls.sql",
+              "base_04_courses_periods.sql",
+          ];
     for (const script of scripts) {
         console.log(`\nRunning ${script}`);
         docker([

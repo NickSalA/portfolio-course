@@ -32,7 +32,7 @@ Desde este directorio, con Docker iniciado:
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<clave-publicable-local>
     ```
 
-5. En un primer arranque, ejecutar `supabase db reset --local --no-seed`. **Borra los datos locales**; `--no-seed` evita cargar el `seed.sql` que la configuración referencia pero aún no existe. No apuntar a un entorno remoto.
+5. En un primer arranque, ejecutar `supabase db reset --local`. **Borra los datos locales** y carga `supabase/seed.sql` con un periodo sintético para desarrollo. No apuntar a un entorno remoto.
 6. Ejecutar `pnpm dev` y abrir `http://localhost:3000`. Studio local normalmente está en `http://127.0.0.1:54323`.
 7. Preparar los permisos de las cuentas de prueba según la guía: iniciar sesión con Google no concede automáticamente el rol docente o la autorización de alumno.
 

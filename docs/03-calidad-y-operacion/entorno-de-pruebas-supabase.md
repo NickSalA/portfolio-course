@@ -60,11 +60,11 @@ Usa los valores de tu instancia, no los del Supabase productivo del responsable.
 Para el primer arranque:
 
 ```bash
-supabase db reset --local --no-seed
+supabase db reset --local
 pnpm dev
 ```
 
-**El reset borra los datos de tu base local**, incluidos usuarios y roles de prueba. Se omite el seed porque actualmente no existe `supabase/seed.sql`; las migraciones sí se aplican. No utilices `--linked` ni una URL remota para este paso.
+**El reset borra los datos de tu base local**, incluidos usuarios y roles de prueba. Aplica las migraciones y `supabase/seed.sql`, que prepara el periodo sintético `2026-II` si no existe ningún periodo. No representa el calendario institucional ni debe aplicarse a una base remota. No utilices `--linked` ni una URL remota para este paso. Si ya tienes datos locales, no hagas reset para obtener el periodo: puedes ejecutar el contenido de `supabase/seed.sql` desde el SQL Editor de Studio local; no modifica un calendario existente.
 
 Abrir:
 
@@ -91,7 +91,7 @@ Es una preparación administrativa de tu base local, no un cambio en producción
 
 ### Alumno
 
-1. Con el docente local, prepara un periodo y curso e incorpora al alumno con el correo exacto de su cuenta Google de prueba.
+1. Con el docente local, selecciona el periodo de prueba disponible, crea un curso e incorpora al alumno con el correo exacto de su cuenta Google de prueba.
 2. Usa otro perfil del navegador o una sesión separada para iniciar sesión como alumno.
 3. Comprueba su acceso al curso. Una cuenta no autorizada debe ser rechazada.
 
@@ -130,15 +130,15 @@ pnpm build
 
 Las pruebas de base y navegador requieren Supabase local. `pnpm test:db` ejecuta las pruebas psql de capacidades y RLS en el contenedor Docker local; no requiere la CLI en el PATH ni ejecuta pgTAP. `pnpm test:db:pending` ejecuta los requisitos pendientes por separado y actualmente debe fallar. Si Playwright pide el navegador, ejecuta `pnpm exec playwright install chromium`. No se dan por aprobadas las comprobaciones solo porque sus comandos existan.
 
-| Problema                            | Revisión rápida                                                                     |
-| ----------------------------------- | ----------------------------------------------------------------------------------- |
-| `supabase: not found`               | Instalar la CLI y comprobar el PATH                                                 |
-| Docker no responde                  | Iniciar el motor y revisar permisos/recursos                                        |
-| Falta `CLIENT_ID` o `CLIENT_SECRET` | `.env` dentro de `portfolio-coursse/`, con los valores recibidos                    |
-| Error de Google o redirección       | Usar `localhost:3000` y avisar al responsable si persiste                           |
-| Cuenta sin acceso académico         | Revisar rol docente local o autorización activa del alumno                          |
-| Error de `seed.sql`                 | Usar `supabase db reset --local --no-seed` solo si aceptas borrar los datos locales |
-| No aparecen datos de un compañero   | Es normal: las bases son independientes                                             |
+| Problema                            | Revisión rápida                                                                             |
+| ----------------------------------- | ------------------------------------------------------------------------------------------- |
+| `supabase: not found`               | Instalar la CLI y comprobar el PATH                                                         |
+| Docker no responde                  | Iniciar el motor y revisar permisos/recursos                                                |
+| Falta `CLIENT_ID` o `CLIENT_SECRET` | `.env` dentro de `portfolio-coursse/`, con los valores recibidos                            |
+| Error de Google o redirección       | Usar `localhost:3000` y avisar al responsable si persiste                                   |
+| Cuenta sin acceso académico         | Revisar rol docente local o autorización activa del alumno                                  |
+| Error de `seed.sql`                 | Revisar el error y confirmar que se está usando la base local; no borrar datos sin respaldo |
+| No aparecen datos de un compañero   | Es normal: las bases son independientes                                                     |
 
 Antes de subir cambios, comprueba que `.env` y `.env.local` sigan excluidos de Git. No incluyas secretos ni datos reales de alumnos en evidencias.
 

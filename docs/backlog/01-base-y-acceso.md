@@ -55,7 +55,7 @@
 
 **Revisión del PR #57**. La migración 0031 protege la titularidad de la autorización desde su alta y excluye matrículas inválidas del cálculo de cupos. El reintento de sincronización y la privacidad de puntos tienen pruebas de regresión. La concurrencia de las preasignaciones sigue en GRP-03 #20 y BASE-06 #15. [Evidencia de la revisión](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#revisión-del-pr-57).
 
-### BASE-04 · Preparar periodos y cursos bajo responsabilidad docente
+### BASE-04 · Consultar periodos institucionales y preparar cursos docentes
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#2-periodos-cursos-e-importación). Reutilizar gestión de cursos/periodos; resolver autoridad sobre periodos globales y efectos en cursos ajenos. Verificar operaciones sin filas afectadas y contexto visible.
 
@@ -63,13 +63,17 @@
 
 **GitHub:** [#13](https://github.com/NickSalA/portfolio-course/issues/13) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
 
-- [ ] Verificar selección y gestión de periodos y cursos existentes.
+- [ ] Verificar la consulta y selección de periodos institucionales y la gestión de cursos docentes existentes.
 - [ ] Comprobar que las acciones afectan solo cursos del docente responsable.
 - [ ] Corregir únicamente brechas demostradas y preparar un curso de ejemplo.
 
 **Aceptación:** el docente prepara un curso para incorporar alumnos sin leer o alterar cursos de otro docente.
 
 **Documentación:** recorrido de preparación y pruebas correspondientes.
+
+**Seguimiento local de implementación:** se conserva la consulta de periodos y la gestión de cursos propios. La migración `0032` retira a usuarios autenticados la escritura de periodos compartidos y la promoción global, evitando que un docente altere indirectamente cursos ajenos. Por decisión del responsable, el equipo administrador gestionará los periodos reales directamente en la base de datos, sin crear por ahora un rol institucional en la aplicación; deberá verificar el calendario existente y el efecto sobre todos los cursos antes de cualquier cambio. La migración `0033` impide más de un periodo actual; si existen duplicados, fallará sin resolverlos automáticamente y el administrador deberá revisarlos antes de aplicarla. El seed es exclusivamente local y no sustituye esta operación. Renombrar, archivar y restaurar cursos ahora tratan cero filas como operación no aplicada. El recorrido es seleccionar un periodo vigente o próximo ya disponible, crear un curso propio y continuar con la incorporación del padrón en BASE-05 #14.
+
+**Evidencia y pendientes:** el usuario ejecutó `pnpm test:db` con migraciones locales aplicadas: pasaron las tres suites, incluida `supabase/qa/base_04_courses_periods.sql` con dos docentes y denegación de cambios globales. También informó que inició sesión como dos docentes, que el segundo no veía el curso del primero y que completó visualmente la creación, cambio de nombre, archivo y restauración de un curso. No se realizó una evaluación formal de usabilidad. ESLint dirigido, `pnpm typecheck` y `git diff --check` pasaron. Se añade `supabase/seed.sql` para preparar un periodo sintético en bases locales vacías, no para producción; dos ejecuciones dentro de una transacción sobre la base local con periodos existentes no alteraron filas. La configuración OAuth desplegada sigue pendiente en BASE-03 #12 y la revisión de experiencia en BASE-07 #16. La importación de cursos archivados sigue en BASE-05 #14. La carga automática del seed en una base vacía no se ha ejecutado y la operación administrativa en un entorno real no se ha probado. La revisión independiente de BASE-04 sigue pendiente; BASE-03 #12 figura cerrada en GitHub, aunque mantiene pendientes de verificación desplegada. No se marca aceptada. Este seguimiento solo se actualizó localmente, no en GitHub.
 
 ### BASE-05 · Validar e incorporar el padrón de alumnos
 
@@ -137,7 +141,8 @@
 **Documentación:** variables de ejemplo sin valores secretos en [`portfolio-coursse/.env.example`](../../portfolio-coursse/.env.example) y condiciones de operación en [aviso-por-correo.md](../03-calidad-y-operacion/aviso-por-correo.md).
 
 **Avance y evidencia (local, no sincronizado con GitHub):**
+
 - Se contrastó con el código actual: no existía cliente SMTP ni variables de correo; se incorporó `nodemailer` (`lib/mail/config.ts`, `lib/mail/notice-template.ts`, `lib/mail/send-test-notice.ts` y `scripts/test-mail.mjs`).
 - Pruebas unitarias con transporte simulado ejecutadas (`vitest run`): `portfolio-coursse/tests/unit/mail-config.test.ts` (6/6 aprobadas) y `test-harness.test.ts` (2/2 aprobadas); `eslint` y `next typegen && tsc --noEmit` sin errores.
-- Prueba de envío SMTP en vivo ejecutada con `corepack pnpm test:mail` usando credenciales locales en `.env.local` (fuera de Git): correo de prueba enviado con éxito a `gianca.0603@gmail.com` (`messageId=<03bbabb5-05e3-e2e0-705b-50b97b003477@gmail.com>`).
+- Prueba de envío SMTP en vivo ejecutada con `corepack pnpm test:mail` usando credenciales locales en `.env.local` (fuera de Git): correo de prueba enviado con éxito; destinatario y `messageId` omitidos por privacidad.
 - Pendiente de seguimiento: revisión del PR en GitHub por R1 (`@NickSalA`) y conexión al flujo real de reclamos en `REC-06` (`#36`).
