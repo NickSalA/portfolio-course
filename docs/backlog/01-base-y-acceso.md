@@ -116,6 +116,8 @@
 
 **Seguimiento local de BASE-06**. `0037` vincula solo autorizaciones activas, conserva el grupo de las matrículas existentes y separa los vínculos históricos contradictorios de los cursos válidos. Las pruebas SQL de ambos órdenes de incorporación y dos sesiones simultáneas pasaron. El inicio real con Google sigue pendiente. La suite general se detiene por una comprobación de permisos que también falla con `0036` sin el cambio de BASE-06. Seguimiento de ese caso en BASE-05 #14, a cargo de @NickSalA, y de cupos concurrentes en GRP-03 #20. [Evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#base-06-15--vinculación-de-autorización-y-matrícula).
 
+**Revisión del PR #60**. `0038` sincroniza el número del padrón conservando el grupo y el número anterior si el padrón lo omite. Las pruebas SQL de BASE-06 pasaron. [Evidencia de la revisión](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#revisión-del-pr-60).
+
 ### BASE-07 · Revisar la experiencia de acceso y contexto académico
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). Ejecutar navegación por rol y revisar contexto, vacíos y errores. Hay interfaces identificadas en código, no verificadas visualmente; distinguir existencia, descubrimiento, funcionamiento y usabilidad.

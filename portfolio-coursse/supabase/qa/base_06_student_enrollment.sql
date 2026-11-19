@@ -16,7 +16,7 @@ end $$;
 -- The actual roster entry point creates an authorization for an existing account.
 select set_config('request.jwt.claim.sub', :teacher_a, true) \g /dev/null
 select public.import_period_students_v2(:period_id,
-  '[{"course_name":"QA course A","email":" QA-STUDENT-3@example.test "}]') \g /dev/null
+  '[{"course_name":"QA course A","email":" QA-STUDENT-3@example.test ","student_number":" 00123 "}]') \g /dev/null
 do $$
 begin
   if (select count(*) from public.course_students where course_id = current_setting('qa.course_a_id')::bigint) <> 2 then
@@ -32,7 +32,8 @@ begin
   end if;
   if not public.sync_authorized_student()
      or (select count(*) from public.course_students) <> 1
-     or (select course_id from public.course_students) <> current_setting('qa.course_a_id')::bigint then
+     or not exists (select 1 from public.course_students
+      where course_id = current_setting('qa.course_a_id')::bigint and student_number = '00123') then
     raise exception 'FAIL: repeated sync changed the late authorization scope';
   end if;
 end $$;
@@ -65,7 +66,7 @@ end $$;
 \echo 'PASS BASE-06: authorization before first sign-in preserves initial assignment'
 
 select set_config('request.jwt.claim.sub', :teacher_a, true) \g /dev/null
-update public.authorized_students set group_id = :group_a1_id where id = :auth_s1_id;
+update public.authorized_students set group_id = :group_a1_id, student_number = '00456' where id = :auth_s1_id;
 select set_config('request.jwt.claim.sub', :student_1, true) \g /dev/null
 do $$
 begin
@@ -75,8 +76,8 @@ begin
   if (select count(*) from public.course_students) <> 1
     or not exists (select 1 from public.course_students
       where id = current_setting('qa.enrollment_s1_id')::bigint
-      and group_id = current_setting('qa.group_a2_id')::bigint) then
-    raise exception 'FAIL: repeated sync overwrote the chosen group';
+      and group_id = current_setting('qa.group_a2_id')::bigint and student_number = '00456') then
+    raise exception 'FAIL: repeat sync changed the group or did not update the roster number';
   end if;
 end $$;
 select set_config('request.jwt.claim.sub', :teacher_a, true) \g /dev/null
@@ -89,7 +90,7 @@ begin
   end if;
 end $$;
 select set_config('request.jwt.claim.sub', :teacher_a, true) \g /dev/null
-update public.authorized_students set status = 'active', group_id = null where id = :auth_s1_id;
+update public.authorized_students set status = 'active', group_id = null, student_number = null where id = :auth_s1_id;
 select set_config('request.jwt.claim.sub', :student_1, true) \g /dev/null
 do $$
 begin
@@ -98,11 +99,11 @@ begin
   end if;
   if not exists (select 1 from public.course_students
       where id = current_setting('qa.enrollment_s1_id')::bigint
-      and group_id = current_setting('qa.group_a2_id')::bigint) then
-    raise exception 'FAIL: restoration changed the enrollment or group';
+      and group_id = current_setting('qa.group_a2_id')::bigint and student_number = '00456') then
+    raise exception 'FAIL: restoration changed the enrollment, group or existing student number';
   end if;
 end $$;
-\echo 'PASS BASE-06: group preserved with and without a roster group, including restoration'
+\echo 'PASS BASE-06: group and optional roster number preserved across synchronization and restoration'
 
 -- Prepare historical records which the current write guard correctly rejects.
 -- The fixture is isolated in this transaction and restores the guard before testing.

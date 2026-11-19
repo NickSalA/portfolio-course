@@ -67,6 +67,11 @@ Este documento registra evidencia ejecutada para la Parte II. Una capacidad pres
 
 **Pendientes**. Registrar el inicio real con Google en ambos órdenes cuando haya credenciales locales. La concurrencia entre alumnos distintos por un cupo de grupo preasignado sigue en GRP-03 #20. El inventario BASE-01 conserva su evidencia histórica.
 
+### Revisión del PR #60
+
+- La migración `0038` copia el número de matrícula del padrón al crear el vínculo y lo actualiza cuando el padrón aporta un valor. Si el padrón omite el número, se conserva el que ya tenía la matrícula. La suite de BASE-06 pasó sobre `0037 → 0038` en una transacción con rollback. Se verificaron los ceros iniciales, la actualización del número, la conservación del grupo y la restauración con el número omitido.
+- El índice único vigente de `0007` ya cubre curso y correo normalizado. La concurrencia por el último cupo entre alumnos distintos al preasignar grupos sigue en GRP-03 #20. El recorrido real con Google sigue pendiente.
+
 ## EXP-01 #38: decisiones y evidencia documental
 
 **Fuente y revisión:** R1 se identificó en la conversación como @NickSalA y confirmó las reglas de [EXP-01](../../backlog/05-exportacion.md); comunicó que R3 las revisó y aceptó, y que la revisión completa se realizará en el PR. Es un reporte de R1, no una aprobación independiente comprobada en GitHub; no se dispone aquí de fecha ni comentario de R3. El profesor no confirmó la fórmula. Seguimiento actualizado en archivos locales únicamente; GitHub no se modificó.
