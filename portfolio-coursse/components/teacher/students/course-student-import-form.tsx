@@ -70,9 +70,8 @@ export function CourseStudentImportForm({
                             <p className="mt-2 text-sm text-muted">
                                 Se enviará el nombre de este curso para cada
                                 fila, ignorando la columna Curso del archivo.
-                                Debe coincidir exactamente con un curso activo
-                                del periodo; las autorizaciones existentes no se
-                                modifican.
+                                Los cursos archivados no admiten importaciones y
+                                las autorizaciones existentes no se modifican.
                             </p>
                         </div>
                         <button

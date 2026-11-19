@@ -122,9 +122,10 @@ export function StudentImportForm({
                                 Carga alumnos y cursos
                             </h2>
                             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-                                El archivo indica el curso de cada alumno. Debe
-                                existir un curso activo con ese nombre exacto en
-                                este periodo.
+                                El archivo indica el curso de cada alumno. Los
+                                cursos que aún no existan se crearán en este
+                                periodo; los cursos archivados no se
+                                modificarán.
                             </p>
                         </div>
                         <button
@@ -151,8 +152,8 @@ export function StudentImportForm({
                                     Confirma los cursos
                                 </p>
                                 <p className="mt-1 text-xs text-muted">
-                                    El archivo usa códigos. Indica el nombre
-                                    exacto de cada curso activo.
+                                    El archivo usa códigos. Indica el nombre de
+                                    cada curso que deseas utilizar o crear.
                                 </p>
                                 <div className="mt-4 space-y-3">
                                     {courseCodes.map((code) => (

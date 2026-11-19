@@ -14,7 +14,7 @@ const reasons: Record<string, string> = {
     email_required: "Falta el correo electrónico.",
     invalid_email: "El correo electrónico no tiene un formato válido.",
     course_not_available:
-        "No existe un curso activo con ese nombre exacto en este periodo.",
+        "El curso con ese nombre está archivado y no admite importaciones.",
     duplicate_in_payload:
         "El correo está repetido en este lote para el mismo curso.",
     already_authorized:

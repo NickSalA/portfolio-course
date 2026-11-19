@@ -29,7 +29,9 @@ declare
     null,
     {"course_name":"QA course A","email":42},
     {"course_name":"","email":"a@example.test"},
-    {"course_name":"QA course A","email":""}
+    {"course_name":"QA course A","email":""},
+    {"course_name":"invalid-only","email":"not-an-email"},
+    {"course_name":" missing ","email":"MISSING@example.test"}
   ]'::jsonb;
   actual jsonb;
   expected jsonb := '[
@@ -37,19 +39,23 @@ declare
     {"index":1,"status":"duplicate","reason":"duplicate_in_payload"},
     {"index":2,"status":"existing","reason":"already_authorized"},
     {"index":3,"status":"invalid","reason":"invalid_email"},
-    {"index":4,"status":"invalid","reason":"course_not_available"},
+    {"index":4,"status":"imported","reason":null},
     {"index":5,"status":"invalid","reason":"course_not_available"},
-    {"index":6,"status":"invalid","reason":"course_not_available"},
+    {"index":6,"status":"imported","reason":null},
     {"index":7,"status":"invalid","reason":"row_must_be_object"},
     {"index":8,"status":"invalid","reason":"invalid_field_type"},
     {"index":9,"status":"invalid","reason":"course_required"},
-    {"index":10,"status":"invalid","reason":"email_required"}
+    {"index":10,"status":"invalid","reason":"email_required"},
+    {"index":11,"status":"invalid","reason":"invalid_email"},
+    {"index":12,"status":"duplicate","reason":"duplicate_in_payload"}
   ]'::jsonb;
 begin
   actual := public.import_period_students(target_period_id => current_setting('qa.period_id')::bigint, students => payload);
   if actual <> expected then raise exception 'FAIL BASE-05: unexpected result %', actual; end if;
   actual := public.import_period_students(current_setting('qa.period_id')::bigint, payload);
   expected := jsonb_set(jsonb_set(expected, '{0,status}', '"existing"'), '{0,reason}', '"already_authorized"');
+  expected := jsonb_set(jsonb_set(expected, '{4,status}', '"existing"'), '{4,reason}', '"already_authorized"');
+  expected := jsonb_set(jsonb_set(expected, '{6,status}', '"existing"'), '{6,reason}', '"already_authorized"');
   if actual <> expected then raise exception 'FAIL BASE-05: repeat result %', actual; end if;
   if public.import_period_students(current_setting('qa.period_id')::bigint, '[]') <> '[]'::jsonb then
     raise exception 'FAIL BASE-05: empty payload';
@@ -86,12 +92,17 @@ begin
   if exists ((select * from qa_authorizations_before except all select * from public.authorized_students)) then
     raise exception 'FAIL BASE-05: existing authorization changed';
   end if;
-  if (select count(*) from public.authorized_students) <> (select count(*) + 1 from qa_authorizations_before)
+  if (select count(*) from public.authorized_students) <> (select count(*) + 3 from qa_authorizations_before)
      or not exists (select 1 from public.authorized_students where course_id = current_setting('qa.course_a_id')::bigint and email = 'new@example.test' and full_name = 'New Student' and student_number = '123') then
     raise exception 'FAIL BASE-05: incorrect inserted authorization';
   end if;
-  if exists ((select * from qa_courses_before except all select * from public.courses) union all (select * from public.courses except all select * from qa_courses_before)) then
-    raise exception 'FAIL BASE-05: courses changed';
+  if exists (select * from qa_courses_before except all select * from public.courses)
+     or (select count(*) from public.courses) <> (select count(*) + 2 from qa_courses_before)
+     or (select count(*) from public.courses where teacher_id = current_setting('qa.teacher_a')::uuid and period_id = current_setting('qa.period_id')::bigint and name in ('missing', 'QA course B') and active) <> 2
+     or exists (select 1 from public.courses where name = 'invalid-only')
+     or not exists (select 1 from public.authorized_students a join public.courses c on c.id = a.course_id where c.teacher_id = current_setting('qa.teacher_a')::uuid and c.period_id = current_setting('qa.period_id')::bigint and c.name = 'QA course B' and a.email = 'foreign@example.test')
+     or not exists (select 1 from public.authorized_students a join public.courses c on c.id = a.course_id where c.teacher_id = current_setting('qa.teacher_a')::uuid and c.period_id = current_setting('qa.period_id')::bigint and c.name = 'missing' and a.email = 'missing@example.test') then
+    raise exception 'FAIL BASE-05: incorrect course creation or authorization';
   end if;
   if exists ((select * from qa_enrollments_before except all select * from public.course_students) union all (select * from public.course_students except all select * from qa_enrollments_before)) then
     raise exception 'FAIL BASE-05: enrollments changed';
