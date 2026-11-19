@@ -71,6 +71,10 @@
 
 **Documentación:** recorrido de preparación y pruebas correspondientes.
 
+**Seguimiento local de implementación:** se conserva la consulta de periodos y la gestión de cursos propios. La migración `0032` retira a usuarios autenticados la escritura de periodos compartidos y la promoción global; no existe todavía un rol ni un procedimiento institucional implementado para administrarlos. Esta restricción evita que un docente altere indirectamente cursos ajenos, pero la definición de autoridad y la provisión operativa de periodos siguen pendientes en BASE-04 #13. Renombrar, archivar y restaurar cursos ahora tratan cero filas como operación no aplicada. El recorrido previsto es seleccionar un periodo vigente o próximo ya disponible, crear un curso propio y continuar con la incorporación del padrón en BASE-05 #14.
+
+**Evidencia y pendientes:** se añadió `supabase/qa/base_04_courses_periods.sql` con dos docentes, curso propio de ejemplo transitorio, accesos ajenos y denegación de cambios globales; su ejecución quedó bloqueada por ausencia del contenedor local de Supabase, por lo que no demuestra aceptación. ESLint dirigido, `pnpm typecheck` y `git diff --check` pasaron. No se ejecutaron recorridos visuales ni se verificaron usabilidad, OAuth o configuración desplegada (BASE-07 #16 y BASE-03 #12). La importación de cursos archivados sigue en BASE-05 #14. Queda pendiente ejecutar las pruebas SQL con la migración aplicada y acordar la administración institucional en BASE-04 #13; no se marca aceptada. Este seguimiento solo se actualizó localmente, no en GitHub.
+
 ### BASE-05 · Validar e incorporar el padrón de alumnos
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#2-periodos-cursos-e-importación). Reutilizar importación de padrón; contrastar validación de filas en servidor, duplicados normalizados, resultado por lote, cursos archivados y RPC antigua aún publicada.
@@ -137,6 +141,7 @@
 **Documentación:** variables de ejemplo sin valores secretos en [`portfolio-coursse/.env.example`](../../portfolio-coursse/.env.example) y condiciones de operación en [aviso-por-correo.md](../03-calidad-y-operacion/aviso-por-correo.md).
 
 **Avance y evidencia (local, no sincronizado con GitHub):**
+
 - Se contrastó con el código actual: no existía cliente SMTP ni variables de correo; se incorporó `nodemailer` (`lib/mail/config.ts`, `lib/mail/notice-template.ts`, `lib/mail/send-test-notice.ts` y `scripts/test-mail.mjs`).
 - Pruebas unitarias con transporte simulado ejecutadas (`vitest run`): `portfolio-coursse/tests/unit/mail-config.test.ts` (6/6 aprobadas) y `test-harness.test.ts` (2/2 aprobadas); `eslint` y `next typegen && tsc --noEmit` sin errores.
 - Prueba de envío SMTP en vivo ejecutada con `corepack pnpm test:mail` usando credenciales locales en `.env.local` (fuera de Git): correo de prueba enviado con éxito a `gianca.0603@gmail.com` (`messageId=<03bbabb5-05e3-e2e0-705b-50b97b003477@gmail.com>`).
