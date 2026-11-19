@@ -140,11 +140,12 @@ export default async function TeacherPage({
                 ) : (
                     <div className="glass mt-8 rounded-3xl border border-white/25 p-6">
                         <h2 className="text-xl font-semibold">
-                            Prepara un periodo
+                            No hay periodos disponibles
                         </h2>
                         <p className="mt-2 text-sm text-muted">
-                            Abre Periodos para preparar el ciclo en el que
-                            trabajarás.
+                            La institución crea y habilita los periodos
+                            académicos. Contacta con ella si necesitas acceder a
+                            uno.
                         </p>
                     </div>
                 )}

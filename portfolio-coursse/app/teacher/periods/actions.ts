@@ -82,12 +82,14 @@ export async function updatePeriodDates(formData: FormData) {
 		redirectWithError("period-data");
 	}
 
-	const { error } = await supabase
+	const { data, error } = await supabase
 		.from("academic_periods")
 		.update({ starts_at: startsAt, ends_at: endsAt })
 		.eq("id", periodId)
-		.in("status", ["upcoming", "current"]);
-	if (error) redirectWithError("period-status");
+		.in("status", ["upcoming", "current"])
+		.select("id")
+		.maybeSingle();
+	if (error || !data) redirectWithError("period-status");
 
 	revalidatePath("/teacher/periods");
 	redirect("/teacher/periods");

@@ -23,6 +23,8 @@ Este documento registra evidencia ejecutada para la Parte II. Una capacidad pres
 | Recorrido docente local                 | Seleccionar periodo, crear, renombrar, archivar y restaurar curso; segundo docente no ve el curso ajeno.             | El responsable informó que completó esos pasos y comprobó la separación con una segunda cuenta.              |
 | Seed local sobre base con periodos      | No modificar el calendario existente, incluso al repetirlo.                                                          | Dos ejecuciones dentro de una transacción no insertaron filas; se revirtió la transacción.                   |
 
+**Revisión posterior:** con la migración `0033` aplicada en Supabase local, `pnpm test:db` pasó las tres suites, incluyendo el rechazo de un segundo periodo actual por inserción o actualización y una transición válida. Las pruebas unitarias de `updatePeriodDates` pasaron para fila actualizada, cero filas y error. No se probó una carrera concurrente ni la aplicación sobre datos duplicados existentes.
+
 **Decisión y límites:** el equipo administrador gestionará los periodos reales directamente en la base de datos; el seed es solo para desarrollo. No se ejecutó la carga automática del seed en una base vacía ni la operación administrativa en un entorno real. La configuración OAuth desplegada sigue en BASE-03 #12, la revisión de experiencia en BASE-07 #16 y la importación de cursos archivados en BASE-05 #14. No se realizó una evaluación formal de usabilidad. La revisión independiente corresponde al PR; el seguimiento de estos resultados se actualizó en archivos locales, no en la issue de GitHub.
 
 ## BASE-03 #12 · Acceso académico por recurso

@@ -56,6 +56,8 @@ from auth.users u where u.id in (
 
 update public.profiles set role = 'teacher' where id in (:teacher_a, :teacher_b);
 
+-- The caller's transaction restores the original period on rollback.
+update public.academic_periods set status = 'closed' where status = 'current';
 insert into public.academic_periods (academic_year, semester, status)
 values (2099, 1, 'current') returning id as period_id \gset
 

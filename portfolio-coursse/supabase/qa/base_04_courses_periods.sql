@@ -9,6 +9,48 @@ insert into public.academic_periods (academic_year, semester, status)
 values (2099, 2, 'upcoming') returning id as next_period_id \gset
 select set_config('qa.next_period_id', :'next_period_id', true) \g /dev/null
 
+-- Exercise the invariant as the database owner, independently of RLS.
+-- Check the constraint name so another unique constraint cannot mask a failure.
+do $$
+declare
+  violated_constraint text;
+begin
+  begin
+    insert into public.academic_periods (academic_year, semester, status)
+    values (2098, 1, 'current');
+    raise exception 'FAIL BASE-04: second current period inserted';
+  exception when unique_violation then
+    get stacked diagnostics violated_constraint = constraint_name;
+    if violated_constraint <> 'academic_periods_single_current_idx' then raise; end if;
+  end;
+
+  begin
+    update public.academic_periods set status = 'current'
+    where id = current_setting('qa.next_period_id')::bigint;
+    raise exception 'FAIL BASE-04: second current period updated';
+  exception when unique_violation then
+    get stacked diagnostics violated_constraint = constraint_name;
+    if violated_constraint <> 'academic_periods_single_current_idx' then raise; end if;
+  end;
+
+  -- Zero current periods and multiple non-current periods are allowed.
+  update public.academic_periods set status = 'closed' where status = 'current';
+  if exists (select 1 from public.academic_periods where status = 'current') then
+    raise exception 'FAIL BASE-04: closing current period failed';
+  end if;
+  update public.academic_periods set status = 'current'
+  where id = current_setting('qa.next_period_id')::bigint;
+  if (select count(*) from public.academic_periods where status = 'current') <> 1 then
+    raise exception 'FAIL BASE-04: valid period transition failed';
+  end if;
+  -- Restore the fixture's statuses for the remaining checks.
+  update public.academic_periods set status = 'upcoming'
+  where id = current_setting('qa.next_period_id')::bigint;
+  update public.academic_periods set status = 'current'
+  where id = (select period_id from public.courses where id = current_setting('qa.course_a_id')::bigint);
+end $$;
+\echo 'PASS BASE-04: at most one current period on insert and update; valid transition succeeds'
+
 -- Preserve complete period rows to detect changes to any column, not only status.
 create temporary table qa_period_before on commit drop as
 select * from public.academic_periods
