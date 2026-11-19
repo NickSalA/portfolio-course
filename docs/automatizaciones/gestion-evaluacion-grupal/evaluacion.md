@@ -51,6 +51,22 @@ Este documento registra evidencia ejecutada para la Parte II. Una capacidad pres
 - **Contraste con las migraciones vigentes.** `0006` ya hace que la comprobación de titularidad docente invoque el control de rol e identidad. `0029` elimina la lectura estudiantil de notas grupales. `0004` crea solo el perfil en el alta Auth. `0007` ya obliga a normalizar el correo y garantiza la unicidad por curso. Las suites locales de capacidades y RLS de notas pasaron tras aplicar `0031`.
 - **Seguimiento.** La preasignación de grupos durante la sincronización corresponde a GRP-03 #20 y BASE-06 #15. El inicio real con Google y la configuración desplegada siguen pendientes en #12. El inventario histórico permanece como referencia de contraste.
 
+## BASE-06 #15 · Vinculación de autorización y matrícula
+
+**Fecha** 2026-11-19 · **Base** `develop` `a433807` · **Migración** `0037_sync_student_enrollment.sql` · **Entorno** Supabase aislado en Docker, PostgreSQL 17 y Node 24. [Especificación](../../../specs/003-vinculacion-matricula/spec.md) · [Pruebas SQL](../../../portfolio-coursse/supabase/qa/base_06_student_enrollment.sql).
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Padrón antes y después del primer ingreso | Solo la identidad verificada se vincula a su autorización activa. El importador de BASE-05 crea la autorización y el siguiente ingreso vincula la cuenta. | Ambos órdenes aprobados en SQL con cuentas sintéticas. |
+| Repetición, baja y restauración | El grupo elegido y la matrícula se conservan, con y sin grupo del padrón. Resincronizar tras una baja no restaura el acceso. | Aprobado. Se conservó el grupo B aunque el padrón indicaba A. |
+| Vínculos anteriores | Completar un vínculo inequívoco conserva el grupo nulo. Un conflicto antiguo queda inactivo, conserva su referencia y no impide acceder a otro curso válido. | Aprobado con fixture transaccional y rollback. |
+| Dos sesiones de la misma identidad | Una sincronización espera a la otra y ambas convergen en una sola matrícula activa con el grupo inicial. | Aprobado en dos conexiones SQL. La segunda esperó el bloqueo antes de continuar. |
+| Comprobaciones de aplicación | Lint, tipos, Vitest y build aprobados. | Todos aprobaron, incluidas 13 pruebas unitarias y build con Turbopack. |
+
+**Límite de la suite general**. El runner pasó capacidades actuales, RLS de notas y BASE-04. Se detuvo en `base_05_import_students.sql:151` con `FAIL BASE-05: anonymous RPC grant`. La misma aserción falló tras restablecer otra vez el entorno aislado a `0036`, sin `0037`. El runner específico de BASE-06 pasó. El fallo preexistente se remite a BASE-05 #14 y su responsable.
+
+**Pendientes**. Registrar el inicio real con Google en ambos órdenes cuando haya credenciales locales. La concurrencia entre alumnos distintos por un cupo de grupo preasignado sigue en GRP-03 #20. El inventario BASE-01 conserva su evidencia histórica.
+
 ## EXP-01 #38: decisiones y evidencia documental
 
 **Fuente y revisión:** R1 se identificó en la conversación como @NickSalA y confirmó las reglas de [EXP-01](../../backlog/05-exportacion.md); comunicó que R3 las revisó y aceptó, y que la revisión completa se realizará en el PR. Es un reporte de R1, no una aprobación independiente comprobada en GitHub; no se dispone aquí de fecha ni comentario de R3. El profesor no confirmó la fórmula. Seguimiento actualizado en archivos locales únicamente; GitHub no se modificó.

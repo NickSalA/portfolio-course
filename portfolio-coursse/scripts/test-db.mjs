@@ -44,6 +44,7 @@ try {
               "group_grades_rls.sql",
               "base_04_courses_periods.sql",
               "base_05_import_students.sql",
+              "base_06_student_enrollment.sql",
           ];
     for (const script of scripts) {
         console.log(`\nRunning ${script}`);
