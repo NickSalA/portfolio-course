@@ -15,11 +15,18 @@ insert into auth.users (
   email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
   created_at, updated_at
 ) values
-  ('00000000-0000-0000-0000-000000000000', 'f1000000-0000-4000-8000-000000000001', 'authenticated', 'authenticated', 'fixture-teacher-a@example.test', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now()),
-  ('00000000-0000-0000-0000-000000000000', 'f2000000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'fixture-teacher-b@example.test', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now()),
-  ('00000000-0000-0000-0000-000000000000', 'f3000000-0000-4000-8000-000000000003', 'authenticated', 'authenticated', 'fixture-student-a@example.test', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now()),
-  ('00000000-0000-0000-0000-000000000000', 'f4000000-0000-4000-8000-000000000004', 'authenticated', 'authenticated', 'fixture-student-b@example.test', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now()),
-  ('00000000-0000-0000-0000-000000000000', 'f5000000-0000-4000-8000-000000000005', 'authenticated', 'authenticated', 'fixture-unauthorized@example.test', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now());
+  ('00000000-0000-0000-0000-000000000000', 'f1000000-0000-4000-8000-000000000001', 'authenticated', 'authenticated', 'fixture-teacher-a@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now()),
+  ('00000000-0000-0000-0000-000000000000', 'f2000000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'fixture-teacher-b@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now()),
+  ('00000000-0000-0000-0000-000000000000', 'f3000000-0000-4000-8000-000000000003', 'authenticated', 'authenticated', 'fixture-student-a@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now()),
+  ('00000000-0000-0000-0000-000000000000', 'f4000000-0000-4000-8000-000000000004', 'authenticated', 'authenticated', 'fixture-student-b@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now()),
+  ('00000000-0000-0000-0000-000000000000', 'f5000000-0000-4000-8000-000000000005', 'authenticated', 'authenticated', 'fixture-unauthorized@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now());
+
+insert into auth.identities (provider_id, user_id, identity_data, provider)
+select u.id::text, u.id, jsonb_build_object('email', u.email, 'email_verified', true), 'google'
+from auth.users u
+where u.email in ('fixture-teacher-a@example.test', 'fixture-teacher-b@example.test',
+                  'fixture-student-a@example.test', 'fixture-student-b@example.test',
+                  'fixture-unauthorized@example.test');
 
 update public.profiles set role = 'teacher'
 where id in ('f1000000-0000-4000-8000-000000000001', 'f2000000-0000-4000-8000-000000000002');
@@ -46,10 +53,14 @@ values (:fixture_course_a_id, 'Fixture group A2', 2, 2) returning id as fixture_
 insert into public.groups (course_id, name, position, capacity)
 values (:fixture_course_b_id, 'Fixture group B1', 1, 2) returning id as fixture_group_b1_id \gset
 
-insert into public.course_students (course_id, student_id, group_id, status)
-values
-  (:fixture_course_a_id, 'f3000000-0000-4000-8000-000000000003', :fixture_group_a1_id, 'active'),
-  (:fixture_course_a_id, 'f4000000-0000-4000-8000-000000000004', null, 'active');
+insert into public.course_students (course_id, student_id, authorized_student_id, group_id, status)
+select a.course_id, u.id, a.id, students.group_id, 'active'
+from (values
+  ('fixture-student-a@example.test', :fixture_group_a1_id::bigint),
+  ('fixture-student-b@example.test', null::bigint)
+) students(email, group_id)
+join auth.users u on u.email = students.email
+join public.authorized_students a on a.email = students.email and a.course_id = :fixture_course_a_id;
 
 insert into public.point_transactions (authorized_student_id, points, reason, created_by)
 select id, 3, 'Synthetic fixture points', 'f1000000-0000-4000-8000-000000000001'

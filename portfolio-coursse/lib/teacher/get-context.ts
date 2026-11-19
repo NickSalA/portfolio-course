@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { redirect } from "next/navigation";
+import { hasAcademicIdentity } from "@/lib/academic/authorize-current-user";
 import { createClient } from "@/lib/supabase/server";
 
 type ContextOptions = {
@@ -15,6 +16,8 @@ export const getTeacherBaseContext = cache(async () => {
 		data: { user },
 	} = await supabase.auth.getUser();
 	if (!user) redirect("/login");
+	if (!(await hasAcademicIdentity(supabase)))
+		redirect("/login?error=unauthorized");
 
 	const [{ data: teacher }, { data: availablePeriods }] = await Promise.all([
 		supabase

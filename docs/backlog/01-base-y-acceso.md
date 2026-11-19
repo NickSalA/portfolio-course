@@ -51,6 +51,8 @@
 
 **Documentación:** matriz de acceso y evidencia de casos válidos y denegados.
 
+**Seguimiento de implementación**. La migración 0030 y el servidor verifican identidad, rol, curso y vigencia. Las pruebas locales cubrieron la lectura de recursos propios y ajenos, la preservación de vínculos anteriores inconsistentes, la revocación y la privacidad de grupos. El recorrido OAuth real y la configuración desplegada quedan pendientes de verificación en BASE-03. El ciclo de sincronización y la conservación del grupo en todos los órdenes de incorporación siguen en BASE-06 #15. [Evidencia de BASE-03](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#base-03-12--acceso-académico-por-recurso).
+
 ### BASE-04 · Preparar periodos y cursos bajo responsabilidad docente
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#2-periodos-cursos-e-importación). Reutilizar gestión de cursos/periodos; resolver autoridad sobre periodos globales y efectos en cursos ajenos. Verificar operaciones sin filas afectadas y contexto visible.

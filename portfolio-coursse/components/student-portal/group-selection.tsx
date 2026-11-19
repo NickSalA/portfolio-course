@@ -51,7 +51,7 @@ export async function GroupSelection({
 						group_position: number;
 						capacity: number;
 						active_members: number;
-						members: { full_name: string | null; email: string }[];
+						members: { full_name: string }[];
 					}) => {
 						const full = group.active_members >= group.capacity;
 						const current = group.id === currentGroupId;
@@ -83,12 +83,8 @@ export async function GroupSelection({
 										{group.members.length > 0 && (
 											<p className="mt-2 text-xs leading-5 text-muted">
 												{group.members
-													.map(
-														(member) =>
-															member.full_name ||
-															member.email,
-													)
-													.join(", ")}
+													.map((member) => member.full_name)
+												.join(", ")}
 											</p>
 										)}
 									</div>

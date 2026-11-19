@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { StudentDashboard } from "@/components/student-portal/student-dashboard";
+import { hasAcademicIdentity } from "@/lib/academic/authorize-current-user";
 import { getStudentDashboard } from "@/lib/student/get-dashboard";
 import { createClient } from "@/lib/supabase/server";
 
@@ -21,6 +22,8 @@ export default async function StudentPage({
 		data: { user },
 	} = await supabase.auth.getUser();
 	if (!user) redirect("/login");
+	if (!(await hasAcademicIdentity(supabase)))
+		redirect("/login?error=unauthorized");
 
 	const { data: profile } = await supabase
 		.from("profiles")

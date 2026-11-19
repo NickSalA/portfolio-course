@@ -7,9 +7,18 @@ insert into auth.users (
   email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
   created_at, updated_at
 ) values
-  ('00000000-0000-0000-0000-000000000000', 'a1000000-0000-4000-8000-000000000001', 'authenticated', 'authenticated', 'rls-teacher-a@example.test', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now()),
-  ('00000000-0000-0000-0000-000000000000', 'a2000000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'rls-teacher-b@example.test', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now()),
-  ('00000000-0000-0000-0000-000000000000', 'a3000000-0000-4000-8000-000000000003', 'authenticated', 'authenticated', 'rls-student@example.test', '', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now());
+  ('00000000-0000-0000-0000-000000000000', 'a1000000-0000-4000-8000-000000000001', 'authenticated', 'authenticated', 'rls-teacher-a@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now()),
+  ('00000000-0000-0000-0000-000000000000', 'a2000000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'rls-teacher-b@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now()),
+  ('00000000-0000-0000-0000-000000000000', 'a3000000-0000-4000-8000-000000000003', 'authenticated', 'authenticated', 'rls-student@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now());
+
+-- Model the provider-verified identities for these synthetic OAuth actors.
+insert into auth.identities (provider_id, user_id, identity_data, provider)
+select u.id::text, u.id, jsonb_build_object('email', u.email, 'email_verified', true), 'google'
+from auth.users u where u.id in (
+  'a1000000-0000-4000-8000-000000000001',
+  'a2000000-0000-4000-8000-000000000002',
+  'a3000000-0000-4000-8000-000000000003'
+);
 
 update public.profiles set role = 'teacher'
 where id in ('a1000000-0000-4000-8000-000000000001', 'a2000000-0000-4000-8000-000000000002');
@@ -29,8 +38,10 @@ values (:course_a_id, 'RLS test group A', 1, 10) returning id as group_a_id \gse
 insert into public.groups (course_id, name, position, capacity)
 values (:course_b_id, 'RLS test group B', 1, 10) returning id as group_b_id \gset
 
-insert into public.course_students (course_id, student_id, group_id, status)
-values (:course_a_id, 'a3000000-0000-4000-8000-000000000003', :group_a_id, 'active');
+insert into public.authorized_students (course_id, email)
+values (:course_a_id, 'rls-student@example.test') returning id as student_auth_id \gset
+insert into public.course_students (course_id, student_id, authorized_student_id, group_id, status)
+values (:course_a_id, 'a3000000-0000-4000-8000-000000000003', :student_auth_id, :group_a_id, 'active');
 
 insert into public.course_evaluations (course_id, name, position)
 values (:course_a_id, 'RLS test evaluation A', 1) returning id as evaluation_a_id \gset
@@ -45,6 +56,7 @@ insert into public.group_grades (group_id, evaluation_id, grade)
 values (:group_a_id, :evaluation_a_id, 12), (:group_b_id, :evaluation_b_id, 14);
 
 set local role authenticated;
+select set_config('request.jwt.claims', '{"amr":[{"method":"oauth"}]}', true) \g /dev/null
 select set_config('request.jwt.claim.sub', 'a3000000-0000-4000-8000-000000000003', true);
 do $$
 begin

@@ -5,7 +5,16 @@ begin;
 create temporary table qa_fixture_transaction () on commit drop;
 \ir fixtures.sql
 
+set local role anon;
+do $$
+begin
+  if exists (select 1 from public.courses) or exists (select 1 from public.academic_periods) then
+    raise exception 'FAIL: academic rows are visible without a session';
+  end if;
+end $$;
+reset role;
 set local role authenticated;
+select set_config('request.jwt.claims', '{"amr":[{"method":"oauth"}]}', true) \g /dev/null
 
 -- BASE-03: an authenticated but unauthorized student sees no academic data.
 select set_config('request.jwt.claim.sub', 'f5000000-0000-4000-8000-000000000005', true);
@@ -70,6 +79,71 @@ begin
   end if;
 end $$;
 \echo 'PASS BASE-06: repeated sync keeps one enrollment and the selected group'
+
+-- BASE-03: verify the allowed set as well as the denied set.
+do $$
+begin
+  if (select array_agg(id) from public.courses) is distinct from array[current_setting('qa.course_a_id')::bigint]
+     or (select array_agg(id) from public.groups) is distinct from array[current_setting('qa.group_a2_id')::bigint]
+     or (select count(*) from public.course_evaluations) <> 3
+     or (select count(*) from public.point_transactions) <> 2 then
+    raise exception 'FAIL: academic access is not restricted to the authorized student resources';
+  end if;
+  if exists (
+    select 1 from public.available_course_group_details(current_setting('qa.enrollment_s1_id')::bigint)
+    where members <> '[]'::jsonb
+  ) then
+    raise exception 'FAIL: group names are visible outside the selection window';
+  end if;
+end $$;
+
+select set_config('request.jwt.claims', '{"amr":[{"method":"password"}]}', true) \g /dev/null
+do $$
+begin
+  if public.has_academic_identity() or exists (select 1 from public.courses) then
+    raise exception 'FAIL: session outside the academic identity flow granted access';
+  end if;
+end $$;
+select set_config('request.jwt.claims', '{"amr":[{"method":"oauth"}]}', true) \g /dev/null
+\echo 'PASS BASE-03: authorized resources only and academic identity required'
+
+-- Revocation and restoration apply to an existing session without resynchronizing.
+select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true);
+update public.authorized_students set status = 'inactive' where id = current_setting('qa.auth_s1_id')::bigint;
+select set_config('request.jwt.claim.sub', 'f3000000-0000-4000-8000-000000000003', true);
+do $$
+begin
+  if exists (select 1 from public.courses) or exists (select 1 from public.course_students)
+     or exists (select 1 from public.course_evaluations) or exists (select 1 from public.point_transactions) then
+    raise exception 'FAIL: academic data still available to a revoked student';
+  end if;
+end $$;
+select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true);
+update public.authorized_students set status = 'active' where id = current_setting('qa.auth_s1_id')::bigint;
+update public.courses set group_selection_opens_at = now() - interval '1 minute',
+  group_selection_closes_at = now() + interval '1 minute'
+where id = current_setting('qa.course_a_id')::bigint;
+select set_config('request.jwt.claim.sub', 'f3000000-0000-4000-8000-000000000003', true);
+do $$
+declare
+  enrollment_id bigint := current_setting('qa.enrollment_s1_id')::bigint;
+begin
+  if not exists (select 1 from public.course_students
+    where id = enrollment_id and group_id = current_setting('qa.group_a2_id')::bigint) then
+    raise exception 'FAIL: restoration did not preserve the enrollment and group';
+  end if;
+  if (select count(*) from public.available_course_groups(enrollment_id)) <> 2
+    or not exists (select 1 from public.available_course_group_details(enrollment_id) where members <> '[]'::jsonb)
+    or exists (select 1 from public.available_course_group_details(enrollment_id) g
+      cross join lateral jsonb_array_elements(g.members) m
+      where m ? 'email' or nullif(m ->> 'full_name', '') is null) then
+    raise exception 'FAIL: group choices do not honor the name and capacity contract';
+  end if;
+end $$;
+\echo 'PASS BASE-03: revocation, restoration and group privacy'
+select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true);
+update public.courses set group_selection_opens_at = null, group_selection_closes_at = null
+where id = current_setting('qa.course_a_id')::bigint;
 
 -- EVA-01: grade range 0..20, pending is not zero, one grade per group and evaluation.
 select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true);

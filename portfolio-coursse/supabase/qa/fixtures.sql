@@ -25,7 +25,7 @@ insert into auth.users (
   created_at, updated_at
 )
 select '00000000-0000-0000-0000-000000000000', u.id::uuid, 'authenticated', 'authenticated', u.email, '',
-  now(), '{"provider":"email","providers":["email"]}', '{}', now(), now()
+  now(), '{"provider":"google","providers":["google"]}', '{}', now(), now()
 from (values
   ('f1000000-0000-4000-8000-000000000001', 'qa-teacher-a@example.test'),
   ('f2000000-0000-4000-8000-000000000002', 'qa-teacher-b@example.test'),
@@ -34,6 +34,18 @@ from (values
   ('f5000000-0000-4000-8000-000000000005', 'qa-student-3@example.test'),
   ('f6000000-0000-4000-8000-000000000006', 'qa-student-4@example.test')
 ) as u(id, email);
+
+-- Model the provider-verified identities for these synthetic OAuth actors.
+insert into auth.identities (provider_id, user_id, identity_data, provider)
+select u.id::text, u.id, jsonb_build_object('email', u.email, 'email_verified', true), 'google'
+from auth.users u where u.id in (
+  'f1000000-0000-4000-8000-000000000001',
+  'f2000000-0000-4000-8000-000000000002',
+  'f3000000-0000-4000-8000-000000000003',
+  'f4000000-0000-4000-8000-000000000004',
+  'f5000000-0000-4000-8000-000000000005',
+  'f6000000-0000-4000-8000-000000000006'
+);
 
 \set teacher_a '''f1000000-0000-4000-8000-000000000001'''
 \set teacher_b '''f2000000-0000-4000-8000-000000000002'''
