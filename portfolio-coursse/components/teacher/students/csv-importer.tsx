@@ -32,7 +32,6 @@ function cell(row: Cell[], index: number | undefined) {
 function parseWorkbook(workbook: XLSX.WorkBook, fixedCourseName?: string) {
 	const students: StudentRow[] = [];
 	const errors: string[] = [];
-	const seen = new Set<string>();
 
 	workbook.SheetNames.forEach((sheetName) => {
 		const sheet = workbook.Sheets[sheetName];
@@ -59,7 +58,7 @@ function parseWorkbook(workbook: XLSX.WorkBook, fixedCourseName?: string) {
 			return;
 		}
 
-		rows.slice(1).forEach((row, rowIndex) => {
+		rows.slice(1).forEach((row) => {
 			const courseName = fixedCourseName ?? cell(row, courseIndex);
 			const email = cell(row, emailIndex).toLowerCase();
 			const directName = cell(row, index.nombre);
@@ -69,24 +68,12 @@ function parseWorkbook(workbook: XLSX.WorkBook, fixedCourseName?: string) {
 				.filter(Boolean)
 				.join(" ");
 			const studentNumber = cell(row, index.matricula);
-			const rowLabel = `${sheetName}, fila ${rowIndex + 2}`;
-
-			if (!courseName) errors.push(`${rowLabel}: falta el curso.`);
-			else if (!email || !email.includes("@"))
-				errors.push(`${rowLabel}: el correo no es válido.`);
-			else if (seen.has(`${courseName.toLowerCase()}::${email}`))
-				errors.push(
-					`${rowLabel}: el correo está repetido para ese curso.`,
-				);
-			else {
-				seen.add(`${courseName.toLowerCase()}::${email}`);
-				students.push({
-					course_name: courseName,
-					full_name: fullName,
-					email,
-					student_number: studentNumber,
-				});
-			}
+			students.push({
+				course_name: courseName,
+				full_name: fullName,
+				email,
+				student_number: studentNumber,
+			});
 		});
 	});
 
@@ -125,7 +112,7 @@ export function CsvImporter({
 			const result = parseWorkbook(workbook, fixedCourseName);
 			setStudents(result.students);
 			setErrors(result.errors);
-			if (!result.errors.length) onValidated(result.students);
+			onValidated(result.students);
 		} catch {
 			setErrors([
 				"No se pudo leer el archivo. Verifica que sea un CSV o XLSX válido.",
@@ -188,23 +175,18 @@ export function CsvImporter({
 					role="alert"
 					className="mt-4 space-y-1 rounded-xl border border-danger/30 bg-danger-soft p-3 text-sm text-danger"
 				>
-					{errors.slice(0, 8).map((error) => (
+					{errors.map((error) => (
 						<li key={error}>{error}</li>
 					))}
-					{errors.length > 8 && (
-						<li>…y {errors.length - 8} errores más.</li>
-					)}
 				</ul>
 			)}
 			{!errors.length && students.length > 0 && (
 				<div className="mt-4 rounded-xl border border-border bg-surface p-3 text-sm">
 					<p>
-						<strong>{students.length}</strong> alumnos listos para
-						importar.
+						<strong>{students.length}</strong> filas para enviar; el servidor validará cada una.
 					</p>
 					<p className="mt-1 text-muted">
-						Se crearán o actualizarán autorizaciones y los cursos
-						que aún no existan en este periodo.
+						El resultado indicará cuáles se importaron o rechazaron.
 					</p>
 				</div>
 			)}
