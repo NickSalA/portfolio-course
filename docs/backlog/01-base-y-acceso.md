@@ -53,6 +53,8 @@
 
 **Seguimiento de implementación**. La migración 0030 y el servidor verifican identidad, rol, curso y vigencia. Las pruebas locales cubrieron la lectura de recursos propios y ajenos, la preservación de vínculos anteriores inconsistentes, la revocación y la privacidad de grupos. El recorrido OAuth real y la configuración desplegada quedan pendientes de verificación en BASE-03. El ciclo de sincronización y la conservación del grupo en todos los órdenes de incorporación siguen en BASE-06 #15. [Evidencia de BASE-03](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#base-03-12--acceso-académico-por-recurso).
 
+**Revisión del PR #57**. La migración 0031 protege la titularidad de la autorización desde su alta y excluye matrículas inválidas del cálculo de cupos. El reintento de sincronización y la privacidad de puntos tienen pruebas de regresión. La concurrencia de las preasignaciones sigue en GRP-03 #20 y BASE-06 #15. [Evidencia de la revisión](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#revisión-del-pr-57).
+
 ### BASE-04 · Preparar periodos y cursos bajo responsabilidad docente
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#2-periodos-cursos-e-importación). Reutilizar gestión de cursos/periodos; resolver autoridad sobre periodos globales y efectos en cursos ajenos. Verificar operaciones sin filas afectadas y contexto visible.

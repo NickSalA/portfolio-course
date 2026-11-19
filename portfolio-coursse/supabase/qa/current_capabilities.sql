@@ -66,6 +66,20 @@ exception when others then
 end $$;
 \echo 'PASS EVA-02: foreign teacher cannot void points'
 
+select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true);
+select set_config('request.jwt.claims', '{"amr":[{"method":"password"}]}', true) \g /dev/null
+do $$
+begin
+  if public.is_teacher_of_course(current_setting('qa.course_a_id')::bigint)
+     or exists (select 1 from public.authorized_students)
+     or exists (select 1 from public.group_grades)
+     or exists (select 1 from public.point_transactions) then
+    raise exception 'FAIL: a teacher session outside the academic identity flow has academic access';
+  end if;
+end $$;
+select set_config('request.jwt.claims', '{"amr":[{"method":"oauth"}]}', true) \g /dev/null
+\echo 'PASS BASE-03: teacher course scope also requires academic identity'
+
 -- BASE-06: repeating the sync keeps one enrollment and the chosen group.
 select set_config('request.jwt.claim.sub', 'f3000000-0000-4000-8000-000000000003', true);
 do $$
@@ -106,6 +120,16 @@ begin
 end $$;
 select set_config('request.jwt.claims', '{"amr":[{"method":"oauth"}]}', true) \g /dev/null
 \echo 'PASS BASE-03: authorized resources only and academic identity required'
+
+select set_config('request.jwt.claim.sub', 'f4000000-0000-4000-8000-000000000004', true);
+do $$
+begin
+  if not exists (select 1 from public.courses where id = current_setting('qa.course_a_id')::bigint)
+     or exists (select 1 from public.point_transactions) then
+    raise exception 'FAIL: a classmate can see private point movements';
+  end if;
+end $$;
+\echo 'PASS BASE-03: an enrolled classmate cannot read another student’s points'
 
 -- Revocation and restoration apply to an existing session without resynchronizing.
 select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true);
@@ -292,6 +316,59 @@ begin
   end if;
 end $$;
 \echo 'PASS GRP-05: no/ended window, full group and foreign group rejected; reopened window applies'
+
+-- A stale enrollment stops consuming a seat if its holder no longer has a verified identity.
+reset role;
+update auth.identities set identity_data = jsonb_set(identity_data, '{email_verified}', 'false')
+where user_id = 'f3000000-0000-4000-8000-000000000003' and provider = 'google';
+update public.groups set capacity = 1 where id = current_setting('qa.group_a2_id')::bigint;
+set local role authenticated;
+do $$
+declare
+  enrollment bigint := current_setting('qa.enrollment_s2_id')::bigint;
+  group_a2 bigint := current_setting('qa.group_a2_id')::bigint;
+begin
+  perform public.select_course_group(enrollment, current_setting('qa.group_a1_id')::bigint);
+  if (select active_members from public.available_course_groups(enrollment) where id = group_a2)
+     is distinct from 0 then
+    raise exception 'FAIL: invalid enrollment counted in group occupancy';
+  end if;
+  perform public.select_course_group(enrollment, group_a2);
+end $$;
+\echo 'PASS BASE-03: occupancy and selection ignore invalid enrollments'
+
+-- Authorization can precede account creation. Only the login sync creates the enrollment.
+select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true);
+insert into public.authorized_students (course_id, email)
+values (current_setting('qa.course_a_id')::bigint, 'qa-first-login@example.test');
+do $$
+begin
+  begin
+    update public.authorized_students set email = 'qa-other@example.test'
+    where email = 'qa-first-login@example.test';
+    raise exception 'FAIL: roster identity was changed in place';
+  exception when check_violation then
+    if sqlerrm <> 'authorization_identity_is_immutable' then raise; end if;
+  end;
+end $$;
+reset role;
+insert into auth.users (id, email, email_confirmed_at)
+values ('f7000000-0000-4000-8000-000000000007', 'qa-first-login@example.test', now());
+insert into auth.identities (provider_id, user_id, provider, identity_data)
+values ('qa-first-login', 'f7000000-0000-4000-8000-000000000007', 'google',
+        '{"email":"qa-first-login@example.test","email_verified":true}');
+set local role authenticated;
+select set_config('request.jwt.claim.sub', 'f7000000-0000-4000-8000-000000000007', true);
+do $$
+begin
+  if not exists (select 1 from public.profiles) or exists (select 1 from public.course_students) then
+    raise exception 'FAIL: first account creation should provision only the profile';
+  end if;
+  if not public.sync_authorized_student() then
+    raise exception 'FAIL: first login did not synchronize the prior authorization';
+  end if;
+end $$;
+\echo 'PASS BASE-03: roster identity stays stable and pre-authorized users can sync on first login'
 
 rollback;
 \echo 'PASS: all synthetic fixtures rolled back'

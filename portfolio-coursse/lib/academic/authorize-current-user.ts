@@ -34,17 +34,21 @@ export async function authorizeCurrentUser(
 		return { ok: true, role: "teacher" };
 	}
 
-	const { data: enrolled, error: syncError } = await supabase.rpc(
-		"sync_authorized_student",
-	);
+	const sync = await supabase.rpc("sync_authorized_student");
+	if (sync.error) {
+		return { ok: false, reason: "sync-failed" };
+	}
+	if (sync.data === true) {
+		return { ok: true, role: "student" };
+	}
 
-	if (syncError) {
+	// The roster may have been saved while the first request was in flight.
+	const retry = await supabase.rpc("sync_authorized_student");
+	if (retry.error) {
 		return { ok: false, reason: "sync-failed" };
 	}
 
-	if (enrolled !== true) {
-		return { ok: false, reason: "not-authorized" };
-	}
-
-	return { ok: true, role: "student" };
+	return retry.data === true
+		? { ok: true, role: "student" }
+		: { ok: false, reason: "not-authorized" };
 }
