@@ -13,18 +13,30 @@ Este documento registra evidencia ejecutada para la Parte II. Una capacidad pres
 - Guía de validación: [`../../../specs/001-manage-group-evaluation/quickstart.md`](../../../specs/001-manage-group-evaluation/quickstart.md)
 - EXP-01 #38: [especificación](../../../specs/001-export-decisions/spec.md), [plan](../../../specs/001-export-decisions/plan.md), [tareas](../../../specs/001-export-decisions/tasks.md) y [guía](../../../specs/001-export-decisions/quickstart.md).
 
+## BASE-04 #13 · Periodos y cursos docentes
+
+**Fecha:** 2026-11-19 · **Versión:** rama `feature/BASE-04`, migración `0032` · **Entorno:** Supabase local aislado y datos de prueba; resultados del recorrido visual comunicados por el responsable.
+
+| Escenario                               | Esperado                                                                                                             | Observado                                                                                                    |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `pnpm test:db`, dos docentes sintéticos | Cada docente gestiona sus cursos sin leer ni modificar los ajenos; se rechazan cambios docentes a periodos globales. | Las tres suites pasaron, incluida `base_04_courses_periods.sql`; las transacciones de prueba se revirtieron. |
+| Recorrido docente local                 | Seleccionar periodo, crear, renombrar, archivar y restaurar curso; segundo docente no ve el curso ajeno.             | El responsable informó que completó esos pasos y comprobó la separación con una segunda cuenta.              |
+| Seed local sobre base con periodos      | No modificar el calendario existente, incluso al repetirlo.                                                          | Dos ejecuciones dentro de una transacción no insertaron filas; se revirtió la transacción.                   |
+
+**Decisión y límites:** el equipo administrador gestionará los periodos reales directamente en la base de datos; el seed es solo para desarrollo. No se ejecutó la carga automática del seed en una base vacía ni la operación administrativa en un entorno real. La configuración OAuth desplegada sigue en BASE-03 #12, la revisión de experiencia en BASE-07 #16 y la importación de cursos archivados en BASE-05 #14. No se realizó una evaluación formal de usabilidad. La revisión independiente corresponde al PR; el seguimiento de estos resultados se actualizó en archivos locales, no en la issue de GitHub.
+
 ## BASE-03 #12 · Acceso académico por recurso
 
 **Fecha** 2026-11-18 · **Versión** rama `feature/base-03-acceso-academico`, migración `0030` · **Entorno** Supabase aislado en Docker, PostgreSQL 17 y Node 24. [Especificación](../../../specs/002-acceso-academico/spec.md) · [Plan](../../../specs/002-acceso-academico/plan.md) · [Tareas](../../../specs/002-acceso-academico/tasks.md).
 
-| Comprobación | Esperado | Observado |
-| --- | --- | --- |
-| Suites SQL de BASE-02 y RLS de notas | Alumno ve recursos propios; alumno sin autorización o sesión y docente ajeno quedan denegados. Los permisos legítimos de notas y puntos se conservan. | Ambas suites pasaron con identidades sintéticas y rollback. |
-| Identidad y revocación con sesión abierta | Otra clase de sesión carece de acceso académico. La baja retira acceso y la reactivación válida conserva matrícula y grupo. | Casos aprobados en SQL, sin volver a sincronizar entre baja y consulta. |
-| Opciones de grupo | Capacidad y ocupación; nombres durante la ventana; respuesta sin correos. | Casos aprobados en SQL. |
-| Actualización `0029 → 0030` y API local | Conservar una matrícula previa inconsistente sin darle acceso. El alumno autorizado ve su curso y las consultas sin sesión quedan vacías. | Actualización y consultas HTTP aprobadas con sesiones sintéticas y datos temporales. |
-| Comprobaciones de aplicación | Lint, tipos, pruebas unitarias y compilación sin errores. | ESLint, TypeScript, 8 pruebas Vitest y build de Next.js con Turbopack aprobados. |
-| Rutas de la aplicación sin sesión | Docente y alumno son redirigidos al login. | Las dos rutas respondieron con HTTP 307 y destino `/login` usando el build local. |
+| Comprobación                              | Esperado                                                                                                                                              | Observado                                                                            |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Suites SQL de BASE-02 y RLS de notas      | Alumno ve recursos propios; alumno sin autorización o sesión y docente ajeno quedan denegados. Los permisos legítimos de notas y puntos se conservan. | Ambas suites pasaron con identidades sintéticas y rollback.                          |
+| Identidad y revocación con sesión abierta | Otra clase de sesión carece de acceso académico. La baja retira acceso y la reactivación válida conserva matrícula y grupo.                           | Casos aprobados en SQL, sin volver a sincronizar entre baja y consulta.              |
+| Opciones de grupo                         | Capacidad y ocupación; nombres durante la ventana; respuesta sin correos.                                                                             | Casos aprobados en SQL.                                                              |
+| Actualización `0029 → 0030` y API local   | Conservar una matrícula previa inconsistente sin darle acceso. El alumno autorizado ve su curso y las consultas sin sesión quedan vacías.             | Actualización y consultas HTTP aprobadas con sesiones sintéticas y datos temporales. |
+| Comprobaciones de aplicación              | Lint, tipos, pruebas unitarias y compilación sin errores.                                                                                             | ESLint, TypeScript, 8 pruebas Vitest y build de Next.js con Turbopack aprobados.     |
+| Rutas de la aplicación sin sesión         | Docente y alumno son redirigidos al login.                                                                                                            | Las dos rutas respondieron con HTTP 307 y destino `/login` usando el build local.    |
 
 **Pendientes**. OAuth real y recorridos visuales docente/alumno quedan por ejecutar con las credenciales Google de desarrollo. Los datos y sesiones sintéticos comprueban la base y la API, pero no el intercambio de código con Google. El responsable de Supabase debe verificar los proveedores del entorno desplegado antes de aplicar la migración allí. El ciclo completo de incorporación queda en BASE-06 #15 y la consulta de notas históricas queda en EVA-04 #27. El inventario BASE-01 conserva su carácter histórico.
 
