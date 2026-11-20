@@ -515,3 +515,39 @@ La suite separada `test:db --pending` sigue fallando por el adaptador de consult
 **Revisión de Sourcery en el PR #65.** Tras aplicar la versión revisada de `0046` desde una instalación limpia, la suite SQL regular aprobó la comprobación de `TRUNCATE` para el rol autenticado y la lectura de destinatarios históricos limitada al docente del curso. Se probó además la actualización desde `0045` con el curso sintético. En Chromium se interrumpió un guardado y se conservó el borrador. Al corregir el valor inválido desapareció el aviso. Dos pestañas reprodujeron una revisión obsoleta y la actualización mostró la nota confirmada más reciente sin perder el borrador. La tabla mostró a ambos destinatarios originales aunque uno ya pertenecía a otro grupo. Pasaron lint, tipos y las 20 pruebas unitarias.
 
 La transición entre versiones requiere coordinar la activación de la aplicación con la migración y pausar los guardados de Notas durante el cambio. El procedimiento está documentado en el [quickstart de EVA-01](../../../specs/005-notas-grupales/quickstart.md#despliegue-coordinado-de-0046). Se comprobó en Supabase aislado. La ventana de despliegue real queda pendiente.
+
+## EVA-03 #26 · Matriz docente de notas y pendientes
+
+**Fecha** 2026-11-20 · **Base** `develop` `c23ba0f` · **Rama** `feature/EVA-03-matriz-notas-docente` · **Migración nueva** ninguna (`Opción A`, reutiliza las RPC de `0044`–`0046`) · **Entorno** Supabase local aislado en Docker (`0001`–`0047`), Node 22.18.0, Next.js 16.3.0 (`pnpm build` + `pnpm start`) y Chrome headless (`1280×800` y `375×812`) con datos sintéticos `@example.test`.
+
+### Recorrido y representación docente actualizada
+
+```text
+/teacher ──▶ Notas (/teacher/grades?period=...&course=...)
+  ├── Carga con loading.tsx (ModuleLoading) y alerta role="alert" + enlace de recarga si falla list_group_grades_with_participants
+  ├── Gestionar Evaluaciones (EvaluationManagerDialog accesible: role="dialog", Esc, fechas America/Lima)
+  │     └── Alta/eliminación sin notas + set_activity_performed_at + ActivityDateCorrection (conservado)
+  ├── Barra de resumen y filtros (GroupGradesTable)
+  │     ├── Progreso en vivo (X calificados · Y pendientes, sin fecha y bloqueadas) + regla visible vacío ≠ 0
+  │     ├── Filtro rápido por evaluación (Todas / T1 / T2 / ...) y descarga local XLSX (pendientes como "")
+  │     └── Región global role="status" anunciando confirmación solo tras respuesta exitosa del servidor
+  └── Matriz Grupos × Evaluaciones (inputs neutros sin semáforos, badges textuales de estado)
+        ├── Columna de grupo: integrantes únicamente active; separados de destinatarios históricos
+        ├── Encabezado de evaluación: fecha America/Lima o badge «Sin fecha de realización» + alerta de padrón unknown
+        ├── Estados textuales: Pendiente | Calificada (incluye 0) | Corregida · rev. N | Bloqueada · sin verificar | Sin fecha | Padrón por verificar
+        ├── Destinatarios: «Destinatarios previstos (N)» antes de guardar → «Destinatarios históricos (N)» tras confirmar (router.refresh)
+        └── Guardado seguro (inFlightRef + Enter/Esc/blur) y diálogo de corrección con motivo obligatorio abierto hasta confirmar o recuperar error
+```
+
+### Comprobaciones ejecutadas
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Pruebas unitarias (`grade-matrix.test.ts`) | Validación `0–20` (máx. 2 decimales, `0` vs vacío), formato `America/Lima`, resolución de destinatarios históricos y alerta `unknown`, clasificación textual de estados, resumen de progreso y formato Excel `""` en pendientes. | 5/5 bloques de prueba aprobados en Vitest (`8` archivos / `31` pruebas totales). |
+| `E1–E4` y `E13` en navegador local (`1280×800`) | Curso, periodo y fechas `America/Lima` visibles sin abrir modal; `T3` sin fecha y `T4` con historial `unknown` advertidos; integrantes actuales excluyen `inactive` y trasladados; destinatarios previstos antes de guardar y destinatarios históricos (`2`) inmediatos tras guardar `15.75` sin F5 manual. | Aprobado con datos sintéticos `@example.test`. |
+| `E5–E8` y `E12` (cero, decimales, corrección, bloqueo) | `0` explícito queda `Calificada` distinto de `Pendiente`; `20.01` y `12.345` conservan borrador con `role="alert"`, «Reintentar» y «Descartar»; corrección exige motivo no vacío y pasa a `Corregida · rev. 2`; vaciar nota o cancelar restaura valor vigente; nota legacy `rev=0` queda `readOnly` con `Bloqueada · sin verificar`. | Aprobado en Chrome local. |
+| `E9–E11` (doble envío, conflicto y fallo de red) | `Enter` seguido de `blur` dispara exactamente `1` petición `POST`; conflicto concurrente entre dos pestañas mantiene abierto el diálogo con alerta, conserva el motivo y actualiza nota vigente (`16` → `17`); fallo de red simulado en celda y en diálogo conserva nota y motivo con «Reintentar» y nunca anuncia éxito falso. | Aprobado interceptando acciones `POST` y usando dos pestañas concurrentes. |
+| `E14–E16` (filtros, XLSX, teclado y móvil `375px`) | Filtro `Todas / T2` y resumen se actualizan tras guardar; `.xlsx` exporta solo confirmadas dejando pendientes como `""` y omitiendo borradores sin guardar; `Esc` descarta borrador y cierra `EvaluationManagerDialog` (`role="dialog"`, `aria-modal="true"`); vista `375×812` sin desbordamiento horizontal del documento. | Aprobado; sin errores de consola ni regresiones visuales en las capturas revisadas. |
+| Comprobaciones de aplicación | Lint, generación de tipos, TypeScript y build de producción sin errores. | `pnpm lint`, `pnpm typecheck` (`tsc --noEmit`) y `pnpm build` aprobados después del último cambio. |
+
+**Dimensiones verificadas y pendientes:** se verificaron **implementación en código**, **descubrimiento** (entrada desde `/teacher` → *Notas*), **funcionamiento visible** (`E1–E16` sobre `next start` + Supabase Docker local) y **usabilidad básica / accesibilidad** (roles `dialog`, `alert`, `status`, `scope`, foco visible, teclado `Enter`/`Esc` y móvil `375×812`). Quedan fuera de alcance la consulta del alumno (`EVA-04 #27` y `EVA-05 #28`), el recorrido integral M2 (`EVA-06 #29`), la recuperación multi-módulo o entre sesiones (`EVA-07 #30`), la exportación individual ajustada (`EXP-03 #40`), la auditoría formal completa de usabilidad/accesibilidad (`QA-01 #42`) y la revisión independiente en PR por `@fabrizio25504` (R4).

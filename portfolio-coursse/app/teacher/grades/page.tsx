@@ -167,12 +167,16 @@ export default async function GradesPage({
             const enrollments = (Array.isArray(group.course_students)
                 ? group.course_students
                 : []) as unknown as RawEnrollment[];
-            const members = enrollments.flatMap((e) => {
-                const s = Array.isArray(e.authorized_students)
-                    ? e.authorized_students[0]
-                    : e.authorized_students;
-                return s ? [{ full_name: s.full_name, email: s.email }] : [];
-            });
+            const members = enrollments
+                .filter((e) => e.status === "active")
+                .flatMap((e) => {
+                    const s = Array.isArray(e.authorized_students)
+                        ? e.authorized_students[0]
+                        : e.authorized_students;
+                    return s
+                        ? [{ full_name: s.full_name, email: s.email }]
+                        : [];
+                });
 
             return {
                 id: group.id,
@@ -237,9 +241,30 @@ export default async function GradesPage({
                             />
                         </div>
                         {gradesUnavailable ? (
-                            <p role="status" className="glass rounded-3xl border border-border p-6 text-muted">
-                                No se pudieron cargar las notas. Recarga la página para intentarlo de nuevo.
-                            </p>
+                            <div
+                                role="alert"
+                                className="glass flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-danger/30 bg-danger-soft/70 p-6 text-sm text-danger"
+                            >
+                                <p>
+                                    No se pudieron cargar las notas. Recarga la
+                                    página para intentarlo de nuevo.
+                                </p>
+                                <a
+                                    href={`/teacher/grades?${new URLSearchParams(
+                                        {
+                                            ...(selectedPeriod
+                                                ? {
+                                                      period: selectedPeriod.public_id,
+                                                  }
+                                                : {}),
+                                            course: selectedCourse.public_id,
+                                        },
+                                    ).toString()}`}
+                                    className="inline-flex min-h-10 items-center rounded-xl border border-danger/40 bg-surface px-4 py-2 font-medium text-foreground transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                                >
+                                    Recargar página
+                                </a>
+                            </div>
                         ) : (
                             <GroupGradesTable
                                 key={selectedCourse.id}
@@ -247,6 +272,10 @@ export default async function GradesPage({
                                 courseName={selectedCourse.name}
                                 groups={groupsData}
                                 evaluations={evaluations}
+                                participantsByEvaluation={
+                                    participantsByEvaluation
+                                }
+                                studentNames={studentNames}
                             />
                         )}
                     </div>

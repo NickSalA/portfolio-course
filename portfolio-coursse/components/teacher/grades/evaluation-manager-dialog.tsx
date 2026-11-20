@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { ActivityDateCorrection } from "./activity-date-correction";
 import {
     addEvaluationAction,
     deleteEvaluationAction,
     setEvaluationOccurrenceAction,
 } from "@/app/teacher/grades/actions";
+import { formatActivityDateLima } from "@/lib/teacher/grade-matrix";
 
 type Evaluation = {
     id: number;
@@ -104,6 +105,30 @@ export function EvaluationManagerDialog({
     const [name, setName] = useState("");
     const [error, setError] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
+    const titleId = useId();
+    const descriptionId = useId();
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const dialogCardRef = useRef<HTMLDivElement>(null);
+
+    function closeDialog() {
+        setIsOpen(false);
+        triggerRef.current?.focus();
+    }
+
+    useEffect(() => {
+        if (!isOpen) return;
+        dialogCardRef.current?.focus();
+
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === "Escape") {
+                setIsOpen(false);
+                triggerRef.current?.focus();
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [isOpen]);
 
     function handleAdd(e: React.FormEvent) {
         e.preventDefault();
@@ -127,7 +152,7 @@ export function EvaluationManagerDialog({
     function handleDelete(evaluationPublicId: string) {
         if (
             !confirm(
-                "¿Seguro que deseas eliminar esta evaluación? Las notas asociadas se perderán.",
+                "¿Seguro que deseas eliminar esta evaluación sin notas confirmadas?",
             )
         ) {
             return;
@@ -148,11 +173,13 @@ export function EvaluationManagerDialog({
     return (
         <>
             <button
+                ref={triggerRef}
                 type="button"
                 onClick={() => setIsOpen(true)}
-                className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-accent hover:text-accent"
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-accent hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
                 <svg
+                    aria-hidden="true"
                     className="h-4 w-4"
                     fill="none"
                     stroke="currentColor"
@@ -175,28 +202,50 @@ export function EvaluationManagerDialog({
             </button>
 
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-                    <div className="glass w-full max-w-md rounded-3xl border border-white/20 bg-background p-6 shadow-2xl">
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs"
+                    onClick={(event) => {
+                        if (event.target === event.currentTarget) {
+                            closeDialog();
+                        }
+                    }}
+                >
+                    <div
+                        ref={dialogCardRef}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby={titleId}
+                        aria-describedby={descriptionId}
+                        tabIndex={-1}
+                        className="glass w-full max-w-md rounded-3xl border border-white/20 bg-background p-6 shadow-2xl focus:outline-none"
+                    >
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold">
+                            <h3 id={titleId} className="text-lg font-semibold">
                                 Evaluaciones del curso
                             </h3>
                             <button
                                 type="button"
-                                onClick={() => setIsOpen(false)}
-                                className="rounded-lg p-1.5 text-muted hover:bg-surface-muted hover:text-foreground"
+                                aria-label="Cerrar gestión de evaluaciones"
+                                onClick={closeDialog}
+                                className="min-h-9 min-w-9 rounded-lg p-1.5 text-muted hover:bg-surface-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                             >
                                 ✕
                             </button>
                         </div>
 
-                        <p className="mt-2 text-sm text-muted">
+                        <p
+                            id={descriptionId}
+                            className="mt-2 text-sm text-muted"
+                        >
                             Agrega o elimina las evaluaciones del curso (ej. T1,
                             T2, Parcial, etc.).
                         </p>
 
                         {error && (
-                            <div className="mt-3 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400">
+                            <div
+                                role="alert"
+                                className="mt-3 rounded-xl border border-danger/30 bg-danger-soft/70 p-3 text-xs font-medium text-danger"
+                            >
                                 {error}
                             </div>
                         )}
@@ -262,7 +311,9 @@ export function EvaluationManagerDialog({
                                                             ev.performed_at
                                                         }
                                                     >
-                                                        {ev.performed_at}
+                                                        {formatActivityDateLima(
+                                                            ev.performed_at,
+                                                        ) ?? ev.performed_at}
                                                     </time>
                                                 </p>
                                                 <ActivityDateCorrection
@@ -358,8 +409,8 @@ export function EvaluationManagerDialog({
                         <div className="mt-6 flex justify-end">
                             <button
                                 type="button"
-                                onClick={() => setIsOpen(false)}
-                                className="rounded-xl border border-border px-4 py-2 text-sm font-medium hover:bg-surface-muted"
+                                onClick={closeDialog}
+                                className="min-h-10 rounded-xl border border-border px-4 py-2 text-sm font-medium hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                             >
                                 Cerrar
                             </button>
