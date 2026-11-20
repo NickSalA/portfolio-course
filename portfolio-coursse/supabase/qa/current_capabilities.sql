@@ -230,8 +230,8 @@ begin
   if voided_movement.is_voided is distinct from true then
     raise exception 'FAIL: voided movement was not kept';
   end if;
-  if (to_jsonb(voided_movement) - 'is_voided') is distinct from
-     (to_jsonb(original_movement) - 'is_voided') then
+  if (to_jsonb(voided_movement) - array['is_voided', 'voided_by', 'voided_at', 'void_reason']) is distinct from
+     (to_jsonb(original_movement) - array['is_voided', 'voided_by', 'voided_at', 'void_reason']) then
     raise exception 'FAIL: void changed original movement fields';
   end if;
   if (select sum(points) from public.point_transactions
@@ -246,6 +246,93 @@ begin
   end;
 end $$;
 \echo 'PASS EVA-02: void is non-destructive and idempotent; zero points rejected'
+
+-- EVA-02: snapshot all grades and existing movements as fixture owner, not through
+-- the actor's RLS-filtered view. Include another student's nonempty balance.
+reset role;
+insert into public.point_transactions (authorized_student_id, points, reason, created_by)
+values (:auth_s2_id, 4, 'QA classmate baseline', :teacher_a);
+insert into public.authorized_students (course_id, email, full_name)
+values (:course_a_id, 'qa-before-login@example.test', 'QA Before Login')
+returning id as auth_before_login_id \gset
+select set_config('qa.auth_before_login_id', :'auth_before_login_id', true),
+       set_config('qa.auth_s4_id', :'auth_s4_id', true) \g /dev/null
+create temporary table qa_grades_before on commit drop as select * from public.group_grades;
+create temporary table qa_points_before on commit drop as select * from public.point_transactions;
+
+do $$
+begin
+  if exists (select 1 from auth.users where email = 'qa-before-login@example.test')
+     or exists (select 1 from public.course_students
+                where authorized_student_id = current_setting('qa.auth_before_login_id')::bigint) then
+    raise exception 'FAIL: before-login recipient already has a user or enrollment';
+  end if;
+end $$;
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true);
+do $$
+begin
+  insert into public.point_transactions (authorized_student_id, points, reason, created_by)
+  values (current_setting('qa.auth_before_login_id')::bigint, 2, 'QA before login', auth.uid());
+  if (select count(*) from public.point_transactions
+      where authorized_student_id = current_setting('qa.auth_before_login_id')::bigint
+        and points = 2 and reason = 'QA before login' and created_by = auth.uid() and not is_voided) <> 1 then
+    raise exception 'FAIL: teacher cannot read the individual movement registered before login';
+  end if;
+  begin
+    insert into public.point_transactions (authorized_student_id, points, reason, created_by)
+    values (current_setting('qa.auth_s4_id')::bigint, 2, 'QA foreign course', auth.uid());
+    raise exception 'FAIL: teacher registered points in another course';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into public.point_transactions (authorized_student_id, points, reason, created_by)
+    values (current_setting('qa.auth_s1_id')::bigint, 2, 'QA forged author', current_setting('qa.teacher_b')::uuid);
+    raise exception 'FAIL: teacher registered points with a forged author';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+select set_config('request.jwt.claim.sub', current_setting('qa.teacher_b'), true);
+do $$
+begin
+  begin
+    insert into public.point_transactions (authorized_student_id, points, reason, created_by)
+    values (current_setting('qa.auth_before_login_id')::bigint, 2, 'QA foreign teacher', auth.uid());
+    raise exception 'FAIL: foreign teacher registered points';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+select set_config('request.jwt.claim.sub', 'f4000000-0000-4000-8000-000000000004', true);
+do $$
+begin
+  begin
+    insert into public.point_transactions (authorized_student_id, points, reason, created_by)
+    values (current_setting('qa.auth_s1_id')::bigint, 2, 'QA student insert', auth.uid());
+    raise exception 'FAIL: student registered points';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+do $$
+begin
+  if exists ((select * from public.group_grades except all select * from qa_grades_before)
+             union all (select * from qa_grades_before except all select * from public.group_grades)) then
+    raise exception 'FAIL: registering points changed group grades';
+  end if;
+  if exists ((select * from public.point_transactions
+              where authorized_student_id <> current_setting('qa.auth_before_login_id')::bigint
+              except all select * from qa_points_before)
+             union all (select * from qa_points_before except all
+                        select * from public.point_transactions
+                        where authorized_student_id <> current_setting('qa.auth_before_login_id')::bigint))
+     or (select count(*) from public.point_transactions
+         where authorized_student_id = current_setting('qa.auth_before_login_id')::bigint) <> 1 then
+    raise exception 'FAIL: individual registration changed other students movements or created extra movements';
+  end if;
+end $$;
+\echo 'PASS EVA-02: individual points before first login; grades and other movements unchanged; unauthorized inserts denied'
+set local role authenticated;
 
 -- GRP-05: closed window, full group, foreign group, reopened window.
 select set_config('request.jwt.claim.sub', 'f4000000-0000-4000-8000-000000000004', true);

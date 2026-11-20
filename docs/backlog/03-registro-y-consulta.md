@@ -23,7 +23,7 @@
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#5-puntos-y-correcciones). Conservar saldo derivado y anulación autorizada; completar trazabilidad de anulación/reemplazo y comprobar titularidad/contexto. Los anulados se ocultan de los historiales revisados.
 
-**Rol:** R1 · **Revisor:** R3 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** BASE-06
+**Rol:** R1 · **Revisor:** R3 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Dependencia:** BASE-06 (issue #15 cerrada en GitHub; seguimiento local pendiente de sincronizar)
 
 **GitHub:** [#25](https://github.com/NickSalA/portfolio-course/issues/25) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
 
@@ -33,7 +33,11 @@
 
 **Aceptación:** el docente gestiona movimientos de sus alumnos y corrige sin borrado de historia; exportar no se introduce como una operación que descuente saldo.
 
-**Documentación:** movimientos incluidos/excluidos del saldo y pruebas; decisiones pendientes de cálculo se cierran en EXP-01.
+**Documentación y contraste local:** la migración `0037` conserva el movimiento anulado y registra responsable, fecha y motivo cuando están disponibles; los movimientos antiguos no permiten reconstruir esos datos. El historial docente identifica anulaciones; el saldo y la exportación incluyen solo movimientos no anulados. La anulación seguida de un ajuste conserva ambos movimientos, pero no los vincula como reemplazo. Las acciones contrastan curso y periodo con el recurso. La recuperación idempotente y conflictos de reintento siguen en EVA-07; la consulta estudiantil y su recorrido corresponden a EVA-04–06, y las decisiones de cálculo a EXP-01.
+
+**Evidencia:** el usuario ejecutó `DOCKER_HOST=unix:///run/docker.sock pnpm test:db` en la instancia local con la migración `0037` aplicada. Pasaron las cinco suites, incluidos `current_capabilities.sql` y `eva_02_point_audit.sql`: los escenarios comprueban titularidad, contexto, anulación y no interferencia con notas y movimientos ajenos; los datos sintéticos se revierten. El usuario informó que la suite volvió a pasar tras aplicar `0038`, que el recorrido propuesto funciona y que el estudiante puede ver los puntos actualizados; no detalló los resultados de cada paso visual. También pasaron `pnpm typecheck`, `pnpm test` (13 pruebas) y `pnpm lint` en la revisión de implementación.
+
+**Condición de la ejecución y pendientes:** la primera ejecución de la suite completa falló en BASE-05 porque `anon` tenía permisos directos de ejecución en tres RPC de importación. El usuario recibió instrucciones para revocarlos manualmente y la ejecución posterior pasó; la salida compartida no incluye el resultado de los `REVOKE`. La migración `0038` versiona la revocación explícita; queda pendiente verificarla en una base nueva para BASE-05. No se debe asumir que otras bases estén corregidas. Quedan pendientes detallar la evidencia de cada paso del recorrido docente y confirmar la exportación repetida sin mutación (EVA-06/EXP-04). BASE-06 #15 figura cerrada en GitHub; su ficha local aún figura en Backlog y requiere sincronización. No se declara aceptada EVA-02 ni se ha actualizado la issue de GitHub.
 
 ### EVA-03 · Completar la matriz docente de notas y pendientes
 

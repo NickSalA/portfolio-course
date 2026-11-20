@@ -7,21 +7,24 @@ import { getTeacherContext } from "@/lib/teacher/get-context";
 export default async function PointsPage({
 	searchParams,
 }: {
-	searchParams: Promise<{ period?: string; course?: string }>;
+	searchParams: Promise<{ period?: string; course?: string; error?: string }>;
 }) {
-	const { period: requestedPeriod, course: requestedCourse } =
-		await searchParams;
+	const {
+		period: requestedPeriod,
+		course: requestedCourse,
+		error,
+	} = await searchParams;
 	const { supabase, user, selectedPeriod } = await getTeacherContext({
 		requestedPeriodPublicId: requestedPeriod,
 	});
 	const { data: courses } = selectedPeriod
 		? await supabase
-				.from("courses")
-				.select("id, public_id, name")
-				.eq("teacher_id", user.id)
-				.eq("period_id", selectedPeriod.id)
-				.eq("active", true)
-				.order("name")
+			  .from("courses")
+			  .select("id, public_id, name")
+			  .eq("teacher_id", user.id)
+			  .eq("period_id", selectedPeriod.id)
+			  .eq("active", true)
+			  .order("name")
 		: { data: [] };
 	const selectedCourse =
 		(courses ?? []).find(
@@ -29,13 +32,13 @@ export default async function PointsPage({
 		) ?? null;
 	const { data: students } = selectedCourse
 		? await supabase
-				.from("authorized_students")
-				.select(
-					"id, full_name, email, point_transactions(id, points, reason, created_at, is_voided)",
-				)
-				.eq("course_id", selectedCourse.id)
-				.eq("status", "active")
-				.order("full_name")
+			  .from("authorized_students")
+			  .select(
+				  "id, full_name, email, point_transactions(id, points, reason, created_at, is_voided, voided_at, voided_by, void_reason)",
+			  )
+			  .eq("course_id", selectedCourse.id)
+			  .eq("status", "active")
+			  .order("full_name")
 		: { data: [] };
 	return (
 		<main className="px-5 py-8 sm:px-8 sm:py-10">
@@ -60,6 +63,15 @@ export default async function PointsPage({
 						)
 					}
 				/>
+				{error === "transaction" && (
+					<p
+						role="alert"
+						className="mt-6 rounded-xl border border-danger bg-surface px-4 py-3 text-sm text-danger"
+					>
+						No se pudo registrar o anular el movimiento. Comprueba
+						los datos e inténtalo de nuevo.
+					</p>
+				)}
 				{selectedPeriod && (
 					<div className="mt-6">
 						<CourseContextSwitcher

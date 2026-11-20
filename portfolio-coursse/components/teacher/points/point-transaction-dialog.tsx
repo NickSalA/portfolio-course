@@ -11,6 +11,9 @@ type Transaction = {
 	points: number;
 	reason: string | null;
 	created_at: string;
+	voided_at: string | null;
+	voided_by: string | null;
+	void_reason: string | null;
 };
 
 function movementDate(value: string) {
@@ -153,13 +156,23 @@ export function PointTransactionDialog({
 								{student.transactions.length} movimientos
 							</p>
 						</div>
+						<p className="mt-2 text-xs text-muted">
+							Los movimientos anulados se conservan en el
+							historial, pero no cuentan en el saldo ni en la
+							exportación.
+						</p>
 						<div className="mt-3 max-h-64 divide-y divide-border overflow-y-auto rounded-xl border border-border bg-surface-muted/40">
-							{student.transactions.map((transaction, index) => (
+							{student.transactions.map((transaction) => (
 								<div
-									key={`${transaction.created_at}-${index}`}
+									key={transaction.id}
 									className="flex items-start justify-between gap-4 px-4 py-3"
 								>
 									<div>
+										{transaction.is_voided && (
+											<p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
+												Anulado · no cuenta en el saldo
+											</p>
+										)}
 										<p className="text-sm">
 											{transaction.reason || "Sin motivo"}
 										</p>
@@ -168,18 +181,29 @@ export function PointTransactionDialog({
 												transaction.created_at,
 											)}
 										</p>
+										{transaction.is_voided && (
+											<div className="mt-2 space-y-1 text-xs text-muted">
+												<p>Fecha de anulación: {transaction.voided_at ? movementDate(transaction.voided_at) : "No disponible"}</p>
+												<p className="break-all">Responsable (ID): {transaction.voided_by ?? "No disponible"}</p>
+												<p className="break-words">Motivo de anulación: {transaction.void_reason || "No disponible"}</p>
+											</div>
+										)}
 									</div>
 									<div className="flex items-center gap-3">
-										<VoidPointTransactionButton
-											transactionId={transaction.id}
-											course={course}
-											period={period}
-										/>
+										{!transaction.is_voided && (
+											<VoidPointTransactionButton
+												transactionId={transaction.id}
+												course={course}
+												period={period}
+											/>
+										)}
 										<p
 											className={
-												transaction.points > 0
-													? "font-semibold tabular-nums text-accent"
-													: "font-semibold tabular-nums text-danger"
+												transaction.is_voided
+													? "font-semibold tabular-nums text-muted line-through"
+													: transaction.points > 0
+													  ? "font-semibold tabular-nums text-accent"
+													  : "font-semibold tabular-nums text-danger"
 											}
 										>
 											{transaction.points > 0

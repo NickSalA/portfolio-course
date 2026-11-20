@@ -41,6 +41,7 @@ try {
         ? ["pending_requirements.sql"]
         : [
               "current_capabilities.sql",
+              "eva_02_point_audit.sql",
               "group_grades_rls.sql",
               "base_04_courses_periods.sql",
               "base_05_import_students.sql",

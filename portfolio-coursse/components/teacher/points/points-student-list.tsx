@@ -10,6 +10,9 @@ type Transaction = {
 	points: number;
 	reason: string | null;
 	created_at: string;
+	voided_at: string | null;
+	voided_by: string | null;
+	void_reason: string | null;
 };
 type Student = {
 	id: number;
@@ -76,11 +79,13 @@ export function PointsStudentList({
 				</div>
 				<div className="divide-y divide-border">
 					{visibleStudents.map((student) => {
-						const transactions = (
-							student.point_transactions ?? []
-						).filter((transaction) => !transaction.is_voided);
+						const transactions = student.point_transactions ?? [];
 						const balance = transactions.reduce(
-							(total, transaction) => total + transaction.points,
+							(total, transaction) =>
+								total +
+								(transaction.is_voided
+									? 0
+									: transaction.points),
 							0,
 						);
 						return (
