@@ -4,7 +4,8 @@ import { hasAcademicIdentity } from "@/lib/academic/authorize-current-user";
 import { getStudentDashboard } from "@/lib/student/get-dashboard";
 import { createClient } from "@/lib/supabase/server";
 
-const groupMessages: Record<string, string> = {
+const studentMessages: Record<string, string> = {
+	forbidden: "Tu cuenta no tiene permisos para acceder al panel docente.",
 	group: "No se pudo seleccionar ese grupo. Inténtalo nuevamente.",
 	"group-full": "Ese grupo acaba de llenarse. Elige otro disponible.",
 	"group-closed": "La ventana de selección de grupos está cerrada.",
@@ -32,7 +33,10 @@ export default async function StudentPage({
 		.maybeSingle();
 	if (profile?.role === "teacher") redirect("/teacher");
 
-	const enrollments = await getStudentDashboard(supabase, user.id);
+	const { enrollments, error: dashboardError } = await getStudentDashboard(
+		supabase,
+		user.id,
+	);
 	const displayName = profile?.full_name ?? user.email;
 	const greetingName = profile?.full_name?.split(" ")[0] ?? "estudiante";
 
@@ -40,8 +44,9 @@ export default async function StudentPage({
 		<StudentDashboard
 			displayName={displayName}
 			greetingName={greetingName}
-			groupMessage={errorCode ? groupMessages[errorCode] : null}
+			statusMessage={errorCode ? studentMessages[errorCode] ?? null : null}
 			groupUpdated={Boolean(selectedGroup)}
+			dashboardError={dashboardError}
 			enrollments={enrollments}
 		/>
 	);

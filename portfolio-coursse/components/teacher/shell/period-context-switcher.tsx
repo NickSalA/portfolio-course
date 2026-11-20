@@ -27,6 +27,7 @@ export function PeriodContextSwitcher({
 	function selectPeriod(publicId: string) {
 		const params = new URLSearchParams(searchParams.toString());
 		params.delete("refresh");
+		params.delete("course");
 		params.set("period", publicId);
 		router.push(`${pathname}?${params.toString()}`);
 	}
@@ -41,6 +42,7 @@ export function PeriodContextSwitcher({
 		<label className="flex items-center gap-2 text-sm text-muted">
 			<span className="hidden sm:inline">Periodo</span>
 			<select
+				aria-label="Periodo académico"
 				value={selectedPublicId}
 				onChange={(event) => selectPeriod(event.target.value)}
 				className="max-w-52 rounded-lg border border-border bg-surface-muted px-3 py-2 font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent"

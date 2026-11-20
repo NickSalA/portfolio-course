@@ -86,6 +86,43 @@ Este documento registra evidencia ejecutada para la Parte II. Una capacidad pres
 
 **Regresiones y pendientes**. Pasaron por separado las suites de capacidades, RLS de notas, BASE-04, BASE-06 y GRP-02. El runner completo se detiene en la aserción `anonymous RPC grant` de BASE-05, tanto en la base `0038` como con `0039`. La suite de requisitos pendientes conserva la nota 12 al reducir grupos y sigue esperando los adaptadores de GRP-06 #23 y EVA-04 #27. La coordinación de cupos preasignados queda en GRP-03 #20. El inventario BASE-01 sigue siendo evidencia histórica.
 
+## BASE-07 #16 · Experiencia de acceso y contexto académico
+
+**Fecha** 2026-11-20 · **Base** `develop` `030b34c` · **Rama** `feature/BASE-07-experiencia-acceso` · **Entorno** Supabase local aislado en Docker (migraciones `0001`–`0043`, periodo sintético `2026-II`), Node 22.18.0, Next.js 16.3.0 y Chrome headless (Playwright) con identidades sintéticas `@example.test`.
+
+### Recorrido y representación actualizada
+
+```text
+/ (inicio) ──▶ /login (LoginCard: errores oauth / authorization / unauthorized)
+                  │
+                  ▼ /auth/callback (authorizeCurrentUser)
+          ┌───────┴───────┐
+          ▼               ▼
+   /student             /teacher (sidebar: ?period & ?course en Alumnos/Puntos/Notas;
+   (loading.tsx,         Periodos/Ajustes/Cerrar sesión visibles en escritorio y móvil)
+    error.tsx,            ├── /teacher/courses/[id] (muestra periodo real del curso)
+    alerta forbidden,     ├── /teacher/students · /points · /grades
+    distingue error       ├── /teacher/periods · /settings
+    de lista vacía)       └── not-found.tsx / error.tsx (404 neutro en español)
+```
+
+### Comprobaciones ejecutadas
+
+| Recorrido | Esperado | Observado |
+| --- | --- | --- |
+| A1–A2 · Visitante y rutas protegidas | Acceso a `/login`; `/teacher`, `/teacher/grades` y `/student` sin sesión redirigen a `/login`. | Aprobado en Chrome local. |
+| A3 · Ingreso real con Google (sin padrón y docente) | Cuenta sin padrón rechazada en `/login?error=unauthorized`; tras asignar `role = teacher` en Supabase local, accede a `/teacher`. | Aprobado manualmente en entorno local con Google OAuth (`CLIENT_ID` y `CLIENT_SECRET` de desarrollo; sin registrar correos personales). |
+| A5 · Retorno OAuth sin código | Redirección a `/login?error=oauth` con alerta en español. | Aprobado (`No se pudo completar el inicio de sesión con Google.`). |
+| A6–A8 · Contexto docente y detalle de curso | Nombre, rol, periodo y curso visibles; `?period=` y `?course=` se conservan entre módulos y el detalle muestra el periodo real del curso. | Aprobado tras corregir `teacher-sidebar.tsx`, `period-context-switcher.tsx` y `courses/[coursePublicId]/page.tsx`. |
+| A9–A10, A19 · Curso ajeno, inexistente y ruta `/teacher/groups` | Estado neutro «Este recurso no está disponible» sin revelar cursos ajenos ni mostrar placeholder engañoso. | Aprobado (`teacher/not-found.tsx` idéntico para curso ajeno e inexistente; `groups` retirado del placeholder). |
+| A15–A16 · Cierre de sesión escritorio y móvil (`375×812`) | Botón visible en ambos tamaños; al cerrar sesión, volver a `/teacher` o `/student` exige login. | Aprobado tras habilitar `SignOutButton`, Periodos y Ajustes en vista móvil. |
+| A11–A12, A14 · Panel del alumno y acceso prohibido | Curso y periodo visibles; `/teacher` como alumno muestra alerta `forbidden`; cuenta sin padrón ve estado vacío honesto. | Aprobado en Chrome local (`student-dashboard.tsx`, `app/student/page.tsx`). |
+| Consulta del alumno con fallo (Vitest) | Distinguir fallo de consulta/RPC (`query-failed`) de ausencia de cursos; no ocultar fallos como lista vacía. | Aprobado en 4 pruebas unitarias simuladas (`get-student-dashboard.test.ts`). |
+| Teclado en `/login` | Orden lógico de Tab hacia botón de Google y foco visible. | Comprobado (`Tab` recorre tema → «Continuar con Google»). |
+| Comprobaciones técnicas y BD | Lint, tipos, Vitest, build y suites SQL locales sin errores. | `pnpm lint`, `pnpm typecheck`, `pnpm test` (6 archivos / 20 pruebas), `pnpm build` y `pnpm test:db` (8 suites) aprobados. |
+
+**Dimensiones verificadas y límites:** se comprobó **implementación en código**, **descubrimiento** desde la navegación de cada rol y **funcionamiento visible** tanto con sesiones sintéticas en Chrome (`1280×800` y `375×812`) como con inicio de sesión real de Google OAuth en local (rechazo sin padrón y acceso docente tras asignar rol en Studio local). No se automatizaron pruebas de `error.tsx` ante un fallo de runtime ni una auditoría integral de accesibilidad (seguimiento en `QA-01 #42`). El retorno a `next` tras sesión vencida (`H14`) queda pendiente de decisión con R1, y la verificación de OAuth desplegado corresponde a producción/BASE-03. No se modificaron RLS ni migraciones.
+
 ## EXP-01 #38: decisiones y evidencia documental
 
 **Fuente y revisión:** R1 se identificó en la conversación como @NickSalA y confirmó las reglas de [EXP-01](../../backlog/05-exportacion.md); comunicó que R3 las revisó y aceptó, y que la revisión completa se realizará en el PR. Es un reporte de R1, no una aprobación independiente comprobada en GitHub; no se dispone aquí de fecha ni comentario de R3. El profesor no confirmó la fórmula. Seguimiento actualizado en archivos locales únicamente; GitHub no se modificó.

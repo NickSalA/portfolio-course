@@ -34,7 +34,7 @@ export default async function TeacherLayout({
 						<ThemeToggle />
 					</div>
 				</header>
-				<div id="teacher-content" className="min-w-0">
+				<div id="teacher-content" tabIndex={-1} className="min-w-0 outline-none">
 					{children}
 				</div>
 			</div>
