@@ -1,11 +1,6 @@
 import { notFound } from "next/navigation";
 
 const modules: Record<string, { title: string; description: string }> = {
-	groups: {
-		title: "Grupos",
-		description:
-			"Aquí gestionarás la capacidad y selección de grupos por curso.",
-	},
 	students: {
 		title: "Alumnos",
 		description:

@@ -134,6 +134,10 @@
 
 **Documentación:** recorrido y representación de pantallas actualizada.
 
+**Seguimiento local de implementación:** se conservó la autenticación OAuth, la autorización académica (`authorizeCurrentUser`) y el selector de periodo/curso existentes, corrigiendo únicamente las brechas comprobadas: barra móvil docente con cierre de sesión, Periodos y Ajustes; conservación de `?period=` y `?course=` entre módulos docentes; periodo visible en el detalle de curso; estados dedicados `not-found.tsx`, `error.tsx` y `student/loading.tsx` con mensajes neutros en español; distinción entre error de consulta y lista vacía en `getStudentDashboard`; alerta para `error=forbidden` en alumno; mensajes en español ante fallos OAuth/signOut; enlace de salto al contenido en alumno; y retiro de `groups` del placeholder `[module]`.
+
+**Evidencia y pendientes:** pasaron `pnpm lint`, `pnpm typecheck`, `pnpm test` (6 archivos / 20 pruebas), `pnpm build`, `pnpm test:db` (8 suites), la verificación en navegador local con identidades sintéticas y el ingreso real con Google OAuth en local (rechazo sin autorización y entrada docente tras asignar rol en Studio) (`docs/automatizaciones/gestion-evaluacion-grupal/evaluacion.md#base-07-16--experiencia-de-acceso-y-contexto-académico`). Quedan pendientes la prueba de `error.tsx` ante fallo de runtime, la revisión integral de accesibilidad (`QA-01 #42`), decidir con R1 el retorno a `next` tras sesión vencida y la comprobación en entorno desplegado. Este seguimiento se actualizó solo localmente, no en GitHub.
+
 ### BASE-08 · Preparar configuración y prueba de aviso por correo
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). No se encontró aviso académico implementado; correo de Supabase Auth no equivale al aviso de reclamos. Preparar proveedor y política de fallo/reintento sin duplicar REC-06.

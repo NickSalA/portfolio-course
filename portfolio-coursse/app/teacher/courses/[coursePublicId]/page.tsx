@@ -39,11 +39,16 @@ export default async function CoursePage({
     const { data: course } = await supabase
         .from("courses")
         .select(
-            "id, public_id, name, description, group_capacity, group_selection_opens_at, group_selection_closes_at, academic_periods(code), authorized_students(count)",
+            "id, public_id, name, description, group_capacity, group_selection_opens_at, group_selection_closes_at, academic_periods(public_id, code), authorized_students(count)",
         )
         .eq("public_id", coursePublicId)
         .maybeSingle();
     if (!course) notFound();
+    const coursePeriod = Array.isArray(course.academic_periods)
+        ? (course.academic_periods[0] ?? null)
+        : course.academic_periods;
+    const effectivePeriodPublicId =
+        coursePeriod?.public_id ?? selectedPeriod ?? "";
     const { data: groups } = await supabase
         .from("groups")
         .select(
@@ -67,7 +72,7 @@ export default async function CoursePage({
             !Array.isArray(group.course_students) ||
             !group.course_students.length,
     ).length;
-    const returnTo = `/teacher/courses/${course.public_id}${selectedPeriod ? `?period=${encodeURIComponent(selectedPeriod)}` : ""}`;
+    const returnTo = `/teacher/courses/${course.public_id}${effectivePeriodPublicId ? `?period=${encodeURIComponent(effectivePeriodPublicId)}` : ""}`;
     const opens = dateTimeForLima(course.group_selection_opens_at);
     const closes = dateTimeForLima(course.group_selection_closes_at);
     return (
@@ -82,13 +87,17 @@ export default async function CoursePage({
                 )}
                 <div>
                     <ModuleHeader
-                        eyebrow="Curso"
+                        eyebrow={
+                            coursePeriod?.code
+                                ? `Curso · ${coursePeriod.code}`
+                                : "Curso"
+                        }
                         title={
                             <span className="inline-flex items-center">
                                 {course.name}
                                 <EditCourseNameDialog
                                     coursePublicId={course.public_id}
-                                    periodPublicId={selectedPeriod ?? ""}
+                                    periodPublicId={effectivePeriodPublicId}
                                     initialName={course.name}
                                     compact
                                 />
@@ -132,13 +141,13 @@ export default async function CoursePage({
                     <CourseDetailActions
                         coursePublicId={course.public_id}
                         courseName={course.name}
-                        periodPublicId={selectedPeriod ?? ""}
+                        periodPublicId={effectivePeriodPublicId}
                     />
                 </div>
                 <div className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,.72fr)] lg:items-stretch">
                     <GroupCapacityForm
                         coursePublicId={course.public_id}
-                        period={selectedPeriod ?? ""}
+                        period={effectivePeriodPublicId}
                         returnTo={returnTo}
                         authorized={authorized}
                         initialCapacity={course.group_capacity}
@@ -160,7 +169,7 @@ export default async function CoursePage({
                             <div className="mt-5">
                                 <GroupSelectionWindowDialog
                                     coursePublicId={course.public_id}
-                                    period={selectedPeriod ?? ""}
+                                    period={effectivePeriodPublicId}
                                     returnTo={returnTo}
                                     opensDate={opens.date}
                                     opensTime={opens.time}
