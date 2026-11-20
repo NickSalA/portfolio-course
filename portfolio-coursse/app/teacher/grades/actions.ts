@@ -223,7 +223,7 @@ const gradeErrors: Record<string, string> = {
     group_grade_participants_unknown: "Hay pertenencias históricas sin verificar en el curso. Revisa los participantes de la actividad antes de guardar.",
     group_grade_participants_empty: "El grupo no tiene participantes registrados en esa fecha.",
     group_grade_legacy_unverified: "La nota anterior está bloqueada hasta verificar sus destinatarios.",
-    group_grade_conflict: "La nota cambió mientras la editabas. Recarga la página antes de reintentar.",
+    group_grade_conflict: "La nota cambió mientras la editabas. Revisa el valor confirmado antes de reintentar.",
     group_grade_reason_required: "Indica un motivo de corrección de hasta 1000 caracteres.",
     group_grade_access_denied: "No tienes permiso para guardar notas en este curso.",
     group_grade_resource_not_found: "El grupo o la evaluación no pertenece a este curso.",
@@ -260,7 +260,10 @@ export async function saveGroupGradeAction(formData: FormData) {
 
     if (error || !data) {
         const message = error?.message;
-        return { error: (message && gradeErrors[message]) || "No se pudo guardar la nota" };
+        return {
+            error: (message && gradeErrors[message]) || "No se pudo guardar la nota",
+            conflict: message === "group_grade_conflict",
+        };
     }
 
     revalidatePath("/teacher/grades");

@@ -187,4 +187,26 @@ create trigger guard_evaluation_grade_history
 before delete or update of performed_at on public.course_evaluations
 for each row execute function academic_access.guard_evaluation_grade_history();
 
+create function public.list_group_grades_with_participants(target_course_id bigint)
+returns table (group_id bigint, evaluation_id bigint, grade numeric, revision integer, participants text[])
+language sql stable security definer set search_path = ''
+as $$
+  select gg.group_id, gg.evaluation_id, gg.grade, gg.revision, roster.names
+  from public.group_grades gg
+  join public.groups g on g.id = gg.group_id
+  join public.course_evaluations e on e.id = gg.evaluation_id and e.course_id = g.course_id
+  left join lateral (
+    select array_agg(coalesce(nullif(trim(a.full_name), ''), a.email, 'Matrícula ' || cs.id)
+      order by coalesce(nullif(trim(a.full_name), ''), a.email), cs.id) names
+    from academic_access.group_grade_participants p
+    join public.course_students cs on cs.id = p.enrollment_id and cs.course_id = g.course_id
+    left join public.authorized_students a on a.id = cs.authorized_student_id and a.course_id = cs.course_id
+    where p.group_id = gg.group_id and p.evaluation_id = gg.evaluation_id
+  ) roster on gg.revision > 0
+  where g.course_id = target_course_id and public.is_teacher_of_course(target_course_id);
+$$;
+
+revoke all on function public.list_group_grades_with_participants(bigint) from public, anon;
+grant execute on function public.list_group_grades_with_participants(bigint) to authenticated;
+
 commit;

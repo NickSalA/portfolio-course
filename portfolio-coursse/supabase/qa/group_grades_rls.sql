@@ -78,6 +78,7 @@ begin
   if has_table_privilege('public.group_grades', 'INSERT')
     or has_table_privilege('public.group_grades', 'UPDATE')
     or has_table_privilege('public.group_grades', 'DELETE')
+    or has_table_privilege('public.group_grades', 'TRUNCATE')
     or has_column_privilege('public.group_grades', 'grade', 'UPDATE') then
     raise exception 'FAIL: authenticated still has direct write privileges';
   end if;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
 import { saveGroupGradeAction } from "@/app/teacher/grades/actions";
 
@@ -20,6 +21,7 @@ type GradeRecord = {
 	evaluation_id: number;
 	grade: number | null;
 	revision: number;
+	participants?: string[] | null;
 };
 
 type GroupRow = {
@@ -29,6 +31,10 @@ type GroupRow = {
 	members: GroupMember[];
 	grades: Record<number, GradeRecord>;
 };
+
+function latestGrade(server?: GradeRecord, local?: GradeRecord) {
+	return local && local.revision > (server?.revision ?? 0) ? local : server;
+}
 
 export function GroupGradesTable({
 	courseId,
@@ -53,6 +59,7 @@ export function GroupGradesTable({
 		value: string;
 	} | null>(null);
 	const dialogRef = useRef<HTMLDialogElement>(null);
+	const router = useRouter();
 	const [, startTransition] = useTransition();
 
 	function clearEdit(key: string) {
@@ -61,6 +68,11 @@ export function GroupGradesTable({
 			delete next[key];
 			return next;
 		});
+	}
+
+	function discardEdit(key: string) {
+		clearEdit(key);
+		setErrors((previous) => ({ ...previous, [key]: "" }));
 	}
 
 	function save(group: GroupRow, evaluation: Evaluation, value: string, revision: number, reason = "") {
@@ -79,11 +91,13 @@ export function GroupGradesTable({
 			try {
 				const result = await saveGroupGradeAction(form);
 				if (result.grade === undefined || result.revision === undefined) {
+					if (result.conflict) router.refresh();
 					throw new Error(result.error ?? "No se pudo confirmar el guardado.");
 				}
 				const record = { evaluation_id: evaluation.id, grade: result.grade, revision: result.revision };
 				setSavedGrades((previous) => ({ ...previous, [key]: record }));
 				setStatus((previous) => ({ ...previous, [key]: "saved" }));
+				clearEdit(key);
 			} catch (error) {
 				const message = error instanceof Error ? error.message : "No se pudo guardar la nota.";
 				setErrors((previous) => ({ ...previous, [key]: message }));
@@ -92,22 +106,30 @@ export function GroupGradesTable({
 					delete next[key];
 					return next;
 				});
-			} finally {
-				clearEdit(key);
 			}
 		});
+	}
+
+	function closeCorrection() {
+		dialogRef.current?.close();
+		setCorrection(null);
+	}
+
+	function cancelCorrection() {
+		if (correction) discardEdit(correction.key);
+		closeCorrection();
 	}
 
 	function handleBlur(group: GroupRow, evaluation: Evaluation, current?: GradeRecord) {
 		const key = `${group.id}-${evaluation.id}`;
 		const value = edits[key]?.trim();
+		if (value === undefined) return;
 		if (!value || Number(value) === current?.grade) {
-			clearEdit(key);
+			discardEdit(key);
 			return;
 		}
 		if (!/^\d+(?:\.\d{1,2}0*)?$/.test(value) || Number(value) > 20) {
 			setErrors((previous) => ({ ...previous, [key]: "Ingresa una nota de 0 a 20 con hasta dos decimales." }));
-			clearEdit(key);
 			return;
 		}
 		if (current && current.grade !== null) {
@@ -126,7 +148,7 @@ export function GroupGradesTable({
 			};
 			for (const ev of evaluations) {
 				const key = `${g.id}-${ev.id}`;
-				const grade = savedGrades[key] ?? g.grades[ev.id];
+				const grade = latestGrade(g.grades[ev.id], savedGrades[key]);
 				row[ev.name] = grade?.grade ?? "-";
 			}
 			return row;
@@ -154,9 +176,9 @@ export function GroupGradesTable({
 				ref={dialogRef}
 				aria-labelledby="grade-correction-title"
 				className="m-auto w-full max-w-md rounded-2xl border border-border bg-surface p-6 text-foreground backdrop:bg-black/50"
-				onClose={() => {
-					if (correction) clearEdit(correction.key);
-					setCorrection(null);
+				onCancel={(event) => {
+					event.preventDefault();
+					cancelCorrection();
 				}}
 			>
 				{correction && (
@@ -167,7 +189,7 @@ export function GroupGradesTable({
 							const reason = String(new FormData(event.currentTarget).get("reason") ?? "").trim();
 							if (!reason) return;
 							save(correction.group, correction.evaluation, correction.value, correction.previous.revision, reason);
-							dialogRef.current?.close();
+							closeCorrection();
 						}}
 					>
 						<h2 id="grade-correction-title" className="text-lg font-semibold">Confirmar corrección</h2>
@@ -178,7 +200,7 @@ export function GroupGradesTable({
 							<textarea name="reason" required maxLength={1000} rows={3} className="w-full rounded-xl border border-border bg-surface-muted p-2" />
 						</label>
 						<div className="flex justify-end gap-3">
-							<button type="button" className="rounded-xl border border-border px-3 py-2" onClick={() => dialogRef.current?.close()}>Cancelar</button>
+							<button type="button" className="rounded-xl border border-border px-3 py-2" onClick={cancelCorrection}>Cancelar</button>
 							<button type="submit" className="rounded-xl bg-accent px-3 py-2 text-white">Confirmar</button>
 						</div>
 					</form>
@@ -234,7 +256,8 @@ export function GroupGradesTable({
 								</td>
 								{evaluations.map((ev) => {
 									const key = `${group.id}-${ev.id}`;
-									const current = savedGrades[key] ?? group.grades[ev.id];
+									const serverGrade = group.grades[ev.id];
+									const current = latestGrade(serverGrade, savedGrades[key]);
 									const legacy = current?.revision === 0 && current.grade !== null;
 									const message = legacy ? "Destinatarios sin verificar" : errors[key];
 									return (
@@ -271,7 +294,16 @@ export function GroupGradesTable({
 											{message && (
 												<p id={`grade-status-${key}`} role={legacy ? undefined : "status"} className="mt-1 text-xs text-muted">
 													{message}
+													{errors[key] && edits[key] !== undefined && current?.grade != null && (
+														<> Nota confirmada {current.grade}.</>
+													)}
 												</p>
+											)}
+											{current && current.revision > 0 && (
+												<details className="mt-1 text-xs text-muted">
+													<summary className="cursor-pointer">Destinatarios históricos</summary>
+													{serverGrade?.participants?.join(", ") || "Lista no disponible en esta vista."}
+												</details>
 											)}
 										</td>
 									);

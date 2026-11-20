@@ -99,12 +99,24 @@ begin
   select * into strict review from public.review_activity_date_correction(
     course, evaluation, current_setting('qa.after_move')::timestamptz - interval '2 microseconds', 'Same participants');
   perform public.confirm_activity_date_correction(course, evaluation, review.review_id);
+  if (select g.participants from public.list_group_grades_with_participants(course) g
+      where g.group_id = a1 and g.evaluation_id = evaluation)
+    is distinct from array['QA Student 1', 'QA Student 2'] then
+    raise exception 'FAIL: teacher view substituted the current roster';
+  end if;
+  if exists (select 1 from public.list_group_grades_with_participants(course) g
+      where g.evaluation_id = old_evaluation and g.participants is not null) then
+    raise exception 'FAIL: teacher view inferred recipients for a legacy grade';
+  end if;
 end;
 $$;
 
 select set_config('request.jwt.claim.sub', :teacher_b, true) \g /dev/null
 do $$
 begin
+  if exists (select 1 from public.list_group_grades_with_participants(current_setting('qa.course_a_id')::bigint)) then
+    raise exception 'FAIL: foreign teacher could read historical recipients';
+  end if;
   perform public.save_group_grade(current_setting('qa.course_a_id')::bigint, current_setting('qa.eval_a_t2_id')::bigint,
     current_setting('qa.group_a1_id')::bigint, 18, 2, 'Unauthorized');
   raise exception 'FAIL: foreign teacher could write';
@@ -115,6 +127,9 @@ $$;
 select set_config('request.jwt.claim.sub', :student_1, true) \g /dev/null
 do $$
 begin
+  if exists (select 1 from public.list_group_grades_with_participants(current_setting('qa.course_a_id')::bigint)) then
+    raise exception 'FAIL: student could read historical recipients';
+  end if;
   perform public.save_group_grade(current_setting('qa.course_a_id')::bigint, current_setting('qa.eval_a_t2_id')::bigint,
     current_setting('qa.group_a1_id')::bigint, 18, 2, 'Unauthorized');
   raise exception 'FAIL: student could write';
@@ -142,7 +157,8 @@ begin
     is distinct from array[current_setting('qa.enrollment_s1_id')::bigint, current_setting('qa.enrollment_s2_id')::bigint] then
     raise exception 'FAIL: historical participants changed';
   end if;
-  if has_function_privilege('anon', 'public.save_group_grade(bigint,bigint,bigint,numeric,integer,text)', 'EXECUTE') then
+  if has_function_privilege('anon', 'public.save_group_grade(bigint,bigint,bigint,numeric,integer,text)', 'EXECUTE')
+    or has_function_privilege('anon', 'public.list_group_grades_with_participants(bigint)', 'EXECUTE') then
     raise exception 'FAIL: anonymous can execute the grade RPC';
   end if;
 end;
