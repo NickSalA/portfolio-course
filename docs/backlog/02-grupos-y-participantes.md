@@ -35,6 +35,8 @@
 
 **Documentación:** modelo y regla temporal, casos y decisiones de datos previos.
 
+**Seguimiento local de GRP-02.** `0039` registra intervalos desde el corte de migración, distingue matrícula sin grupo de historia desconocida y preserva grupos con historial o notas. Se validaron la actualización desde `0038`, cambios simultáneos, rollback y permisos del docente. La resolución de participantes por actividad sigue en GRP-06 #23 y el acceso estudiantil histórico en EVA-04 #27. El cupo concurrente de preasignaciones sigue en GRP-03 #20. [Evidencia de GRP-02](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#grp-02-19--historial-de-pertenencia-a-grupos).
+
 ### GRP-03 · Elegir y cambiar de grupo preservando historia y cupo
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#3-grupos-cupo-ventana-e-historia). Conservar validaciones de la RPC de selección; contrastar bypass docente directo, sincronización que restaura el grupo autorizado y concurrencia con cambios de capacidad.

@@ -72,6 +72,20 @@ Este documento registra evidencia ejecutada para la Parte II. Una capacidad pres
 - La migración `0038` copia el número de matrícula del padrón al crear el vínculo y lo actualiza cuando el padrón aporta un valor. Si el padrón omite el número, se conserva el que ya tenía la matrícula. La suite de BASE-06 pasó sobre `0037 → 0038` en una transacción con rollback. Se verificaron los ceros iniciales, la actualización del número, la conservación del grupo y la restauración con el número omitido.
 - El índice único vigente de `0007` ya cubre curso y correo normalizado. La concurrencia por el último cupo entre alumnos distintos al preasignar grupos sigue en GRP-03 #20. El recorrido real con Google sigue pendiente.
 
+## GRP-02 #19 · Historial de pertenencia a grupos
+
+**Fecha** 2026-11-19 · **Base** `develop` `059f01a` · **Migración** `0039_group_membership_history.sql` · **Entorno** Supabase aislado, PostgreSQL 17 y Node 24. [Especificación](../../../specs/004-historial-grupos/spec.md) · [Suite SQL](../../../portfolio-coursse/supabase/qa/grp_02_group_membership_history.sql).
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Actualización desde `0038` | El corte registra el grupo vigente, un instante anterior es desconocido y un vínculo incoherente queda desconocido hasta repararse. | Aprobado sobre matrículas sintéticas previas a ejecutar la migración. |
+| Cambios y orden | La hora exacta resuelve al estado nuevo. Se distinguen grupo, sin grupo e inactiva. Repetir la sincronización conserva los intervalos. Un rollback revierte ambos cambios. | Aprobado en la suite SQL. |
+| Dos conexiones | La segunda escritura espera a la primera. Se conservan tres intervalos adyacentes en orden. | Aprobado con dos conexiones SQL y confirmación del bloqueo. |
+| Acceso y conservación | El docente responsable puede consultar. La sesión anónima, el alumno y el docente ajeno quedan denegados. Reducir grupos conserva las referencias y la nota existente. | Aprobado en la suite SQL. |
+| Comprobaciones de aplicación | Lint, TypeScript, unitarias y build aprobados. | Pasaron las comprobaciones, incluidas 13 pruebas Vitest y build con Turbopack. |
+
+**Regresiones y pendientes**. Pasaron por separado las suites de capacidades, RLS de notas, BASE-04, BASE-06 y GRP-02. El runner completo se detiene en la aserción `anonymous RPC grant` de BASE-05, tanto en la base `0038` como con `0039`. La suite de requisitos pendientes conserva la nota 12 al reducir grupos y sigue esperando los adaptadores de GRP-06 #23 y EVA-04 #27. La coordinación de cupos preasignados queda en GRP-03 #20. El inventario BASE-01 sigue siendo evidencia histórica.
+
 ## EXP-01 #38: decisiones y evidencia documental
 
 **Fuente y revisión:** R1 se identificó en la conversación como @NickSalA y confirmó las reglas de [EXP-01](../../backlog/05-exportacion.md); comunicó que R3 las revisó y aceptó, y que la revisión completa se realizará en el PR. Es un reporte de R1, no una aprobación independiente comprobada en GitHub; no se dispone aquí de fecha ni comentario de R3. El profesor no confirmó la fórmula. Seguimiento actualizado en archivos locales únicamente; GitHub no se modificó.
