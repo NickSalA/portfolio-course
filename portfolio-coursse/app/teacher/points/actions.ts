@@ -8,11 +8,18 @@ export async function voidPointTransaction(formData: FormData) {
 	const transactionId = Number(formData.get("transaction_id"));
 	const course = String(formData.get("course") ?? "").trim();
 	const period = String(formData.get("period") ?? "").trim();
+	const reason = String(formData.get("void_reason") ?? "").trim();
 	const params = new URLSearchParams();
 	if (period) params.set("period", period);
 	if (course) params.set("course", course);
 	const path = `/teacher/points${params.size ? `?${params.toString()}` : ""}`;
-	if (!Number.isSafeInteger(transactionId) || transactionId <= 0 || !course || !period)
+	if (
+		!Number.isSafeInteger(transactionId) ||
+		transactionId <= 0 ||
+		!course ||
+		!period ||
+		!reason
+	)
 		redirect(`${path}${params.size ? "&" : "?"}error=transaction`);
 	const supabase = await createClient();
 	const { data: voided, error } = await supabase.rpc(
@@ -21,7 +28,7 @@ export async function voidPointTransaction(formData: FormData) {
 			target_transaction_id: transactionId,
 			target_course: course,
 			target_period: period,
-			void_reason_input: String(formData.get("void_reason") ?? "").trim() || null,
+			void_reason_input: reason,
 		},
 	);
 	if (error || !voided) {
@@ -77,8 +84,14 @@ export async function registerPointTransaction(formData: FormData) {
 			transaction_reason: reason || null,
 		},
 	);
-	if (error || !registered)
+	if (error || !registered) {
+		console.error("Point registration failed", {
+			error,
+			authorizationId,
+			registered,
+		});
 		redirect(`${path}${params.size ? "&" : "?"}error=transaction`);
+	}
 
 	revalidatePath("/teacher/points");
 	revalidatePath("/student");

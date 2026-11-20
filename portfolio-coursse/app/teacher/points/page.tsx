@@ -5,120 +5,121 @@ import { PointsStudentList } from "@/components/teacher/points/points-student-li
 import { getTeacherContext } from "@/lib/teacher/get-context";
 
 export default async function PointsPage({
-	searchParams,
+    searchParams,
 }: {
-	searchParams: Promise<{ period?: string; course?: string; error?: string }>;
+    searchParams: Promise<{ period?: string; course?: string; error?: string }>;
 }) {
-	const {
-		period: requestedPeriod,
-		course: requestedCourse,
-		error,
-	} = await searchParams;
-	const { supabase, user, selectedPeriod } = await getTeacherContext({
-		requestedPeriodPublicId: requestedPeriod,
-	});
-	const { data: courses } = selectedPeriod
-		? await supabase
-			  .from("courses")
-			  .select("id, public_id, name")
-			  .eq("teacher_id", user.id)
-			  .eq("period_id", selectedPeriod.id)
-			  .eq("active", true)
-			  .order("name")
-		: { data: [] };
-	const selectedCourse =
-		(courses ?? []).find(
-			(course) => course.public_id === requestedCourse,
-		) ?? null;
-	const { data: students } = selectedCourse
-		? await supabase
-			  .from("authorized_students")
-			  .select(
-				  "id, full_name, email, point_transactions(id, points, reason, created_at, is_voided, voided_at, voided_by, void_reason)",
-			  )
-			  .eq("course_id", selectedCourse.id)
-			  .eq("status", "active")
-			  .order("full_name")
-		: { data: [] };
-	return (
-		<main className="px-5 py-8 sm:px-8 sm:py-10">
-			<div className="mx-auto max-w-6xl">
-				<ModuleHeader
-					eyebrow="Puntos"
-					title={
-						selectedCourse
-							? selectedCourse.name
-							: "Movimientos de puntos"
-					}
-					description={
-						selectedCourse
-							? "Registra ajustes y consulta el saldo derivado de cada alumno autorizado."
-							: "Selecciona un curso para registrar y consultar movimientos de puntos."
-					}
-					aside={
-						selectedPeriod && (
-							<span className="rounded-full bg-accent-soft px-3 py-1.5 text-sm font-medium text-accent">
-								{selectedPeriod.code}
-							</span>
-						)
-					}
-				/>
-				{error === "transaction" && (
-					<p
-						role="alert"
-						className="mt-6 rounded-xl border border-danger bg-surface px-4 py-3 text-sm text-danger"
-					>
-						No se pudo registrar o anular el movimiento. Comprueba
-						los datos e inténtalo de nuevo.
-					</p>
-				)}
-				{selectedPeriod && (
-					<div className="mt-6">
-						<CourseContextSwitcher
-							courses={(courses ?? []).map((course) => ({
-								publicId: course.public_id,
-								name: course.name,
-							}))}
-						/>
-					</div>
-				)}
-				{selectedCourse ? (
-					<PointsStudentList
-						course={selectedCourse.public_id}
-						courseName={selectedCourse.name}
-						period={selectedPeriod?.public_id ?? ""}
-						students={students ?? []}
-					/>
-				) : (
-					<section className="mt-6">
-						<p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
-							Cursos
-						</p>
-						<h2 className="mt-2 text-xl font-semibold">
-							Selecciona un curso
-						</h2>
-						<div className="mt-4 grid gap-3 md:grid-cols-2">
-							{(courses ?? []).map((course) => (
-								<Link
-									key={course.id}
-									href={`/teacher/points?period=${selectedPeriod?.public_id}&course=${course.public_id}`}
-									className="glass flex items-center justify-between rounded-2xl border border-white/25 p-5 transition hover:border-accent"
-								>
-									<span className="font-medium">
-										{course.name}
-									</span>
-									<span
-										aria-hidden="true"
-										className="text-xl text-muted"
-									>
-										→
-									</span>
-								</Link>
-							))}
-						</div>
-					</section>
-				)}
-			</div>
-		</main>
-	);
+    const {
+        period: requestedPeriod,
+        course: requestedCourse,
+        error,
+    } = await searchParams;
+    const { supabase, user, selectedPeriod } = await getTeacherContext({
+        requestedPeriodPublicId: requestedPeriod,
+    });
+    const { data: courses } = selectedPeriod
+        ? await supabase
+              .from("courses")
+              .select("id, public_id, name")
+              .eq("teacher_id", user.id)
+              .eq("period_id", selectedPeriod.id)
+              .eq("active", true)
+              .order("name")
+        : { data: [] };
+    const selectedCourse =
+        (courses ?? []).find(
+            (course) => course.public_id === requestedCourse,
+        ) ?? null;
+    const { data: students } = selectedCourse
+        ? await supabase
+              .from("authorized_students")
+              .select(
+                  "id, full_name, email, point_transactions(id, public_id, created_by, points, reason, created_at, is_voided, voided_at, voided_by, void_reason)",
+              )
+              .eq("course_id", selectedCourse.id)
+              .eq("status", "active")
+              .order("full_name")
+        : { data: [] };
+    return (
+        <main className="px-5 py-8 sm:px-8 sm:py-10">
+            <div className="mx-auto max-w-6xl">
+                <ModuleHeader
+                    eyebrow="Puntos"
+                    title={
+                        selectedCourse
+                            ? selectedCourse.name
+                            : "Movimientos de puntos"
+                    }
+                    description={
+                        selectedCourse
+                            ? "Registra ajustes y consulta el saldo derivado de cada alumno autorizado."
+                            : "Selecciona un curso para registrar y consultar movimientos de puntos."
+                    }
+                    aside={
+                        selectedPeriod && (
+                            <span className="rounded-full bg-accent-soft px-3 py-1.5 text-sm font-medium text-accent">
+                                {selectedPeriod.code}
+                            </span>
+                        )
+                    }
+                />
+                {error === "transaction" && (
+                    <p
+                        role="alert"
+                        className="mt-6 rounded-xl border border-danger bg-surface px-4 py-3 text-sm text-danger"
+                    >
+                        No se pudo registrar o anular el movimiento. Comprueba
+                        los datos e inténtalo de nuevo.
+                    </p>
+                )}
+                {selectedPeriod && (
+                    <div className="mt-6">
+                        <CourseContextSwitcher
+                            courses={(courses ?? []).map((course) => ({
+                                publicId: course.public_id,
+                                name: course.name,
+                            }))}
+                        />
+                    </div>
+                )}
+                {selectedCourse ? (
+                    <PointsStudentList
+                        course={selectedCourse.public_id}
+                        userId={user.id}
+                        courseName={selectedCourse.name}
+                        period={selectedPeriod?.public_id ?? ""}
+                        students={students ?? []}
+                    />
+                ) : (
+                    <section className="mt-6">
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+                            Cursos
+                        </p>
+                        <h2 className="mt-2 text-xl font-semibold">
+                            Selecciona un curso
+                        </h2>
+                        <div className="mt-4 grid gap-3 md:grid-cols-2">
+                            {(courses ?? []).map((course) => (
+                                <Link
+                                    key={course.id}
+                                    href={`/teacher/points?period=${selectedPeriod?.public_id}&course=${course.public_id}`}
+                                    className="glass flex items-center justify-between rounded-2xl border border-white/25 p-5 transition hover:border-accent"
+                                >
+                                    <span className="font-medium">
+                                        {course.name}
+                                    </span>
+                                    <span
+                                        aria-hidden="true"
+                                        className="text-xl text-muted"
+                                    >
+                                        →
+                                    </span>
+                                </Link>
+                            ))}
+                        </div>
+                    </section>
+                )}
+            </div>
+        </main>
+    );
 }

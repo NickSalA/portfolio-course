@@ -1,4 +1,4 @@
--- Run with psql after migrations 0037; synthetic fixtures are rolled back.
+-- Run with psql after migrations through 0043; synthetic fixtures are rolled back.
 \set ON_ERROR_STOP on
 begin;
 create temporary table qa_fixture_transaction () on commit drop;
@@ -43,6 +43,7 @@ declare
   changed public.point_transactions%rowtype;
   grades_before jsonb;
   other_before jsonb;
+  invalid_reason text;
 begin
   select jsonb_agg(to_jsonb(g) order by g.id) into grades_before from public.group_grades g;
   select jsonb_agg(to_jsonb(x) order by x.id) into other_before
@@ -75,6 +76,18 @@ begin
   exception when raise_exception then
     if sqlerrm <> 'invalid_context' then raise; end if;
   end;
+  foreach invalid_reason in array array[null::text, '', '   ', E'\t\n\r'] loop
+    begin
+      perform public.void_point_transaction_in_context(t, c, p, invalid_reason);
+      raise exception 'blank reason accepted';
+    exception when raise_exception then
+      if sqlerrm <> 'invalid_void_reason' then raise; end if;
+    end;
+  end loop;
+  select * into strict original from public.point_transactions where id = t;
+  if original.is_voided or original.voided_by is not null or original.voided_at is not null or original.void_reason is not null then
+    raise exception 'blank reason modified movement';
+  end if;
   begin
     perform academic_access.void_point_transaction_internal(t, null, null, null);
     raise exception 'internal void callable directly';
@@ -144,7 +157,7 @@ do $$
 begin
   begin
     perform public.void_point_transaction_in_context(current_setting('qa.replacement_id')::bigint,
-      current_setting('qa.course_public')::uuid, current_setting('qa.period_public')::uuid, null);
+      current_setting('qa.course_public')::uuid, current_setting('qa.period_public')::uuid, 'correction');
     raise exception 'foreign teacher voided points';
   exception when raise_exception then
     if sqlerrm <> 'not_course_teacher' then raise; end if;
@@ -162,7 +175,7 @@ do $$
 begin
   begin
     perform public.void_point_transaction_in_context(current_setting('qa.replacement_id')::bigint,
-      current_setting('qa.course_public')::uuid, current_setting('qa.period_public')::uuid, null);
+      current_setting('qa.course_public')::uuid, current_setting('qa.period_public')::uuid, 'correction');
     raise exception 'student voided points';
   exception when raise_exception then
     if sqlerrm <> 'not_course_teacher' then raise; end if;
