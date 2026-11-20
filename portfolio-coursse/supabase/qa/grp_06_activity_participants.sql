@@ -1,4 +1,11 @@
 \set ON_ERROR_STOP on
+-- The runner copies QA files to a temporary container directory before psql -f.
+-- Resolve that exact -f argument rather than guessing a shared temporary path.
+\! p=$(tr '\0' '\n' < /proc/$PPID/cmdline | sed -n '/grp_06_activity_participants.sql$/p'); test -n "$p" && sh "$(dirname -- "$p")/grp_06_concurrency.sh"
+\if :SHELL_ERROR
+\echo 'FAIL: GRP-06 concurrency runner failed'
+select 1 / 0;
+\endif
 begin;
 create temporary table qa_fixture_transaction () on commit drop;
 \ir fixtures.sql
