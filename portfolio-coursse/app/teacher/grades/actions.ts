@@ -104,6 +104,8 @@ type CorrectionReview = {
 };
 
 function correctionError(message: string): string {
+    if (message.includes("activity_date_changes_graded_participants"))
+        return "La fecha propuesta altera o deja sin confirmar los destinatarios de una nota guardada.";
     if (message.includes("activity_review_stale"))
         return "La fecha o el padrón cambiaron desde la revisión. Vuelve a revisar el impacto antes de confirmar.";
     if (message.includes("activity_review_already_used"))
@@ -207,51 +209,60 @@ export async function deleteEvaluationAction(formData: FormData) {
         .eq("public_id", evaluationPublicId);
 
     if (error) {
-        return { error: "No se pudo eliminar la evaluación" };
+        return { error: error.message.includes("graded_activity_cannot_be_deleted")
+            ? "La evaluación tiene notas confirmadas y no se puede eliminar."
+            : "No se pudo eliminar la evaluación" };
     }
 
     revalidatePath("/teacher/grades");
     return { success: true };
 }
 
+const gradeErrors: Record<string, string> = {
+    activity_time_required: "Primero registra la fecha de realización de la actividad.",
+    group_grade_participants_unknown: "Hay pertenencias históricas sin verificar en el curso. Revisa los participantes de la actividad antes de guardar.",
+    group_grade_participants_empty: "El grupo no tiene participantes registrados en esa fecha.",
+    group_grade_legacy_unverified: "La nota anterior está bloqueada hasta verificar sus destinatarios.",
+    group_grade_conflict: "La nota cambió mientras la editabas. Recarga la página antes de reintentar.",
+    group_grade_reason_required: "Indica un motivo de corrección de hasta 1000 caracteres.",
+    group_grade_access_denied: "No tienes permiso para guardar notas en este curso.",
+    group_grade_resource_not_found: "El grupo o la evaluación no pertenece a este curso.",
+    group_grade_invalid_value: "Ingresa una nota de 0 a 20 con hasta dos decimales.",
+};
+
 export async function saveGroupGradeAction(formData: FormData) {
+    const courseId = Number(formData.get("course_id"));
     const groupId = Number(formData.get("group_id"));
     const evaluationId = Number(formData.get("evaluation_id"));
-    const rawGrade = formData.get("grade");
-    const feedback = String(formData.get("feedback") ?? "").trim() || null;
+    const rawGrade = String(formData.get("grade") ?? "").trim();
+    const rawRevision = formData.get("revision");
+    const revision = Number(rawRevision);
 
-    if (!Number.isInteger(groupId) || !Number.isInteger(evaluationId)) {
-        return { error: "Datos del grupo o evaluación inválidos" };
+    if (![courseId, groupId, evaluationId].every((id) => Number.isSafeInteger(id) && id > 0)
+        || typeof rawRevision !== "string" || !/^\d+$/.test(rawRevision)
+        || !Number.isSafeInteger(revision) || revision > 2_147_483_647) {
+        return { error: "Datos del curso, grupo o evaluación inválidos" };
     }
 
-    const grade =
-        rawGrade === "" || rawGrade === null ? null : Number(rawGrade);
-
-    if (grade !== null && (isNaN(grade) || grade < 0 || grade > 20)) {
-        return { error: "La calificación debe estar entre 0 y 20" };
+    if (!/^\d+(?:\.\d{1,2}0*)?$/.test(rawGrade) || Number(rawGrade) > 20) {
+        return { error: gradeErrors.group_grade_invalid_value };
     }
 
     const supabase = await createClient();
+    const { data, error } = await supabase.rpc("save_group_grade", {
+        target_course_id: courseId,
+        target_group_id: groupId,
+        target_evaluation_id: evaluationId,
+        new_grade: Number(rawGrade),
+        expected_revision: revision,
+        correction_reason: String(formData.get("reason") ?? "").trim() || null,
+    }).single<{ grade: number; revision: number }>();
 
-    const { error } = await supabase.from("group_grades").upsert(
-        {
-            group_id: groupId,
-            evaluation_id: evaluationId,
-            grade,
-            feedback,
-            updated_at: new Date().toISOString(),
-        },
-        {
-            onConflict: "group_id,evaluation_id",
-        },
-    );
-
-    if (error) {
-        console.error("Save grade error:", error);
-        return { error: "No se pudo guardar la nota" };
+    if (error || !data) {
+        const message = error?.message;
+        return { error: (message && gradeErrors[message]) || "No se pudo guardar la nota" };
     }
 
     revalidatePath("/teacher/grades");
-    revalidatePath("/student");
-    return { success: true };
+    return { grade: data.grade, revision: data.revision };
 }

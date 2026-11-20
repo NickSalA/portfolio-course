@@ -201,3 +201,5 @@ begin
 end $$;
 select extensions.dblink_disconnect('a'), extensions.dblink_disconnect('b');
 \echo 'PASS GRP-06: history write waited for confirmation and both changes persisted'
+
+\ir eva_01_concurrency.sql

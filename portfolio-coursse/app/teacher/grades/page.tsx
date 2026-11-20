@@ -57,7 +57,7 @@ export default async function GradesPage({
     type GradeRecord = {
         evaluation_id: number;
         grade: number | null;
-        feedback: string | null;
+        revision: number;
     };
 
     type GroupRowData = {
@@ -139,7 +139,7 @@ export default async function GradesPage({
         const { data: rawGrades } = groupIds.length
             ? await supabase
                   .from("group_grades")
-                  .select("group_id, evaluation_id, grade, feedback")
+                  .select("group_id, evaluation_id, grade, revision")
                   .in("group_id", groupIds)
             : { data: [] };
 
@@ -235,6 +235,8 @@ export default async function GradesPage({
                             />
                         </div>
                         <GroupGradesTable
+                            key={selectedCourse.id}
+                            courseId={selectedCourse.id}
                             courseName={selectedCourse.name}
                             groups={groupsData}
                             evaluations={evaluations}
