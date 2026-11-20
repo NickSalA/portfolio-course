@@ -34,6 +34,7 @@
         "eslint": "^9.39.5",
         "eslint-config-next": "16.3.0",
         "semantic-release": "^25.0.9",
+        "supabase": "^3.2.0",
         "tailwindcss": "^4.3.3",
         "typescript": "^5.9.3",
         "vitest": "^5.0.3"
