@@ -169,50 +169,6 @@ select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true
 update public.courses set group_selection_opens_at = null, group_selection_closes_at = null
 where id = current_setting('qa.course_a_id')::bigint;
 
--- EVA-01: grade range 0..20, pending is not zero, one grade per group and evaluation.
-select set_config('request.jwt.claim.sub', current_setting('qa.teacher_a'), true);
-do $$
-declare
-  a1 bigint := current_setting('qa.group_a1_id')::bigint;
-  t1 bigint := current_setting('qa.eval_a_t1_id')::bigint;
-  t2 bigint := current_setting('qa.eval_a_t2_id')::bigint;
-begin
-  update public.group_grades set grade = 20 where group_id = a1 and evaluation_id = t1;
-  if (select grade from public.group_grades where group_id = a1 and evaluation_id = t1) is distinct from 20 then
-    raise exception 'FAIL: maximum grade 20 not stored';
-  end if;
-  update public.group_grades set grade = 0 where group_id = a1 and evaluation_id = t1;
-  if (select grade from public.group_grades where group_id = a1 and evaluation_id = t1) is distinct from 0 then
-    raise exception 'FAIL: explicit zero not stored';
-  end if;
-  if not exists (select 1 from public.group_grades where group_id = a1 and evaluation_id = t2 and grade is null) then
-    raise exception 'FAIL: pending grade missing or not null';
-  end if;
-
-  begin
-    update public.group_grades set grade = 20.01 where group_id = a1 and evaluation_id = t1;
-    raise exception 'FAIL: grade 20.01 accepted';
-  exception when check_violation then null;
-  end;
-  begin
-    update public.group_grades set grade = -0.01 where group_id = a1 and evaluation_id = t1;
-    raise exception 'FAIL: grade -0.01 accepted';
-  exception when check_violation then null;
-  end;
-  begin
-    insert into public.group_grades (group_id, evaluation_id, grade) values (a1, t1, 10);
-    raise exception 'FAIL: second grade for the same group and evaluation accepted';
-  exception when unique_violation then null;
-  end;
-  begin
-    insert into public.group_grades (group_id, evaluation_id, grade)
-    values (a1, current_setting('qa.eval_b_t1_id')::bigint, 10);
-    raise exception 'FAIL: cross-course grade accepted';
-  exception when insufficient_privilege then null;
-  end;
-end $$;
-\echo 'PASS EVA-01: 0/20 bounds, pending != 0, unique and same-course grades'
-
 -- EVA-02: voiding keeps the movement, is idempotent and zero points are rejected.
 do $$
 declare

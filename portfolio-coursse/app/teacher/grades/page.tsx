@@ -57,7 +57,8 @@ export default async function GradesPage({
     type GradeRecord = {
         evaluation_id: number;
         grade: number | null;
-        feedback: string | null;
+        revision: number;
+        participants: string[] | null;
     };
 
     type GroupRowData = {
@@ -69,6 +70,7 @@ export default async function GradesPage({
     };
 
     let groupsData: GroupRowData[] = [];
+    let gradesUnavailable = false;
     let studentNames: Record<number, string> = {};
 
     if (selectedCourse) {
@@ -135,16 +137,16 @@ export default async function GradesPage({
             .order("position");
 
         // Fetch existing grades for these groups
-        const groupIds = (rawGroups ?? []).map((g) => g.id);
-        const { data: rawGrades } = groupIds.length
-            ? await supabase
-                  .from("group_grades")
-                  .select("group_id, evaluation_id, grade, feedback")
-                  .in("group_id", groupIds)
-            : { data: [] };
+        const { data: rawGrades, error: gradesError } = rawGroups?.length
+            ? await supabase.rpc("list_group_grades_with_participants", {
+                  target_course_id: selectedCourse.id,
+              })
+            : { data: [], error: null };
+        gradesUnavailable = Boolean(gradesError);
 
         const gradesByGroup: Record<number, Record<number, GradeRecord>> = {};
-        for (const grade of rawGrades ?? []) {
+        const gradeRows: (GradeRecord & { group_id: number })[] = Array.isArray(rawGrades) ? rawGrades : [];
+        for (const grade of gradeRows) {
             if (!gradesByGroup[grade.group_id]) {
                 gradesByGroup[grade.group_id] = {};
             }
@@ -234,11 +236,19 @@ export default async function GradesPage({
                                 }
                             />
                         </div>
-                        <GroupGradesTable
-                            courseName={selectedCourse.name}
-                            groups={groupsData}
-                            evaluations={evaluations}
-                        />
+                        {gradesUnavailable ? (
+                            <p role="status" className="glass rounded-3xl border border-border p-6 text-muted">
+                                No se pudieron cargar las notas. Recarga la página para intentarlo de nuevo.
+                            </p>
+                        ) : (
+                            <GroupGradesTable
+                                key={selectedCourse.id}
+                                courseId={selectedCourse.id}
+                                courseName={selectedCourse.name}
+                                groups={groupsData}
+                                evaluations={evaluations}
+                            />
+                        )}
                     </div>
                 ) : (
                     <section className="mt-6">

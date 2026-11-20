@@ -19,6 +19,9 @@
 
 **Documentación:** reglas de registro/corrección y evidencia de límites y permisos.
 
+
+**Seguimiento local de EVA-01.** La migración `0046` centraliza el guardado, conserva los participantes originales y audita las correcciones. Pasaron la actualización desde `0045`, una instalación limpia, la suite SQL regular y el recorrido docente sintético. Las notas antiguas con destinatarios desconocidos se mantienen visibles y bloqueadas para edición. La consulta estudiantil queda en EVA-04 #27 y la exportación histórica en EXP-03 #40. La aceptación queda pendiente de revisión independiente. Este registro actualiza solo la ficha local. [Evidencia de EVA-01](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#eva-01-24--registro-y-corrección-de-notas-grupales)
+
 ### EVA-02 · Verificar puntos individuales y corrección no destructiva
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#5-puntos-y-correcciones). Conservar saldo derivado y anulación autorizada; completar trazabilidad de anulación/reemplazo y comprobar titularidad/contexto. Los anulados se ocultan de los historiales revisados.

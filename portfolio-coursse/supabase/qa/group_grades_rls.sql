@@ -71,61 +71,31 @@ $$;
 
 select set_config('request.jwt.claim.sub', 'a1000000-0000-4000-8000-000000000001', true);
 do $$
-declare affected integer;
 begin
   if (select count(*) from public.group_grades) <> 1 then
     raise exception 'FAIL: teacher A cannot read exactly their own course grade';
   end if;
-
-  update public.group_grades set grade = 16
-  where group_id = current_setting('test.group_a_id')::bigint
-    and evaluation_id = current_setting('test.evaluation_a_id')::bigint;
-  get diagnostics affected = row_count;
-  if affected <> 1 then
-    raise exception 'FAIL: teacher A cannot update their own course grade';
+  if has_table_privilege('public.group_grades', 'INSERT')
+    or has_table_privilege('public.group_grades', 'UPDATE')
+    or has_table_privilege('public.group_grades', 'DELETE')
+    or has_table_privilege('public.group_grades', 'TRUNCATE')
+    or has_column_privilege('public.group_grades', 'grade', 'UPDATE') then
+    raise exception 'FAIL: authenticated still has direct write privileges';
   end if;
-
-  begin
-    insert into public.group_grades (group_id, evaluation_id, grade)
-    values (
-          current_setting('test.group_a_id')::bigint,
-          current_setting('test.evaluation_b_id')::bigint,
-          18
-        );
-    raise exception 'FAIL: cross-course group/evaluation grade insert unexpectedly succeeded';
-  exception when insufficient_privilege then
-    null;
-  end;
 end;
 $$;
-\echo 'PASS: teacher A can read/update own course and cannot insert cross-course grade'
+\echo 'PASS: teacher A can read own course and cannot write directly'
 
 select set_config('request.jwt.claim.sub', 'a2000000-0000-4000-8000-000000000002', true);
 do $$
-declare affected integer;
 begin
-  if (select count(*) from public.group_grades) <> 1 then
+  if (select count(*) from public.group_grades) <> 1
+    or exists (select 1 from public.group_grades where group_id = current_setting('test.group_a_id')::bigint) then
     raise exception 'FAIL: teacher B can read grades outside their own course';
-  end if;
-
-  update public.group_grades set grade = 19
-  where group_id = current_setting('test.group_a_id')::bigint
-    and evaluation_id = current_setting('test.evaluation_a_id')::bigint;
-  get diagnostics affected = row_count;
-  if affected <> 0 then
-    raise exception 'FAIL: teacher B unexpectedly updated teacher A grade';
-  end if;
-
-  update public.group_grades set grade = 17
-  where group_id = current_setting('test.group_b_id')::bigint
-    and evaluation_id = current_setting('test.evaluation_b_id')::bigint;
-  get diagnostics affected = row_count;
-  if affected <> 1 then
-    raise exception 'FAIL: teacher B cannot update their own course grade';
   end if;
 end;
 $$;
-\echo 'PASS: teacher B can read/update own course but cannot read/update teacher A grade'
+\echo 'PASS: teacher B can only read their own course grades'
 
 rollback;
 \echo 'PASS: all synthetic fixtures rolled back'

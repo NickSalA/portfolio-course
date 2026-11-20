@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-const container = "supabase_db_portfolio-course";
+const container = process.env.PORTFOLIO_QA_DB_CONTAINER ?? "supabase_db_portfolio-course";
 const fixtures = fileURLToPath(new URL("../supabase/qa/.", import.meta.url));
 const pending = process.argv[2] === "--pending";
 const grp06 = process.argv[2] === "--grp-06";
@@ -47,6 +47,7 @@ try {
                 "eva_02_point_audit.sql",
                 "eva_02_point_replay.sql",
                 "group_grades_rls.sql",
+                "eva_01_group_grades.sql",
                 "base_04_courses_periods.sql",
                 "base_05_import_students.sql",
                 "base_06_student_enrollment.sql",

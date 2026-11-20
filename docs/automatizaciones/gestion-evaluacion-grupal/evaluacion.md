@@ -458,3 +458,23 @@ Pendiente. No hay métricas ni resultados todavía.
 - No se ha verificado un proveedor de monitoreo, alertas, respaldos o restauración.
 - No se usan datos personales reales ni secretos como evidencia.
 - El inventario inicial es una decisión de alcance y no sustituye pruebas de comportamiento.
+
+## EVA-01 #24 · Registro y corrección de notas grupales
+
+Validación del 20 de noviembre de 2026 en la rama `feature/eva-01-notas-grupales`, desde `develop` en `f8961ec`, con Supabase local aislado y migración `0046`. Se contrastaron la ficha EVA-01, BASE-01, el caso vigente y las migraciones `0028`, `0029`, `0039`, `0044` y `0045`.
+
+| Escenario y esperado | Resultado observado |
+| --- | --- |
+| Instalación limpia y actualización desde `0045` | Las migraciones y la semilla terminaron correctamente. La actualización preservó las notas sintéticas 0 y 15 y una nota pendiente, con revisión 0 y sin atribuciones inferidas. |
+| Límites, permisos, trazabilidad y pertenencia | Pasó la suite SQL regular. Rechazó valores fuera del rango o precisión, escritura directa y guardado sin permisos. El valor 0 se confirmó, la corrección a 20 conservó comentario, autor, motivo y hora, y la repetición no añadió un evento. Se bloquearon una nota antigua sin destinatarios verificables, el borrado de su evaluación y el guardado con pertenencia desconocida. |
+| Cambio A1 → A2 y carreras de guardado | Las dos sesiones observaron el bloqueo de evaluación. Se rechazó un cambio de fecha que reasignaba destinatarios y se permitió otro que los conservaba. Una corrección concurrente con revisión obsoleta fue rechazada. |
+| Recorrido docente en Chromium local | Se navegó a Notas con un curso y una sesión sintéticos. T1 mostraba la nota antigua bloqueada. En T2 se registró 0, se recargó, se canceló una corrección, se confirmó otra a 20 y se verificó que vaciar o ingresar 12.345 conservaba 20. La consulta posterior encontró un evento 0 → 20 y dos destinatarios originales. |
+| Comprobaciones de aplicación | Pasaron ESLint, tipos de Next.js y TypeScript, las 20 pruebas unitarias y `git diff --check`. |
+
+Se conservaron unicidad, rango y aislamiento por curso. Quedan cubiertos los antecedentes del guardado que sobrescribía nota y comentario sin auditoría y del borrado que podía arrastrar una nota confirmada. Las notas antiguas sin destinatarios comprobables se conservan con su valor y quedan bloqueadas para edición. Las pertenencias desconocidas del padrón bloquean la primera confirmación cuando GRP-06 carece de evidencia para descartarlas.
+
+La suite separada `test:db --pending` sigue fallando por el adaptador de consulta de EVA-04 #27 y por una referencia de prueba al adaptador antiguo de GRP-06 #23. Las pruebas vigentes de GRP-06 pasaron con la RPC actual. La matriz docente ampliada sigue en #26, la recuperación de guardados en #30 y el XLSX histórico en #40. La prueba en Chromium acredita el recorrido funcional con sesión sintética. Quedan pendientes la evaluación formal de usabilidad y la revisión independiente.
+
+**Revisión de Sourcery en el PR #65.** Tras aplicar la versión revisada de `0046` desde una instalación limpia, la suite SQL regular aprobó la comprobación de `TRUNCATE` para el rol autenticado y la lectura de destinatarios históricos limitada al docente del curso. Se probó además la actualización desde `0045` con el curso sintético. En Chromium se interrumpió un guardado y se conservó el borrador. Al corregir el valor inválido desapareció el aviso. Dos pestañas reprodujeron una revisión obsoleta y la actualización mostró la nota confirmada más reciente sin perder el borrador. La tabla mostró a ambos destinatarios originales aunque uno ya pertenecía a otro grupo. Pasaron lint, tipos y las 20 pruebas unitarias.
+
+La transición entre versiones requiere coordinar la activación de la aplicación con la migración y pausar los guardados de Notas durante el cambio. El procedimiento está documentado en el [quickstart de EVA-01](../../../specs/005-notas-grupales/quickstart.md#despliegue-coordinado-de-0046). Se comprobó en Supabase aislado. La ventana de despliegue real queda pendiente.
