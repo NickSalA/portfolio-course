@@ -123,6 +123,43 @@ Este documento registra evidencia ejecutada para la Parte II. Una capacidad pres
 
 **Dimensiones verificadas y límites:** se comprobó **implementación en código**, **descubrimiento** desde la navegación de cada rol y **funcionamiento visible** tanto con sesiones sintéticas en Chrome (`1280×800` y `375×812`) como con inicio de sesión real de Google OAuth en local (rechazo sin padrón y acceso docente tras asignar rol en Studio local). No se automatizaron pruebas de `error.tsx` ante un fallo de runtime ni una auditoría integral de accesibilidad (seguimiento en `QA-01 #42`). El retorno a `next` tras sesión vencida (`H14`) queda pendiente de decisión con R1, y la verificación de OAuth desplegado corresponde a producción/BASE-03. No se modificaron RLS ni migraciones.
 
+## GRP-01 #18 · Configuración de número, capacidad y ventana de grupos
+
+**Fecha** 2026-11-20 · **Base** `develop` `c560503` · **Rama** `feature/GRP-01-config-grupos` · **Migración** `0047_configure_group_count_and_locks.sql` · **Entorno** Supabase local aislado en Docker (`0001`–`0047`), Node 22.18.0, Next.js 16.3.0 (`pnpm build` + `pnpm start`) y Chrome headless con cuentas sintéticas `@example.test`.
+
+### Condiciones de configuración verificadas
+
+- **Número y capacidad:** ambos deben ser enteros `>= 1`; la capacidad nunca puede quedar por debajo de los alumnos activos actualmente asignados a un grupo (`capacity_below_existing_members`). Si `número × capacidad` es menor que los alumnos activos autorizados, la UI muestra una advertencia visible pero permite guardar (decisión documentada para revisión con R1 `@NickSalA`).
+- **Cursos vacíos y conservación histórica:** permite crear grupos aunque el curso tenga `0` alumnos autorizados. Al reducir el número de grupos, solo se eliminan grupos excedentes sin integrantes, `authorized_students`, `group_grades` ni historial `academic_access.group_membership_history`; los grupos conservados se informan al docente.
+- **Ventana y reapertura global:** siempre en zona `America/Lima` con cierre estrictamente posterior a apertura (`closes > opens`, admitiendo cualquier minuto, incluido `23:59`). Se muestran cuatro estados con texto (`Sin configurar`, `Programada`, `Abierta`, `Cerrada`) y opciones de ampliación o reapertura para **todo el curso**, sin permisos individuales ni impacto en cursos ajenos.
+- **Curso activo y concurrencia:** `synchronize_course_groups` y `configure_course_group_selection` bloquean la fila del curso (`FOR UPDATE`) exigiendo `courses.active = true` (`course_not_active`) y `is_teacher_of_course` (`not_course_teacher`). `synchronize_course_groups` adquiere `pg_advisory_xact_lock(group.id)` en orden por `id` antes de validar ocupación y mantiene compatibilidad retroactiva de 2 argumentos (`target_group_count default null`).
+
+### Recorrido docente actualizado
+
+```text
+/teacher/courses/[coursePublicId] (muestra Grupos, Autorizados activos y Asignados activos)
+  ├── Tarjeta «Configurar grupos» (GroupCapacityForm)
+  │     ├── Alumnos por grupo (>= 1) + Número de grupos (>= 1, sugerido ceil(activos/cap))
+  │     ├── Vista previa en vivo: cupos totales, advertencia de déficit o reducción segura
+  │     └── Envío con estado pendiente ──▶ synchronizeGroups ──▶ RPC 0047 ──▶ banner ?saved=groups (+retained) o alerta
+  ├── Tarjeta «Ventana de selección» (siempre visible, con badge de estado y horario Lima)
+  │     └── GroupSelectionWindowDialog (Configurar / Ampliar o editar / Reabrir para todo el curso)
+  │           ├── Atajo editable «Prellenar desde ahora (+48 h)» al reabrir
+  │           └── Validación rango (step=60) ──▶ saveSelectionWindow ──▶ RPC 0047 ──▶ banner ?saved=window | window-reopened
+  └── Listado de Grupos ──▶ GroupMembersDialog (miembros activos únicamente)
+```
+
+### Comprobaciones ejecutadas
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| `grp_01_group_configuration.sql` (`pnpm test:db`) | Número explícito con 0 y con alumnos; reducción conserva grupos con notas/historial y elimina libres; rechazo de `0`, `< miembros`, `cierre <= apertura`, curso archivado y docente ajeno; reapertura habilita curso A sin tocar curso B; firma de 2 argumentos compatible. | Aprobado en Docker local con rollback. Pasaron 10 suites SQL (`current_capabilities`, `eva_02_*`, `group_grades_rls`, `eva_01`, `base_04`–`06`, `grp_01`, `grp_02`). *Nota preexistente:* `grp_06_activity_participants.sql` falla en este entorno Windows por fin de línea CRLF al copiar `grp_06_concurrency.sh`. |
+| Pruebas unitarias (`group-config.test.ts`) | Sugerencia de grupos, parseo/formato `America/Lima` (`23:59`), estados `[opens, closes)`, validación de rango y aviso de cierre pasado, atajo +48 h y vista previa de cupos. | 6/6 pruebas aprobadas dentro de Vitest (7 archivos / 26 pruebas en total). |
+| Navegador local (`1280×800` y `375×812`, sintético) | Curso vacío crea 3×4 y ve tarjeta de ventana; conteo filtra inactivos; capacidad `< miembros` alerta y bloquea envío; reducción de 3 a 1 conserva grupo con nota y avisa `1` retenido; rango inválido bloquea y `23:59` guarda estado `Cerrada`; reapertura cambia a `Abierta` sin alterar otro curso; curso archivado deshabilita controles; docente B recibe 404 neutro; móvil sin desborde y `Esc` cierra diálogos. | Aprobado en todos los recorridos probados sobre `next start` local. |
+| Comprobaciones de aplicación | Lint, generación de tipos, TypeScript y build de producción sin errores. | `pnpm lint`, `pnpm typecheck` y `pnpm build` aprobados. |
+
+**Dimensiones verificadas y pendientes:** se verificaron **implementación en código**, **descubrimiento**, **funcionamiento visible** y **revisión básica de teclado/móvil (`aria-labelledby`, `role="alert"`, `role="status"`, `Esc`, `375px`)** en entorno local aislado. La validación de selección concurrente estudiantil y resincronización corresponde a `GRP-03 #20` (R1), el recorrido estudiantil de selección a `GRP-04 #21` (R2) y la auditoría integral de accesibilidad a `QA-01 #42`. Decisión propuesta para revisar en PR con R1 (`@NickSalA`): mantener `número × capacidad < autorizados` como advertencia no bloqueante en UI.
+
 ## EXP-01 #38: decisiones y evidencia documental
 
 **Fuente y revisión:** R1 se identificó en la conversación como @NickSalA y confirmó las reglas de [EXP-01](../../backlog/05-exportacion.md); comunicó que R3 las revisó y aceptó, y que la revisión completa se realizará en el PR. Es un reporte de R1, no una aprobación independiente comprobada en GitHub; no se dispone aquí de fecha ni comentario de R3. El profesor no confirmó la fórmula. Seguimiento actualizado en archivos locales únicamente; GitHub no se modificó.
