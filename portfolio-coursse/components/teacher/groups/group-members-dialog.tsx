@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useId, useRef } from "react";
 
 type Member = { full_name: string | null; email: string };
 
@@ -14,6 +14,7 @@ export function GroupMembersDialog({
 	members: Member[];
 }) {
 	const dialogRef = useRef<HTMLDialogElement>(null);
+	const headingId = useId();
 	return (
 		<>
 			<button
@@ -39,6 +40,7 @@ export function GroupMembersDialog({
 			</button>
 			<dialog
 				ref={dialogRef}
+				aria-labelledby={headingId}
 				className="m-auto w-[min(100%-2rem,38rem)] overscroll-contain rounded-3xl border border-white/25 bg-transparent p-0 text-foreground shadow-2xl backdrop:bg-slate-950/55 backdrop:backdrop-blur-sm"
 			>
 				<div className="glass-strong rounded-3xl p-6 sm:p-8">
@@ -47,7 +49,7 @@ export function GroupMembersDialog({
 							<p className="text-xs font-semibold uppercase tracking-[.16em] text-accent">
 								Integrantes
 							</p>
-							<h2 className="mt-2 text-2xl font-semibold">
+							<h2 id={headingId} className="mt-2 text-2xl font-semibold">
 								{groupName}
 							</h2>
 							<p className="mt-1 text-sm text-muted">
@@ -58,7 +60,7 @@ export function GroupMembersDialog({
 							type="button"
 							onClick={() => dialogRef.current?.close()}
 							aria-label={`Cerrar ${groupName}`}
-							className="grid size-9 place-items-center rounded-lg border border-border bg-surface-muted text-lg text-muted"
+							className="grid size-9 place-items-center rounded-lg border border-border bg-surface-muted text-lg text-muted transition hover:border-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 						>
 							×
 						</button>
