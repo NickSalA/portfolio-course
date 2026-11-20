@@ -78,6 +78,9 @@
 
 **Documentación:** permisos vigentes, diseño y matriz esperado/observado.
 
+**Seguimiento local de EVA-04.** La migración `0048` habilita la consulta del alumno por matrícula autorizada y destinatarios históricos. Una actividad fechada con grupo verificable puede devolver un pendiente aunque todavía no exista una nota. La política de titularidad de puntos se conservó. La evidencia se registró en [evaluación EVA-04](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#eva-04-27--consulta-estudiantil-de-resultados). El panel corresponde a EVA-05 #28 y la aceptación queda pendiente de revisión independiente. Este seguimiento se actualizó en el repositorio local.
+
+
 ### EVA-05 · Mostrar notas y puntos propios en el panel del alumno
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). El panel existente muestra puntos, no notas. Integrar consulta histórica sin reconstruir el panel completo; verificar actividad/grupo original, pendientes/cero y estados visibles.

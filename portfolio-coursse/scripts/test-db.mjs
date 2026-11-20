@@ -48,6 +48,7 @@ try {
                 "eva_02_point_replay.sql",
                 "group_grades_rls.sql",
                 "eva_01_group_grades.sql",
+                "eva_04_student_results.sql",
                 "base_04_courses_periods.sql",
                 "base_05_import_students.sql",
                 "base_06_student_enrollment.sql",
