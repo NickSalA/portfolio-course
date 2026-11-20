@@ -4,9 +4,10 @@ import { fileURLToPath } from "node:url";
 const container = "supabase_db_portfolio-course";
 const fixtures = fileURLToPath(new URL("../supabase/qa/.", import.meta.url));
 const pending = process.argv[2] === "--pending";
+const grp06 = process.argv[2] === "--grp-06";
 
-if (process.argv.length > 3 || (process.argv[2] && !pending)) {
-    console.error("Usage: node scripts/test-db.mjs [--pending]");
+if (process.argv.length > 3 || (process.argv[2] && !pending && !grp06)) {
+    console.error("Usage: node scripts/test-db.mjs [--pending|--grp-06]");
     process.exit(1);
 }
 
@@ -39,16 +40,19 @@ try {
     docker(["cp", `${fixtures}/.`, `${container}:${directory}`]);
     const scripts = pending
         ? ["pending_requirements.sql"]
-        : [
-              "current_capabilities.sql",
-              "eva_02_point_audit.sql",
-              "eva_02_point_replay.sql",
-              "group_grades_rls.sql",
-              "base_04_courses_periods.sql",
-              "base_05_import_students.sql",
-              "base_06_student_enrollment.sql",
-              "grp_02_group_membership_history.sql",
-          ];
+        : grp06
+          ? ["grp_06_activity_participants.sql"]
+          : [
+                "current_capabilities.sql",
+                "eva_02_point_audit.sql",
+                "eva_02_point_replay.sql",
+                "group_grades_rls.sql",
+                "base_04_courses_periods.sql",
+                "base_05_import_students.sql",
+                "base_06_student_enrollment.sql",
+                "grp_02_group_membership_history.sql",
+                "grp_06_activity_participants.sql",
+            ];
     for (const script of scripts) {
         console.log(`\nRunning ${script}`);
         docker([
