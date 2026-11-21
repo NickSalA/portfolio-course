@@ -551,3 +551,19 @@ La transición entre versiones requiere coordinar la activación de la aplicaci�
 | Comprobaciones de aplicación | Lint, generación de tipos, TypeScript y build de producción sin errores. | `pnpm lint`, `pnpm typecheck` (`tsc --noEmit`) y `pnpm build` aprobados después del último cambio. |
 
 **Dimensiones verificadas y pendientes:** se verificaron **implementación en código**, **descubrimiento** (entrada desde `/teacher` → *Notas*), **funcionamiento visible** (`E1–E16` sobre `next start` + Supabase Docker local) y **usabilidad básica / accesibilidad** (roles `dialog`, `alert`, `status`, `scope`, foco visible, teclado `Enter`/`Esc` y móvil `375×812`). Quedan fuera de alcance la consulta del alumno (`EVA-04 #27` y `EVA-05 #28`), el recorrido integral M2 (`EVA-06 #29`), la recuperación multi-módulo o entre sesiones (`EVA-07 #30`), la exportación individual ajustada (`EXP-03 #40`), la auditoría formal completa de usabilidad/accesibilidad (`QA-01 #42`) y la revisión independiente en PR por `@fabrizio25504` (R4).
+## EVA-04 #27 · Consulta estudiantil de resultados
+
+Validación del 20 de noviembre de 2026 en `feature/eva-04-consulta-resultados`, desde `develop` en `c23ba0f`, con datos sintéticos y Supabase local aislado. Se contrastaron la ficha EVA-04, BASE-01, el caso vigente y las reglas de las migraciones `0029`, `0030`, `0039` y `0046`. La migración `0048` usa la matrícula autorizada, el historial para pendientes y los destinatarios conservados para notas confirmadas.
+
+| Escenario esperado | Resultado observado |
+| --- | --- |
+| El traslado conserva el grupo original y el nuevo integrante carece de la nota anterior | El alumno trasladado recibió T1 del grupo A1 con valor 0, y T2 de A2 como pendiente. El alumno que ingresó después careció de T1. |
+| Pendiente distinto de cero y evidencia incompleta omitida | Tanto la fila existente con valor pendiente como el pendiente sin fila se devolvieron con `null`. Se omitieron las actividades sin fecha o historial y las notas antiguas con destinatarios sin verificar. |
+| Corrección disponible de inmediato y acceso docente preservado | El docente responsable corrigió la nota a 17,25. El alumno histórico consultó el nuevo valor en la siguiente lectura y mantuvo el grupo original. |
+| Sesión y alcance académico válidos | Un alumno de otro curso, un docente con matrícula vinculada y una sesión ausente o sin OAuth verificado quedaron sin resultados. La revocación retiró el acceso a notas y puntos con la sesión previa. El rol anónimo careció de permiso sobre la RPC. |
+| Titularidad de puntos y acceso a tablas | Se conservaron las lecturas de puntos propios y se excluyeron movimientos ajenos. El anulado se conserva bajo la política existente y queda fuera del saldo. Las tablas de historial y auditoría siguieron privadas, y la tabla de notas siguió sin devolver filas a alumnos. |
+| Instalación y acceso HTTP | Pasaron la instalación limpia, la actualización desde `0046` pasando por `0047`, la suite SQL regular y una prueba HTTP de PostgREST para la consulta propia, curso ajeno, sesión anónima, tabla de notas y puntos propios. Pasaron también lint, tipos y las 26 pruebas unitarias. |
+
+La denegación general descrita en BASE-01 se conserva como evidencia histórica de la tabla directa. La consulta estudiantil entra por `list_student_group_grades`, sin recuperar la política por grupo actual. Los puntos mantienen la titularidad de `0030`. La integración visual del panel queda en EVA-05 #28 y la aceptación de EVA-04 queda pendiente de revisión independiente.
+
+La suite separada `test:db --pending` confirmó el caso de preservación de GRP-02 y continúa fallando por el adaptador provisional de GRP-06 #23. La prueba de GRP-06 que usa la migración vigente pasó en la suite regular. EVA-04 quedó en esa suite con el contrato real.
