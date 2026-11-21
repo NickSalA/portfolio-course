@@ -52,18 +52,27 @@ function many<T>(relationship: Relationship<T> | undefined): T[] {
 	);
 }
 
+export type StudentDashboardResult = {
+	enrollments: StudentEnrollmentSummary[];
+	error: "query-failed" | null;
+};
+
 export async function getStudentDashboard(
 	supabase: SupabaseClient,
 	studentId: string,
-): Promise<StudentEnrollmentSummary[]> {
+): Promise<StudentDashboardResult> {
 	const { data: enrollmentSynced, error: enrollmentSyncError } =
 		await supabase.rpc("sync_authorized_student");
-	if (enrollmentSyncError || !enrollmentSynced) {
+	if (enrollmentSyncError) {
 		console.error("Student enrollment sync failed", {
 			studentId,
-			synced: enrollmentSynced,
 			error: enrollmentSyncError,
 		});
+		return { enrollments: [], error: "query-failed" };
+	}
+	if (!enrollmentSynced) {
+		// Authenticated account without active authorizations; continue to query
+		// so previously linked enrollments remain inspectable if applicable.
 	}
 
 	const { data, error } = await supabase
@@ -75,34 +84,39 @@ export async function getStudentDashboard(
 		.eq("status", "active");
 	if (error) {
 		console.error("Student enrollment query failed", { studentId, error });
-		return [];
+		return { enrollments: [], error: "query-failed" };
 	}
 
-	return ((data ?? []) as unknown as RawEnrollment[]).map((enrollment) => {
-		const course = one(enrollment.courses);
-		const authorizedStudent = one(enrollment.authorized_students);
-		const transactions = many(authorizedStudent?.point_transactions)
-			.filter((transaction) => !transaction.is_voided)
-			.map((transaction) => ({
-				id: transaction.id,
-				points: transaction.points,
-				reason: transaction.reason,
-				created_at: transaction.created_at,
-			}));
+	const enrollments = ((data ?? []) as unknown as RawEnrollment[]).map(
+		(enrollment) => {
+			const course = one(enrollment.courses);
+			const authorizedStudent = one(enrollment.authorized_students);
+			const transactions = many(authorizedStudent?.point_transactions)
+				.filter((transaction) => !transaction.is_voided)
+				.map((transaction) => ({
+					id: transaction.id,
+					points: transaction.points,
+					reason: transaction.reason,
+					created_at: transaction.created_at,
+				}));
 
-		return {
-			id: enrollment.id,
-			groupId: enrollment.group_id,
-			groupName: one(enrollment.groups)?.name ?? null,
-			courseName: course?.name ?? null,
-			periodCode: one(course?.academic_periods ?? null)?.code ?? null,
-			groupSelectionOpensAt: course?.group_selection_opens_at ?? null,
-			groupSelectionClosesAt: course?.group_selection_closes_at ?? null,
-			transactions,
-			balance: transactions.reduce(
-				(total, transaction) => total + transaction.points,
-				0,
-			),
-		};
-	});
+			return {
+				id: enrollment.id,
+				groupId: enrollment.group_id,
+				groupName: one(enrollment.groups)?.name ?? null,
+				courseName: course?.name ?? null,
+				periodCode: one(course?.academic_periods ?? null)?.code ?? null,
+				groupSelectionOpensAt: course?.group_selection_opens_at ?? null,
+				groupSelectionClosesAt:
+					course?.group_selection_closes_at ?? null,
+				transactions,
+				balance: transactions.reduce(
+					(total, transaction) => total + transaction.points,
+					0,
+				),
+			};
+		},
+	);
+
+	return { enrollments, error: null };
 }

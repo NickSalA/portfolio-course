@@ -1,84 +1,49 @@
 # Hoja de ruta: controles y evidencia operativa
 
-**Estado:** propuesta para el equipo. El responsable confirmó que todavía no dispone de
-monitoreo, alertas, respaldos o procedimientos de recuperación adicionales documentados. No se
-ha verificado la configuración de Vercel ni de Supabase productivo. Nada de lo siguiente está
-implantado o medido por el hecho de estar descrito aquí.
+**Estado:** controles propuestos y evidencia de ejecución pendiente. La inspección estática confirma workflows de CI y release; no demuestra checks aprobados, monitoreo, alertas, respaldos ni recuperación operativos. No se ha verificado la configuración de Vercel ni de Supabase productivo.
 
-## 1. Separar pruebas de producción
+## 1. Alcance y prioridad de las reglas
 
-- Preparar Supabase local para migraciones, RLS y pruebas repetibles siguiendo la
-  [guía de entorno aislado](entorno-de-pruebas-supabase.md); usar solo datos sintéticos.
-- Cuando se necesiten previews compartidos, crear otro proyecto Supabase, limitar sus claves a
-  Vercel Preview y verificar variables y redirects antes de probar OAuth. No ejecutar pruebas
-  destructivas ni `db reset` contra producción.
-- Asignar una persona responsable de las variables y migraciones de cada entorno; registrar en
-  el PR qué proyecto de pruebas se utilizó, sin incluir identificadores sensibles ni claves.
+Los controles cubren el proyecto completo de **registro y seguimiento de evaluaciones grupales**, no solo el guardado docente. Rigen los [acuerdos vigentes](../../development/PLAN-REFINAMIENTO-PARTE-I.md) y los [objetivos del proyecto](../../development/02-objetivos.md) frente a exclusiones anteriores incompatibles. El [caso de docs/01](../01-definicion/caso-evaluacion-grupal.md) requiere actualización y las tareas deben reflejarse en el [backlog y responsabilidades](../04-gestion/backlog-y-responsabilidades.md). Esa sincronización queda pendiente; las especificaciones externas antiguas no se consideran confirmación de las reglas nuevas ni se modifican aquí.
 
-**Criterio de salida:** ejecutar las migraciones de cero y las pruebas de autorización en un
-entorno aislado, y verificar manualmente que una preview no apunta a la base productiva.
+## 2. Separar pruebas de producción
 
-## 2. Checks de integración y pruebas del proceso
+- Preparar Supabase local para migraciones, RLS y pruebas repetibles con datos sintéticos. No ejecutar pruebas destructivas ni `db reset` contra producción.
+- Para previews compartidos, utilizar un proyecto Supabase de prueba, separar claves y verificar variables y redirects de OAuth. Asignar responsable de variables y migraciones; registrar el entorno en el PR sin secretos ni identificadores sensibles.
 
-- Crear un workflow de GitHub Actions para PR hacia `develop` y `main`: instalar con el lockfile,
-  ejecutar `pnpm lint`, `pnpm exec tsc --noEmit` y `pnpm build` en `portfolio-coursse/`. Usar
-  variables públicas **del entorno de prueba** solo si el build las requiere; no proporcionar
-  secretos privilegiados a PR de terceros. Configurar protección de ramas y checks requeridos
-  después de verlos funcionar.
-- Añadir pruebas automatizadas representativas: migraciones en Supabase local, RLS por rol y
-  curso (alumno sin `SELECT` sobre notas, docente autorizado solo para su curso), validación de
-  rango y pertenencia, reintentos y fallos de guardado. Para la extensión de
-  notas, cubrir los [casos de traslado y corrección](../02-diseno/modelo-datos.md). Mantener una
-  revisión manual del docente para las reglas académicas, no solo checks técnicos.
-- Guardar resultados de checks y pruebas con versión/PR, fecha, entorno y datos anonimizados;
-  distinguir evidencia de calidad del código de evidencia de ejecución de evaluaciones.
+**Criterio de salida:** ejecutar migraciones desde cero y pruebas de autorización en un entorno aislado, y verificar que la preview no apunta a producción.
 
-**Criterio de salida:** un PR de prueba falla si se rompe una validación o permiso, y otro pasa
-con la corrección; los resultados quedan accesibles al equipo sin datos personales.
+## 3. Checks y pruebas del proceso
 
-## 3. Señales y alertas del proceso de notas
+El [workflow CI](../../.github/workflows/ci.yml) configura instalación con lockfile, lint, generación de tipos de Next.js, TypeScript y build desde `portfolio-coursse/`, en PR y push a `main`. El [workflow de release](../../.github/workflows/release.yml) configura semantic-release en push a `main`. Su existencia no acredita ejecución exitosa, protección de ramas ni despliegue. Los [scripts del paquete](../../portfolio-coursse/package.json) incluyen pruebas unitarias, E2E y de base de datos, pero CI no las invoca actualmente.
 
-- Definir eventos estructurados para intentar registrar/corregir una nota: evaluación y curso
-  identificados de forma no personal, resultado (éxito/rechazo/error), categoría del error,
-  instante y un identificador de correlación/reintento. Evitar nombres, correos, motivos de
-  excepciones individuales, calificaciones o secretos en logs públicos. Mantener la razón y
-  trazabilidad de correcciones en almacenamiento académico con permisos docentes.
-- Habilitar en el proveedor que el equipo elija la captura de errores del servidor y de base
-  de datos, con retención y acceso restringidos. Establecer responsable, canal y umbral de
-  alerta para fallos de guardado, fallos repetidos de autenticación/autorización y errores de
-  migración; acordar umbrales tras observar la línea base, no inventar tasas actuales.
-- Conciliar por curso y evaluación la cantidad de grupos previstos frente a notas guardadas;
-  revisar faltantes y duplicados, y medir tiempos/correcciones con el protocolo de
-  [indicadores](indicadores-y-ci-cd.md). No usar un check de CI como prueba de que las notas
-  reales llegaron a su destino.
+Añadir y ejecutar pruebas representativas antes de declarar cobertura:
 
-**Criterio de salida:** en pruebas, provocar un guardado fallido y uno exitoso, localizar sus
-señales sin datos sensibles y demostrar que la alerta llega a la persona responsable; guardar
-fecha y resultado de la comprobación.
+- **Permisos e historia:** permitir al estudiante consultar inmediatamente, tras confirmar el registro y sin publicación separada, sus puntos y las notas de las actividades en las que participó. Probar autorización en servidor/RLS, no solo ocultación en UI. Negar notas ajenas y acceso por mera pertenencia actual a otro grupo; un cambio de grupo conserva los resultados históricos propios. Solo el docente autorizado del curso modifica notas y puntos.
+- **Registro:** comprobar curso, evaluación, grupo, pertenencia histórica y rango de nota de 0 a 20, correcciones y reintentos sin duplicación. Distinguir nota pendiente vacía de cero registrado. Resolver con revisión docente las ambigüedades temporales, sin inventar un traslado directo docente adicional.
+- **Reclamos:** permitir un único reclamo por grupo/evaluación a cualquiera de los participantes históricos y su consulta por esos participantes y el docente. El reclamo sobre un movimiento de puntos propio es único y privado entre alumno y docente. Probar **Pendiente → En revisión → Respondido**, decisión final motivada, sin duplicado, réplica ni reapertura. Una respuesta favorable requiere corrección docente expresa, no cambia automáticamente notas o puntos.
+- **Correo:** cada nuevo reclamo genera aviso al docente responsable con enlace y sin notas, puntos ni texto del reclamo. Comprobar acceso autorizado al abrir el enlace y distinguir generación, envío, entrega y lectura. Si falla el correo, el reclamo permanece registrado; la recuperación detallada sigue pendiente. No añadir avisos al alumno, recordatorios ni escalamiento.
+- **Exportación XLSX por curso:** verificar atribución histórica por alumno y cálculo con puntos como **supuesto de trabajo del equipo, no confirmado por el profesor**: aplicación automática, trabajos de igual peso, una unidad de nota por punto con margen y máximo de 20 por trabajo, sin reutilizar el saldo en cada trabajo o añadirlo otra vez al promedio. No alterar notas base ni resultados de compañeros; conservar el excedente sin efecto adicional. Exportar no consume ni modifica puntos y con iguales entradas conserva resultados académicos. Las notas pendientes permanecen vacías y, si faltan notas, no se presenta un promedio final ajustado completo. Redondear solo al final a dos decimales. Saldo negativo, movimientos incluidos, precisión de notas y columnas definitivas requieren definición previa a cerrar las pruebas.
 
-## 4. Respaldos, restauración y respuesta a incidentes
+**Criterio de salida:** conservar resultados por escenario con esperado/observado, versión/PR, fecha y entorno; demostrar casos permitidos y denegados, fallos y recuperación sin datos personales. Registrar los checks realmente ejecutados, no inferirlos del YAML.
 
-- Antes de cambiar el esquema productivo, revisar el plan de Supabase contratado: confirmar si
-  hay respaldos, frecuencia, retención, alcance y posibilidad de restauración. Definir quién
-  puede iniciar una recuperación y dónde guardar la documentación de acceso fuera del repo. No
-  asumir que un respaldo existe solo por usar Supabase.
-- Definir una política acorde con el riesgo y el plan disponible: periodicidad y retención,
-  objetivo máximo de pérdida de datos (RPO) y tiempo de recuperación (RTO), con aprobación del
-  equipo/docente. Mantener datos de alumnos y secretos fuera de repositorios y evidencias públicas.
-- Ensayar restauración en un **proyecto aislado**, verificar integridad de cursos, evaluaciones,
-  notas y autorizaciones, permisos RLS y capacidad de reanudar el servicio. Nunca usar producción
-  para ensayos destructivos ni dar por probada una restauración solo por generar una copia.
-- Escribir un procedimiento breve: detectar, detener cambios si procede, avisar al responsable,
-  registrar el alcance y la hora, restaurar/reconciliar y documentar la causa y acciones. Incluir
-  respuesta a un guardado parcialmente fallido o repetido sin duplicar registros.
+## 4. Señales y alertas del proceso
 
-**Criterio de salida:** constancia de una restauración de prueba con fecha, entorno, tiempo,
-resultado y discrepancias; RPO/RTO acordados y responsable de activación identificado.
+- Definir eventos estructurados para registro/corrección de notas y puntos, reclamos, aviso al docente y exportación: resultado, categoría de error, instante e identificador de correlación/reintento no personal. Evitar nombres, correos, notas, puntos, motivos privados, texto de reclamos y secretos en logs públicos. Conservar trazabilidad académica y decisiones en almacenamiento de acceso restringido según el tipo de registro.
+- Habilitar captura de errores del servidor y de base de datos con retención y acceso restringidos. Acordar responsable, canal y umbrales de alerta después de observar ejecuciones; no inventar tasas actuales ni confundir alertas técnicas con el correo funcional de reclamo.
+- Conciliar registros esperados y guardados por curso/evaluación, participantes históricos, duplicados y resultados exportados. Aplicar el protocolo de [indicadores](indicadores-y-ci-cd.md); un check de CI no prueba que las notas reales llegaron a su destino.
 
-## 5. Evidencia para el trabajo final
+**Criterio de salida:** provocar fallos y éxitos en pruebas, localizar señales sin datos sensibles y verificar la recepción de una alerta por el responsable, con fecha y resultado.
 
-Al implementar el flujo, registrar diseño, pruebas ejecutadas, métricas comparadas con una línea
-base manual, errores, señales y conclusiones en
-`docs/automatizaciones/<nombre-del-proceso>/evaluacion.md` según la
-[constitución](../../.specify/memory/constitution.md). Hasta tener ejecuciones comprobadas,
-reportar cada control como **pendiente**; no anunciar disponibilidad ni porcentajes de éxito.
+## 5. Respaldos, restauración y respuesta a incidentes
+
+- Antes de cambiar producción, verificar el plan de Supabase: existencia, frecuencia, retención, alcance y restauración de respaldos. Definir quién puede recuperar y documentar accesos fuera del repositorio; no asumir respaldos por usar el proveedor.
+- Acordar periodicidad, retención, objetivo de pérdida máxima de datos (RPO) y tiempo de recuperación (RTO). Mantener datos personales y secretos fuera de evidencias públicas.
+- Ensayar restauración solo en entorno aislado. Verificar cursos, evaluaciones, participación histórica, notas, movimientos de puntos, reclamos y respuestas, integridad y permisos de consulta. Una copia generada no acredita restauración.
+- Documentar detección, contención, aviso al responsable, alcance, restauración/conciliación y causa. Incluir guardados parciales, reintentos sin duplicados y estado del aviso por correo.
+
+**Criterio de salida:** constancia de restauración con fecha, entorno, tiempo, resultado y discrepancias; RPO/RTO acordados y responsable identificado.
+
+## 6. Evidencia para el trabajo final
+
+Registrar diseño, pruebas, señales, errores y conclusiones en la [evaluación del proceso](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md). La comparación temporal será contra un procedimiento manual **simulado**, no una línea base histórica real del docente. El seguimiento se evalúa contra escenarios funcionales esperados, sin inventar una línea base de reclamos. Hasta contar con comprobaciones, indicar controles y resultados como pendientes; no anunciar disponibilidad, porcentajes de mejora ni éxito operativo.

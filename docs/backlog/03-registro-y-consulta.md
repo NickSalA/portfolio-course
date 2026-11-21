@@ -1,0 +1,134 @@
+# Backlog 03 — Registro y consulta de resultados
+
+> Convenciones e índices: [README](README.md). Alcance: [caso](../01-definicion/caso-evaluacion-grupal.md). Hito principal: [M2](../04-gestion/milestones.md). Se preserva el código que supere la verificación; no se considera suficiente el guardado o la pantalla sin probar sus permisos y destinatarios.
+
+### EVA-01 · Registrar y corregir una nota por grupo y evaluación
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#4-registro-corrección-y-consulta-de-notas). Conservar rango 0–20, unicidad y RLS de mismo curso; el upsert actual sobrescribe nota/feedback sin versiones ni autor/motivo de corrección. Mantener participantes originales y revisar borrados destructivos.
+
+**Rol:** R3 · **Revisor:** R4 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** GRP-06, BASE-03
+
+**GitHub:** [#24](https://github.com/NickSalA/portfolio-course/issues/24) · **Asignado:** @MathiMomos · **Revisión propuesta:** @fabrizio25504
+
+- [ ] Verificar nota única por grupo/evaluación y coincidencia de curso y docente.
+- [ ] Admitir 0–20 y distinguir nota pendiente de cero explícito.
+- [ ] Conservar valor anterior/nuevo, responsable y momento de las correcciones confirmadas.
+- [ ] Mantener destinatarios históricos de la actividad cuando cambie la nota.
+
+**Aceptación:** la nota grupal se registra una vez y corresponde a los participantes; valor inválido, curso ajeno o corrección no autorizada no deja un cambio aceptado.
+
+**Documentación:** reglas de registro/corrección y evidencia de límites y permisos.
+
+
+**Seguimiento local de EVA-01.** La migración `0046` centraliza el guardado, conserva los participantes originales y audita las correcciones. Pasaron la actualización desde `0045`, una instalación limpia, la suite SQL regular y el recorrido docente sintético. Las notas antiguas con destinatarios desconocidos se mantienen visibles y bloqueadas para edición. La consulta estudiantil queda en EVA-04 #27 y la exportación histórica en EXP-03 #40. La aceptación queda pendiente de revisión independiente. Este registro actualiza solo la ficha local. [Evidencia de EVA-01](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#eva-01-24--registro-y-corrección-de-notas-grupales)
+
+### EVA-02 · Verificar puntos individuales y corrección no destructiva
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#5-puntos-y-correcciones). Conservar saldo derivado y anulación autorizada; completar trazabilidad de anulación/reemplazo y comprobar titularidad/contexto. Los anulados se ocultan de los historiales revisados.
+
+**Rol:** R1 · **Revisor:** R3 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Dependencia:** BASE-06 (issue #15 cerrada en GitHub; seguimiento local pendiente de sincronizar)
+
+**GitHub:** [#25](https://github.com/NickSalA/portfolio-course/issues/25) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
+
+- [ ] Revisar asignación de puntos, destinatario y consulta del historial existentes.
+- [ ] Mantener saldo derivado y corrección por anulación o ajuste que preserve el original.
+- [ ] Probar que registrar puntos no modifica notas grupales ni resultados de otros alumnos.
+
+**Aceptación:** el docente gestiona movimientos de sus alumnos y corrige sin borrado de historia; exportar no se introduce como una operación que descuente saldo.
+
+**Documentación y contraste local:** la migración `0040` (probada previamente con el número `0037`) conserva el movimiento anulado y registra responsable, fecha y motivo cuando están disponibles; los movimientos antiguos no permiten reconstruir esos datos. El historial docente identifica anulaciones; el saldo y la exportación incluyen solo movimientos no anulados. La anulación seguida de un ajuste conserva ambos movimientos, pero no los vincula como reemplazo. Las acciones contrastan curso y periodo con el recurso. La recuperación integral de reintentos entre sesiones y dispositivos sigue en EVA-07; la consulta estudiantil y su recorrido corresponden a EVA-04–06, y las decisiones de cálculo a EXP-01.
+
+**Evidencia:** el usuario ejecutó `DOCKER_HOST=unix:///run/docker.sock pnpm test:db` en la instancia local con la migración `0037` aplicada. Pasaron las cinco suites, incluidos `current_capabilities.sql` y `eva_02_point_audit.sql`: los escenarios comprueban titularidad, contexto, anulación y no interferencia con notas y movimientos ajenos; los datos sintéticos se revierten. El usuario informó que la suite volvió a pasar tras aplicar `0038`, que el recorrido propuesto funciona y que el estudiante puede ver los puntos actualizados; no detalló los resultados de cada paso visual. También pasaron `pnpm typecheck`, `pnpm test` (13 pruebas) y `pnpm lint` en la revisión de implementación.
+
+**Seguimiento local de revisión:** la migración `0043` exige motivo no blanco en la RPC con contexto, conservando la RPC legacy sin motivo; la acción de servidor también lo valida y registra fallos de registro. Se ampliaron los escenarios SQL para motivos vacíos y compatibilidad legacy. Se aplicaron las migraciones `0042` y `0043` y pasó `DOCKER_HOST=unix:///run/docker.sock pnpm test:db`; también pasaron `pnpm typecheck`, `pnpm lint` y `pnpm test` (13 pruebas). Pendiente el recorrido visual docente de estos cambios (EVA-02 #25); siguen pendientes la vinculación de reemplazos y los recorridos/exportación indicados abajo. No se ha actualizado GitHub ni se declara aceptación funcional.
+
+**Revisión de reintentos (comentarios 1 y 3):** la UI conserva el UUID y los datos pendientes en `sessionStorage`, por docente, periodo, curso y alumno; al encontrar el movimiento coincidente en el historial lo descarta. Un cambio de contenido exige descartar explícitamente el intento, con aviso de posible duplicación. La migración nueva `0042` mantiene RLS y solo acepta replay con el mismo contenido, creador, autorización activa y contexto autorizado. Esto aborda el antecedente de conflicto semántico de BASE-01 en esta RPC; la recuperación integral sigue en EVA-07 (#30), incluida la recuperación entre pestañas/dispositivos o después de cerrar la sesión del navegador. Se añadieron escenarios SQL propios que pasaron con la suite de base de datos tras aplicar las migraciones. Quedan pendientes los recorridos visuales, incluidos fallo de red, remount y reintento (EVA-02 #25); no se declara aceptación ni se actualizó GitHub.
+
+**Condición de la ejecución y pendientes:** la primera ejecución de la suite completa falló en BASE-05 porque `anon` tenía permisos directos de ejecución en tres RPC de importación. El usuario recibió instrucciones para revocarlos manualmente y la ejecución posterior pasó; la salida compartida no incluye el resultado de los `REVOKE`. La migración `0041` versiona la revocación explícita. Con autorización del usuario se reconstruyó la base local y se aplicó la secuencia completa, incluidas `0040` y `0041`; después pasó `pnpm test:db`. Esto no verifica otras instalaciones para BASE-05. No se debe asumir que otras bases estén corregidas. Quedan pendientes detallar la evidencia de cada paso del recorrido docente y confirmar la exportación repetida sin mutación (EVA-06/EXP-04). BASE-06 #15 figura cerrada en GitHub; su ficha local aún figura en Backlog y requiere sincronización. No se declara aceptada EVA-02 ni se ha actualizado la issue de GitHub.
+
+### EVA-03 · Completar la matriz docente de notas y pendientes
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). Existe /teacher/grades con entrada «Notas» y tabla de consulta/edición; no hay evidencia visual ni vista independiente de solo consulta identificada. Reutilizarla y comprobar guardado por pérdida de foco, confirmación, fallo, pendientes/cero y participantes históricos.
+
+**Rol:** R2 · **Revisor:** R4 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-01, BASE-07
+
+**GitHub:** [#26](https://github.com/NickSalA/portfolio-course/issues/26) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @fabrizio25504
+
+- [ ] Presentar curso, actividad y grupos/participantes correspondientes.
+- [ ] Mostrar nota guardada, corrección y pendiente sin confundir vacío con cero.
+- [ ] Informar progreso, confirmación y error; evitar doble envío accidental y conservar entradas ante un fallo.
+
+**Aceptación:** el docente registra una calificación por grupo sin buscar a cada alumno; la interfaz no anuncia éxito antes de confirmar ni exige publicar después.
+
+**Documentación:** prototipo y recorrido docente actualizados.
+
+**Seguimiento local de implementación:** completada la matriz docente en `/teacher/grades` reutilizando sin nuevas migraciones SQL las RPC de `0044`–`0046` (`Opción A`). Se incorporaron [`lib/teacher/grade-matrix.ts`](../../portfolio-coursse/lib/teacher/grade-matrix.ts), `app/teacher/grades/loading.tsx`, filtrado de integrantes actuales `active` y envío de `participantsByEvaluation` + `studentNames` en [`page.tsx`](../../portfolio-coursse/app/teacher/grades/page.tsx), validación unificada en [`actions.ts`](../../portfolio-coursse/app/teacher/grades/actions.ts), estados textuales neutros (`Pendiente`, `Calificada`, `Corregida · rev. N`, `Bloqueada · sin verificar`, `Sin fecha`, `Padrón por verificar`), fechas `America/Lima`, filtro de evaluaciones, resumen de progreso, destinatarios previstos y confirmados tras `router.refresh()`, bloqueo por celda `inFlightRef`, conservación de borradores y motivos en errores/conflictos con botones explícitos de recuperación, exportación local `.xlsx` con celdas vacías `""` en pendientes y mejoras de accesibilidad (`role="dialog"`, `Esc`, fechas Lima) en `EvaluationManagerDialog`.
+
+**Evidencia y pendientes:** pasaron `pnpm lint`, `pnpm typecheck`, `pnpm test` (`8` archivos / `31` pruebas, incluidas `5` en [`grade-matrix.test.ts`](../../portfolio-coursse/tests/unit/grade-matrix.test.ts)), `pnpm build` y los recorridos `E1–E16` en navegador local (`Chrome`, `1280×800`, `375×812` y teclado) con datos sintéticos `@example.test`. Detalle en [evaluacion.md](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#eva-03-26--matriz-docente-de-notas-y-pendientes). Pendiente de revisión independiente de R4 (`@fabrizio25504`) en PR y continuación en `EVA-06 #29`; siguen fuera de alcance `EVA-04`, `EVA-05`, `EVA-07`, `EXP-03` y `QA-01`. Este seguimiento se actualizó solo localmente, no en GitHub.
+
+### EVA-04 · Autorizar consultas por participación histórica y titularidad
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#4-registro-corrección-y-consulta-de-notas). 0029 bloquea lectura estudiantil; no restaurar la política de 0028 basada en grupo actual. Diseñar acceso histórico y titularidad de puntos con pruebas directas.
+
+**Rol:** R3 · **Revisor:** R4 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-01, EVA-02, GRP-02
+
+**GitHub:** [#27](https://github.com/NickSalA/portfolio-course/issues/27) · **Asignado:** @MathiMomos · **Revisión propuesta:** @fabrizio25504
+
+- [ ] Diseñar el permiso de consulta estudiantil según participantes de la actividad y puntos propios.
+- [ ] Sustituir la denegación antigua mediante cambios nuevos y comprobados; no restaurar una lectura basada solo en grupo actual.
+- [ ] Probar alumno trasladado, nuevo integrante, curso ajeno, docente ajeno y sesión ausente por acceso directo.
+
+**Aceptación:** cada resultado confirmado se puede consultar inmediatamente por sus destinatarios, sin exponer datos ajenos. La evidencia antigua de denegación se conserva como histórica, no como aceptación nueva.
+
+**Documentación:** permisos vigentes, diseño y matriz esperado/observado.
+
+**Seguimiento local de EVA-04.** La migración `0048` habilita la consulta del alumno por matrícula autorizada y destinatarios históricos. Una actividad fechada con grupo verificable puede devolver un pendiente aunque todavía no exista una nota. La política de titularidad de puntos se conservó. La evidencia se registró en [evaluación EVA-04](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#eva-04-27--consulta-estudiantil-de-resultados). El panel corresponde a EVA-05 #28 y la aceptación queda pendiente de revisión independiente. Este seguimiento se actualizó en el repositorio local.
+
+
+### EVA-05 · Mostrar notas y puntos propios en el panel del alumno
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). El panel existente muestra puntos, no notas. Integrar consulta histórica sin reconstruir el panel completo; verificar actividad/grupo original, pendientes/cero y estados visibles.
+
+**Rol:** R2 · **Revisor:** R4 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-04, BASE-07
+
+**GitHub:** [#28](https://github.com/NickSalA/portfolio-course/issues/28) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @fabrizio25504
+
+- [ ] Mostrar actividad, nota grupal base y relación con el grupo de la actividad.
+- [ ] Mantener consulta de puntos y movimientos propios, separada de calificaciones.
+- [ ] Distinguir pendientes y ceros; no agregar un botón de publicación ni una nota final individual no acordada en pantalla.
+
+**Aceptación:** tras el registro, el alumno consulta sus resultados y conserva los de actividades anteriores después de un cambio de grupo.
+
+**Documentación:** recorrido estudiantil y pruebas de carga, vacío y error.
+
+### EVA-06 · Comprobar registro y consulta de extremo a extremo
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#comprobaciones-necesarias-para-aceptación-funcional). Ejecutar registro/corrección, límites, consulta por participante histórico y acceso ajeno. Separar pruebas de interfaz, persistencia y políticas directas; el inventario no certifica el recorrido M2.
+
+**Rol:** R4 · **Revisor:** R1 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-03, EVA-05, EVA-07
+
+**GitHub:** [#29](https://github.com/NickSalA/portfolio-course/issues/29) · **Asignado:** @fabrizio25504 · **Revisión propuesta:** @NickSalA
+
+- [ ] Ejecutar registro/corrección docente y consulta del alumno con límites 0/20 y pendiente.
+- [ ] Probar alumnos de actividades anteriores, nuevo grupo y acceso ajeno.
+- [ ] Contrastar puntos visibles con sus movimientos sin alterar notas.
+
+**Aceptación:** recorrido M2 demostrado con datos sintéticos; defectos reproducibles asignados al autor del módulo y evidencias de su corrección antes del cierre.
+
+**Documentación:** pruebas y resultados de M2.
+
+### EVA-07 · Integrar recuperación de guardados sin duplicación
+
+**Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#5-puntos-y-correcciones). El registro de puntos trata cualquier 23505 como éxito sin verificar equivalencia. Probar UUID con contenido igual/distinto; revisar también confirmación incierta y sobrescrituras concurrentes de notas.
+
+**Rol:** R1 · **Revisor:** R3 · **Milestone:** M2 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-01, EVA-02, GRP-03
+
+**GitHub:** [#30](https://github.com/NickSalA/portfolio-course/issues/30) · **Asignado:** @NickSalA · **Revisión propuesta:** @MathiMomos
+
+- [ ] Comprobar fallos antes/después de confirmar y repetición de acciones de grupos, notas y puntos.
+- [ ] Permitir verificar el resultado sin duplicar registros o correcciones.
+- [ ] Comunicar rechazo, fallo o confirmación incierta con una acción siguiente comprensible.
+
+**Aceptación:** un reintento equivalente converge al mismo resultado académico; una corrección nueva no se confunde con un reintento y los fallos no se presentan como éxito.
+
+**Documentación:** comportamiento de recuperación, pasos y resultados de prueba.
