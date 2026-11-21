@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { validateGradeInput } from "@/lib/teacher/grade-matrix";
 import { createClient } from "@/lib/supabase/server";
 
 export async function addEvaluationAction(formData: FormData) {
@@ -244,8 +245,9 @@ export async function saveGroupGradeAction(formData: FormData) {
         return { error: "Datos del curso, grupo o evaluación inválidos" };
     }
 
-    if (!/^\d+(?:\.\d{1,2}0*)?$/.test(rawGrade) || Number(rawGrade) > 20) {
-        return { error: gradeErrors.group_grade_invalid_value };
+    const validation = validateGradeInput(rawGrade);
+    if (!validation.ok) {
+        return { error: validation.message };
     }
 
     const supabase = await createClient();
@@ -253,7 +255,7 @@ export async function saveGroupGradeAction(formData: FormData) {
         target_course_id: courseId,
         target_group_id: groupId,
         target_evaluation_id: evaluationId,
-        new_grade: Number(rawGrade),
+        new_grade: validation.value,
         expected_revision: revision,
         correction_reason: String(formData.get("reason") ?? "").trim() || null,
     }).single<{ grade: number; revision: number }>();
