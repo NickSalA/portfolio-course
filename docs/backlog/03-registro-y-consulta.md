@@ -101,6 +101,11 @@
 
 **Documentación:** recorrido estudiantil y pruebas de carga, vacío y error.
 
+**Seguimiento local de EVA-05:** implementado el panel estudiantil de notas grupales históricas separado de puntos, reutilizando la RPC `list_student_group_grades` de `0048`:
+- **Antecedentes BASE-01 atendidos:** [`get-dashboard.ts`](../../portfolio-coursse/lib/student/get-dashboard.ts) consulta `list_student_group_grades` por matrícula activa preservando `0` explícito vs `null` pendiente y aislando fallos (`gradesError`) sin ocultar puntos ni matrícula; [`student-course-card.tsx`](../../portfolio-coursse/components/student-portal/student-course-card.tsx) separa la sección *Notas grupales* de *Puntos*, muestra fecha en `America/Lima`, grupo histórico de la actividad (indicando cuando difiere del grupo actual) y estado `Pendiente`, sin botón de publicación ni cálculo ajustado individual.
+- **Pruebas ejecutadas:** `pnpm test` (`get-student-dashboard.test.ts` ampliado a 5 casos), `pnpm lint`, `pnpm typecheck` y `pnpm build`.
+- **Pendiente:** recorrido visual en navegador con sesión sintética y revisión independiente; seguimiento actualizado solo localmente, no en GitHub. Contribución siguiente: `EVA-06 #29`.
+
 ### EVA-06 · Comprobar registro y consulta de extremo a extremo
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#comprobaciones-necesarias-para-aceptación-funcional). Ejecutar registro/corrección, límites, consulta por participante histórico y acceso ajeno. Separar pruebas de interfaz, persistencia y políticas directas; el inventario no certifica el recorrido M2.
