@@ -54,7 +54,9 @@ try {
                 "base_06_student_enrollment.sql",
                 "grp_01_group_configuration.sql",
                 "grp_02_group_membership_history.sql",
+                "grp_03_group_selection.sql",
                 "grp_06_activity_participants.sql",
+                "rec_01_claims_model.sql",
             ];
     for (const script of scripts) {
         console.log(`\nRunning ${script}`);

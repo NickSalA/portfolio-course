@@ -21,6 +21,9 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 **Documentación:** actualizar [modelo de datos](../02-diseno/modelo-datos.md) con relaciones, restricciones y permisos; registrar comprobaciones en [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md).
 
+**Seguimiento local de REC-01:** la migración [`0050_claims_model_and_rls.sql`](../../portfolio-coursse/supabase/migrations/0050_claims_model_and_rls.sql) define la tabla `public.claims`, claves foráneas compuestas por curso/titular, índices únicos parciales permanentes (`(group_id, evaluation_id)` para `group_grade` y `(point_transaction_id)` para `point_transaction`), funciones de participación histórica (`academic_access.is_historical_group_participant`, `can_read_historical_group_claim`), políticas RLS de lectura/alta y trigger `guard_claim_mutation` que bloquea borrados, inmutabilidad de identidad y reapertura tras `responded`.
+- **Pendiente de ejecución:** aplicar `0050` y ejecutar [`rec_01_claims_model.sql`](../../portfolio-coursse/supabase/qa/rec_01_claims_model.sql) en Supabase local (Docker Desktop no estuvo disponible en este entorno) y revisión independiente; seguimiento actualizado solo localmente, no en GitHub. Desbloquea `REC-02 #32`.
+
 ### REC-02 · Presentación de ambos tipos de reclamo
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). No se encontró operación de presentación. Conservar identidad del autor y registro académico original; comprobar concurrencia e idempotencia sin supeditar persistencia al correo.
