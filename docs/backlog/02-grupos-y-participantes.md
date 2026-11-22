@@ -57,6 +57,11 @@
 
 **Documentación:** reglas de selección, fallos y prueba de concurrencia.
 
+**Seguimiento local de GRP-03:** la migración [`0049_grp03_group_selection_concurrency_and_history.sql`](../../portfolio-coursse/supabase/migrations/0049_grp03_group_selection_concurrency_and_history.sql) endurece la selección y preasignación de grupos sin añadir traslado directo docente:
+- **Antecedentes BASE-01 atendidos en código:** retira las políticas directas `"teachers create enrollments"` y `"teachers update enrollments"` sobre `course_students` y añade el trigger `guard_course_student_group_write` (`42501`) para impedir bypass directo sobre `group_id` desde clientes `authenticated`; corrige `select_course_group` adquiriendo `courses ... for share` y `pg_advisory_xact_lock(selected_group_id)` *antes* de leer `groups.capacity` (evitando lecturas obsoletas frente a `synchronize_course_groups`) y hace idempotente la repetición sobre el grupo ya confirmado con ventana abierta; extiende `sync_authorized_student` para verificar capacidad bajo advisory lock en preasignaciones iniciales sin sobrescribir el grupo elegido en resincronizaciones.
+- **Aplicación:** [`app/student/actions.ts`](../../portfolio-coursse/app/student/actions.ts) valida enteros positivos en `enrollment_id` y `group_id`.
+- **Pendiente de ejecución:** validar `0049` y [`grp_03_group_selection.sql`](../../portfolio-coursse/supabase/qa/grp_03_group_selection.sql) contra PostgreSQL/Supabase local (Docker Desktop no estuvo disponible en este entorno) y prueba de carrera real en dos sesiones para el último cupo; seguimiento actualizado solo localmente, no en GitHub. Contribución siguiente: `GRP-04 #21` y `EVA-07 #30`.
+
 ### GRP-04 · Completar la selección de grupo del alumno
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). Reutilizar GroupSelection; ejecutar elección/cambio, rechazo, recarga y reapertura. Revisar minimización de nombres/correos en la RPC; el payload entregado no queda protegido por ocultarlo en pantalla.
