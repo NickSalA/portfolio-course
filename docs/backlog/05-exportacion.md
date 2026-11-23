@@ -40,6 +40,10 @@ Antes de implementar, verificar lo existente y conservar lo que pase los criteri
 
 **Documentación:** actualizar [modelo de datos](../02-diseno/modelo-datos.md) con el contrato de cálculo derivado y la preservación de datos base; registrar pruebas y límites en [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md).
 
+**Seguimiento local de EXP-02:** implementado el módulo puro [`adjusted-average.ts`](../../portfolio-coursse/lib/export/adjusted-average.ts) (`calculateAdjustedAverage` y `calculateActivePointsBalance`) conforme a las decisiones cerradas en `EXP-01 #38` (notas `0..20` hasta 2 decimales, `0` vs pendiente `null`, saldos positivos y negativos con límite `[0, 20]`, exclusión de movimientos anulados, precisión completa sin redondeo intermedio y redondeo half-up solo del promedio ajustado final).
+- **Pruebas ejecutadas:** `pnpm test:node` (`adjusted-average.test.mjs`, 14 pruebas aprobadas) y `pnpm test` (`adjusted-average.test.ts`, 13 pruebas aprobadas), además de `pnpm lint`, `pnpm typecheck` y `pnpm build`.
+- **Pendiente:** revisión independiente R4 (`@fabrizio25504`) en PR; seguimiento actualizado solo localmente, no en GitHub. Desbloquea `EXP-03 #40`.
+
 ### EXP-03 · Descarga XLSX por curso con atribución histórica
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). Reutilizar generación XLSX, no la atribución actual: exporta integrantes actuales y notas locales incluso no confirmadas, con pendiente «-». Integrar datos históricos confirmados y cálculo sin mutaciones.

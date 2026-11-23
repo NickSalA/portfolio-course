@@ -6,7 +6,12 @@ import { createClient } from "@/lib/supabase/server";
 export async function selectStudentGroup(formData: FormData) {
 	const enrollmentId = Number(formData.get("enrollment_id"));
 	const groupId = Number(formData.get("group_id"));
-	if (!Number.isInteger(enrollmentId) || !Number.isInteger(groupId))
+	if (
+		!Number.isInteger(enrollmentId) ||
+		enrollmentId <= 0 ||
+		!Number.isInteger(groupId) ||
+		groupId <= 0
+	)
 		redirect("/student?error=group");
 	const supabase = await createClient();
 	const { error } = await supabase.rpc("select_course_group", {

@@ -58,8 +58,8 @@ export function StudentDashboard({
 						Hola, {greetingName}.
 					</h1>
 					<p className="mt-2 text-sm text-muted">
-						Consulta tus cursos, grupos y movimientos de puntos
-						cuando lo necesites.
+						Consulta tus cursos, grupos, notas grupales y
+						movimientos de puntos cuando lo necesites.
 					</p>
 					{statusMessage && (
 						<p

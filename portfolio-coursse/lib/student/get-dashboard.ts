@@ -10,8 +10,18 @@ type RawTransaction = {
 	is_voided: boolean;
 };
 
+type RawGroupGrade = {
+	evaluation_public_id: string;
+	evaluation_name: string;
+	group_public_id: string;
+	group_name: string;
+	performed_at: string;
+	grade: number | string | null;
+};
+
 type RawEnrollment = {
 	id: number;
+	course_id: number;
 	group_id: number | null;
 	groups: Relationship<{ name: string | null }>;
 	courses: Relationship<{
@@ -27,8 +37,18 @@ type RawEnrollment = {
 
 export type StudentPointTransaction = Omit<RawTransaction, "is_voided">;
 
+export type StudentGroupGrade = {
+	evaluationPublicId: string;
+	evaluationName: string;
+	groupPublicId: string;
+	groupName: string;
+	performedAt: string;
+	grade: number | null;
+};
+
 export type StudentEnrollmentSummary = {
 	id: number;
+	courseId: number;
 	groupId: number | null;
 	groupName: string | null;
 	courseName: string | null;
@@ -37,7 +57,22 @@ export type StudentEnrollmentSummary = {
 	groupSelectionClosesAt: string | null;
 	transactions: StudentPointTransaction[];
 	balance: number;
+	grades: StudentGroupGrade[];
+	gradesError: boolean;
 };
+
+function parseGradeValue(
+	rawGrade: number | string | null | undefined,
+): number | null {
+	if (rawGrade === null || rawGrade === undefined) {
+		return null;
+	}
+	if (typeof rawGrade === "string" && rawGrade.trim() === "") {
+		return null;
+	}
+	const numeric = Number(rawGrade);
+	return Number.isFinite(numeric) ? numeric : null;
+}
 
 function one<T>(relationship: Relationship<T>) {
 	return Array.isArray(relationship)
@@ -78,7 +113,7 @@ export async function getStudentDashboard(
 	const { data, error } = await supabase
 		.from("course_students")
 		.select(
-			"id, group_id, groups(name), courses(name, group_selection_opens_at, group_selection_closes_at, academic_periods(code)), authorized_students(point_transactions(id, points, reason, created_at, is_voided))",
+			"id, course_id, group_id, groups(name), courses(name, group_selection_opens_at, group_selection_closes_at, academic_periods(code)), authorized_students(point_transactions(id, points, reason, created_at, is_voided))",
 		)
 		.eq("student_id", studentId)
 		.eq("status", "active");
@@ -87,8 +122,9 @@ export async function getStudentDashboard(
 		return { enrollments: [], error: "query-failed" };
 	}
 
-	const enrollments = ((data ?? []) as unknown as RawEnrollment[]).map(
-		(enrollment) => {
+	const rawEnrollments = (data ?? []) as unknown as RawEnrollment[];
+	const enrollments = await Promise.all(
+		rawEnrollments.map(async (enrollment) => {
 			const course = one(enrollment.courses);
 			const authorizedStudent = one(enrollment.authorized_students);
 			const transactions = many(authorizedStudent?.point_transactions)
@@ -100,8 +136,35 @@ export async function getStudentDashboard(
 					created_at: transaction.created_at,
 				}));
 
+			const { data: rawGrades, error: gradesRpcError } =
+				await supabase.rpc("list_student_group_grades", {
+					target_course_id: enrollment.course_id,
+				});
+
+			if (gradesRpcError) {
+				console.error("Student group grades query failed", {
+					studentId,
+					courseId: enrollment.course_id,
+					error: gradesRpcError,
+				});
+			}
+
+			const grades: StudentGroupGrade[] = gradesRpcError
+				? []
+				: ((Array.isArray(rawGrades) ? rawGrades : []) as RawGroupGrade[]).map(
+						(row) => ({
+							evaluationPublicId: row.evaluation_public_id,
+							evaluationName: row.evaluation_name,
+							groupPublicId: row.group_public_id,
+							groupName: row.group_name,
+							performedAt: row.performed_at,
+							grade: parseGradeValue(row.grade),
+						}),
+					);
+
 			return {
 				id: enrollment.id,
+				courseId: enrollment.course_id,
 				groupId: enrollment.group_id,
 				groupName: one(enrollment.groups)?.name ?? null,
 				courseName: course?.name ?? null,
@@ -114,8 +177,10 @@ export async function getStudentDashboard(
 					(total, transaction) => total + transaction.points,
 					0,
 				),
+				grades,
+				gradesError: Boolean(gradesRpcError),
 			};
-		},
+		}),
 	);
 
 	return { enrollments, error: null };
