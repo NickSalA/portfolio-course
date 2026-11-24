@@ -1,14 +1,13 @@
 import { redirect } from "next/navigation";
 import { StudentDashboard } from "@/components/student-portal/student-dashboard";
 import { hasAcademicIdentity } from "@/lib/academic/authorize-current-user";
+import { STUDENT_GROUP_ERROR_MESSAGES } from "@/lib/student/group-selection";
 import { getStudentDashboard } from "@/lib/student/get-dashboard";
 import { createClient } from "@/lib/supabase/server";
 
 const studentMessages: Record<string, string> = {
 	forbidden: "Tu cuenta no tiene permisos para acceder al panel docente.",
-	group: "No se pudo seleccionar ese grupo. Inténtalo nuevamente.",
-	"group-full": "Ese grupo acaba de llenarse. Elige otro disponible.",
-	"group-closed": "La ventana de selección de grupos está cerrada.",
+	...STUDENT_GROUP_ERROR_MESSAGES,
 };
 
 export default async function StudentPage({
