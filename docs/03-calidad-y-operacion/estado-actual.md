@@ -59,6 +59,10 @@ Se incorporaron las operaciones de presentación y consulta estudiantil sobre el
 - **Reglas implementadas:** creación exclusiva en estado `pending`, autorización en servidor/BD por participación histórica (`group_grade`) o titularidad (`point_transaction`), convergencia idempotente ante reintento equivalente del mismo autor (`created: false`), rechazo con error comprensible ante duplicados o accesos no autorizados, y persistencia desacoplada del envío de correo (`REC-06`).
 - **Límites vigentes:** las migraciones `0050`/`0052` y las suites SQL [`rec_01_claims_model.sql`](../../portfolio-coursse/supabase/qa/rec_01_claims_model.sql) y [`rec_02_claim_submission.sql`](../../portfolio-coursse/supabase/qa/rec_02_claim_submission.sql) quedan pendientes de ejecución en Docker/Supabase local; la interfaz estudiantil corresponde a `REC-04 #34` y la atención docente a `REC-03 #33` / `REC-05 #35`.
 
+### Bandeja y detalle docente de reclamos (`REC-05 #35`)
+
+Se implementó la vista docente [`/teacher/claims`](../../portfolio-coursse/app/teacher/claims/page.tsx) con entrada «Reclamos» en el sidebar docente ([`teacher-sidebar.tsx`](../../portfolio-coursse/components/teacher/shell/teacher-sidebar.tsx)), filtros por estado y tipo, detalle del registro histórico asociado, acciones ordenadas (`Iniciar revisión` → `Enviar respuesta final`), aviso explícito con enlace separado a Notas/Puntos para correcciones académicas y control técnico de reintento de correo (`REC-06`). El recorrido visual en navegador en vivo, la ejecución SQL local y la revisión independiente de R2 (`@RobertoPizarro`) siguen pendientes.
+
 ## Datos de operación aún no confirmados
 
 El responsable indicó que aún no dispone de monitoreo, alertas, respaldos o procedimientos de

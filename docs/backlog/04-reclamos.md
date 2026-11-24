@@ -89,18 +89,23 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). No se identificó bandeja/detalle docente de reclamos. Verificar descubrimiento desde navegación, contexto del registro, respuesta final y operación académica separada.
 
-**Rol:** R5 · **Revisor:** R2 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-03
+**Rol:** R5 · **Revisor:** R2 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** In review · **Bloqueado por:** REC-03
 
 **GitHub:** [#35](https://github.com/NickSalA/portfolio-course/issues/35) · **Asignado:** @Forex549 · **Revisión propuesta:** @RobertoPizarro
 
-- [ ] Verificar la bandeja y el detalle existentes antes de completar sus brechas.
-- [ ] Mostrar los reclamos de los cursos autorizados, diferenciando tipo y estado.
-- [ ] Presentar registro histórico, autor, motivo y respuesta, e integrar revisión y respuesta motivada.
-- [ ] Mostrar confirmaciones y errores sin duplicar acciones; identificar la corrección académica como una operación separada.
+- [x] Verificar la bandeja y el detalle existentes antes de completar sus brechas.
+- [x] Mostrar los reclamos de los cursos autorizados, diferenciando tipo y estado.
+- [x] Presentar registro histórico, autor, motivo y respuesta, e integrar revisión y respuesta motivada.
+- [x] Mostrar confirmaciones y errores sin duplicar acciones; identificar la corrección académica como una operación separada.
 
 **Aceptación:** el docente localiza un reclamo de cada tipo, consulta su contexto y completa la atención sin acceder a cursos ajenos. Un caso Respondido muestra la decisión final sin controles de reapertura; responder no modifica el registro académico.
 
 **Documentación:** actualizar [estado actual](../03-calidad-y-operacion/estado-actual.md) con el recorrido docente y [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md) con sus comprobaciones.
+
+**Seguimiento local de REC-05 (no sincronizado con GitHub):**
+- **Implementación:** ruta docente [`/teacher/claims`](../../portfolio-coursse/app/teacher/claims/page.tsx) (con [`loading.tsx`](../../portfolio-coursse/app/teacher/claims/loading.tsx) y enlace «Reclamos» en [`teacher-sidebar.tsx`](../../portfolio-coursse/components/teacher/shell/teacher-sidebar.tsx) conservando `?period=` y `?course=`), helpers puros [`inbox-helpers.ts`](../../portfolio-coursse/lib/claims/inbox-helpers.ts) y componente interactivo [`teacher-claims-inbox.tsx`](../../portfolio-coursse/components/teacher/claims/teacher-claims-inbox.tsx). Permite filtrar por estado (`Pendiente`, `En revisión`, `Respondido`) y tipo (`Nota grupal`, `Puntos`), abrir enlaces profundos `?claim=<uuid>` desde el correo `REC-06`, consultar contexto histórico, ejecutar `Iniciar revisión` y `Enviar respuesta final` bloqueando dobles envíos, ver decisión final cerrada sin controles de reapertura, acceder al enlace explícito de corrección académica separada (`/teacher/grades` o `/teacher/points`) y reintentar avisos SMTP fallidos (`REC-06`).
+- **Pruebas ejecutadas:** `pnpm test` (`4/4` en [`teacher-claims-inbox.test.ts`](../../portfolio-coursse/tests/unit/teacher-claims-inbox.test.ts), `77/77` en 14 archivos), `pnpm lint`, `pnpm typecheck` y `pnpm build` (ruta dinámica `/teacher/claims` compilada).
+- **Pendientes para cierre y aceptación:** recorrido visual y pruebas de usabilidad/teclado en navegador en vivo con Supabase local activo (en esta sesión se acreditan implementación en código, navegación identificada en código y pruebas unitarias/build, no recorrido visual en navegador), QA integral (`REC-07 #37`), accesibilidad (`QA-01 #42`) y revisión independiente de R2 (`@RobertoPizarro`) en PR. Este seguimiento se actualizó solo localmente, no en GitHub.
 
 ### REC-06 · Correo docente y recuperación de fallos
 

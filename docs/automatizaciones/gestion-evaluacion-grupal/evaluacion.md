@@ -659,3 +659,21 @@ La suite separada `test:db --pending` confirmó el caso de preservación de GRP-
 | Calidad y build de aplicación | Sin errores de ESLint, tipos ni build. | `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI) aprobados. |
 
 **Pendientes:** ejecutar `0054` y [`rec_06_claim_notifications.sql`](../../../portfolio-coursse/supabase/qa/rec_06_claim_notifications.sql) en Supabase local con Docker, integrar la visibilidad del estado técnico y botón de reintento en la bandeja docente (`REC-05 #35`), prueba integrada en `REC-07 #37` y revisión independiente de R1 (`@NickSalA`) en PR. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
+
+## REC-05 #35 · Bandeja y detalle docente de reclamos
+
+**Fecha:** 2026-11-23 · **Base:** `feature/r5-reclamos-exportacion` · **Migración nueva:** ninguna (reutiliza `0053` y `0054`) · **Entorno:** Windows 11, Node 22.14.0, pnpm 11.20.0. No se ejecutó recorrido visual en navegador en vivo ni contra Supabase local (Docker no estuvo disponible).
+
+### Recorrido implementado en código
+
+- **Navegación identificada:** entrada «Reclamos» en [`teacher-sidebar.tsx`](../../../portfolio-coursse/components/teacher/shell/teacher-sidebar.tsx) hacia `/teacher/claims` conservando `?period=` y `?course=`, y soporte de enlace profundo `?claim=<uuid>` desde el aviso `REC-06`.
+- **Bandeja y detalle:** [`TeacherClaimsInbox`](../../../portfolio-coursse/components/teacher/claims/teacher-claims-inbox.tsx) diferencia `Nota grupal` / `Puntos` y `Pendiente` / `En revisión` / `Respondido`, muestra contexto histórico, autor, motivo, acciones bloqueadas durante envío (`busyAction`), respuesta final sin controles de reapertura, enlace explícito a corrección académica separada (`/teacher/grades` o `/teacher/points`) y estado/reintento del aviso SMTP (`REC-06`).
+
+### Comprobaciones ejecutadas
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Helpers de bandeja (`teacher-claims-inbox.test.ts`) | Resumen por estado/tipo, filtros combinados, resolución de enlace profundo `?claim=` y enlaces separados a Notas/Puntos. | Aprobado en Vitest (`4/4` pruebas; `77/77` en 14 archivos). |
+| Calidad y build de aplicación | Sin errores de ESLint, tipos ni build de producción. | `pnpm lint`, `pnpm typecheck` y `pnpm build` aprobados; ruta dinámica `/teacher/claims` compilada. |
+
+**Dimensiones verificadas y pendientes:** se verificaron **implementación en código**, **navegación identificada en código** y **pruebas unitarias/build**. Quedan pendientes el recorrido visual y pruebas de usabilidad/teclado en navegador en vivo, la verificación integrada en `REC-07 #37`, la revisión de accesibilidad `QA-01 #42` y la revisión independiente de R2 (`@RobertoPizarro`) en PR. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
