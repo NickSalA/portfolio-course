@@ -578,3 +578,110 @@ La suite separada `test:db --pending` confirmó el caso de preservación de GRP-
 | `EVA-05 #28` | [`get-dashboard.ts`](../../../portfolio-coursse/lib/student/get-dashboard.ts) consulta `list_student_group_grades` por matrícula activa y expone `grades`/`gradesError`; [`student-course-card.tsx`](../../../portfolio-coursse/components/student-portal/student-course-card.tsx) y [`student-dashboard.tsx`](../../../portfolio-coursse/components/student-portal/student-dashboard.tsx) separan *Notas grupales* históricas de *Puntos* (`0` vs `Pendiente`, fecha `America/Lima`, etiqueta de grupo histórico). | `pnpm test` (`get-student-dashboard.test.ts` `5/5` PASS), `pnpm lint`, `pnpm typecheck`, `pnpm build` (con variables placeholder de CI). | Recorrido visual en navegador con sesión sintética y revisión independiente R4. |
 | `GRP-03 #20` | Migración [`0049_grp03_group_selection_concurrency_and_history.sql`](../../../portfolio-coursse/supabase/migrations/0049_grp03_group_selection_concurrency_and_history.sql) (bloqueo de bypass directo en `course_students.group_id`, orden `courses for share` → `pg_advisory_xact_lock` antes de leer capacidad en `select_course_group`, idempotencia y control de cupo en preasignaciones iniciales de `sync_authorized_student`), validación positiva en [`app/student/actions.ts`](../../../portfolio-coursse/app/student/actions.ts) y script [`grp_03_group_selection.sql`](../../../portfolio-coursse/supabase/qa/grp_03_group_selection.sql) registrado en [`test-db.mjs`](../../../portfolio-coursse/scripts/test-db.mjs). | `pnpm lint`, `pnpm typecheck`, `pnpm build`. | Ejecutar `supabase db reset --local` y `pnpm test:db` (Docker requerido), prueba concurrente de dos sesiones por el último cupo y revisión independiente R3. |
 | `REC-01 #31` | Migración [`0050_claims_model_and_rls.sql`](../../../portfolio-coursse/supabase/migrations/0050_claims_model_and_rls.sql) (`public.claims`, FKs compuestas por curso/titular, índices únicos parciales permanentes, participación histórica `is_historical_group_participant`, políticas RLS y trigger `guard_claim_mutation`) y script [`rec_01_claims_model.sql`](../../../portfolio-coursse/supabase/qa/rec_01_claims_model.sql) registrado en [`test-db.mjs`](../../../portfolio-coursse/scripts/test-db.mjs). | Inspección estática y actualización documental en [`modelo-datos.md`](../../02-diseno/modelo-datos.md). | Ejecutar `supabase db reset --local` y `pnpm test:db` (Docker requerido) y revisión independiente R4. |
+
+## EXP-03 #40 · Descarga XLSX por curso con atribución histórica
+
+**Fecha:** 2026-11-23 · **Base:** `develop` (`86268ec`) · **Rama:** `feature/r5-reclamos-exportacion` · **Migración nueva:** [`0051_course_export_historical_data.sql`](../../../portfolio-coursse/supabase/migrations/0051_course_export_historical_data.sql) · **Entorno:** Windows 11, Node 22.14.0, pnpm 11.20.0. Docker no estuvo disponible en este entorno; no se ejecutó contra Supabase local ni producción.
+
+### Contrato y recorrido implementados
+
+- **RPC de solo lectura (`0051`):** `public.list_course_export_grade_attributions(target_course_id)` (`STABLE SECURITY DEFINER`) valida `is_teacher_of_course` y devuelve únicamente notas confirmadas (`revision > 0`) desde `academic_access.group_grade_participants`, sin consultar `course_students.group_id` ni exponer filas legacy `revision = 0`.
+- **Generación XLSX pura:** [`course-export.ts`](../../../portfolio-coursse/lib/export/course-export.ts) reutiliza `xlsx` y [`adjusted-average.ts`](../../../portfolio-coursse/lib/export/adjusted-average.ts) para emitir la hoja `Resultados Curso` con columnas `Nombre`, `Correo`, evaluaciones ordenadas por `(position, id)`, `Promedio base` (precisión completa con formato `0.00`), `Saldo` (entero siempre visible), `Puntos aplicados`, `Excedente` y `Promedio ajustado` (redondeo half-up a 2 decimales con formato `0.00`).
+- **Endpoint y UI:** [`GET /api/teacher/courses/[coursePublicId]/export`](../../../portfolio-coursse/app/api/teacher/courses/[coursePublicId]/export/route.ts) valida UUID, sesión, identidad académica verificada, rol `teacher` y propiedad del curso, ejecutando solo lecturas (sin invocar `ensure_default_evaluations`). [`CourseExportButton`](../../../portfolio-coursse/components/teacher/grades/course-export-button.tsx) se integró en `/teacher/grades` y `/teacher/courses/[coursePublicId]` con estados de carga, error (`role="alert"`) y confirmación (`role="status"`).
+
+### Comprobaciones sintéticas ejecutadas
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Atribución histórica, traslado, cero vs pendiente y legacy (`course-export.test.ts`) | Alumna trasladada conserva T1 de grupo A (`10`) y T2 de grupo B (`18`) con saldo `15` → aplicados `12`, excedente `3`, promedio base `14`, ajustado `20.00`; alumno con `0` explícito y `1` con saldo `-3` → aplicados `-1`, excedente `-2`, ajustado `0.00`; nota legacy `revision = 0` queda como celda vacía (`undefined` en SheetJS) manteniendo saldo `3`; inactivo con historia se conserva (`13.505 → 13.51`) e inactivo sin historia se excluye. | Aprobado en Vitest (`10/10` pruebas de `course-export.test.ts`, inspeccionando celdas y formatos `0.00`/`0` tras `XLSX.read` del buffer generado). |
+| Sin trabajos y precisión intermedia (`course-export.test.ts`) | Con `0` evaluaciones, `Saldo` (`4`) permanece visible y promedios/aplicados/excedente quedan vacíos; con `[10, 10, 11]` y saldo `+1`, `Promedio base` conserva `31/3` y `Promedio ajustado` redondea a `10.67`. | Aprobado en Vitest. |
+| Repetición sin mutaciones y control de acceso en servidor (`course-export.test.ts`) | Dos renders consecutivos producen la misma matriz XLSX sin mutar entradas; `loadCourseExportForTeacher` devuelve `400` (UUID inválido), `403` (sin identidad verificada o rol `student`), `404` (curso ajeno/inexistente), `500` (fallo de lectura) y `200` invocando únicamente `has_academic_identity` y `list_course_export_grade_attributions`. | Aprobado en Vitest (`55/55` pruebas en 10 archivos). |
+| Regresión de cálculo puro (`adjusted-average.test.mjs`) | Mantener los 14 casos de `EXP-02`. | `node --experimental-strip-types --test lib/export/adjusted-average.test.mjs`: `14/14` PASS. |
+| Calidad y build de aplicación | Sin errores de ESLint, tipos ni build de Next.js. | `pnpm lint`, `pnpm typecheck` (`next typegen && tsc --noEmit`) y `pnpm build` (con variables placeholder de CI) aprobados; ruta dinámica `/api/teacher/courses/[coursePublicId]/export` compilada. |
+
+**Dimensiones verificadas y pendientes:** se verificaron **implementación en código**, **navegación identificada en código** (`/teacher/grades` y `/teacher/courses/[coursePublicId]`) y **pruebas unitarias/binarias XLSX y de autorización en servidor**. Quedan pendientes: ejecutar `supabase db reset --local` y `pnpm test:db` para validar `0051` y [`exp_03_course_export.sql`](../../../portfolio-coursse/supabase/qa/exp_03_course_export.sql) en PostgreSQL/Supabase local (Docker no estuvo disponible), comprobar el recorrido visual y la descarga en navegador en vivo, la revisión independiente de R2 (`@RobertoPizarro`) en PR y la matriz QA de `EXP-04 #41`. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
+
+## REC-02 #32 · Presentación de ambos tipos de reclamo
+
+**Fecha:** 2026-11-23 · **Base:** `feature/r5-reclamos-exportacion` (`7091fd8`) · **Migración nueva:** [`0052_submit_claims_rpc.sql`](../../../portfolio-coursse/supabase/migrations/0052_submit_claims_rpc.sql) · **Entorno:** Windows 11, Node 22.14.0, pnpm 11.20.0. Docker no estuvo disponible; no se ejecutó contra Supabase local ni producción.
+
+### Operaciones implementadas
+
+- **RPCs transaccionales (`0052`):** `public.submit_group_grade_claim(target_group_public_id, target_evaluation_public_id, claim_reason)` y `public.submit_point_transaction_claim(target_point_transaction_id, claim_reason)` resuelven curso, matrícula y permisos directamente desde `auth.uid()` y `REC-01` (`is_historical_group_participant` / `can_read_enrollment`), crean el registro en estado `pending`, devuelven `created = false` en reintentos equivalentes del mismo autor y rechazan con `claim_already_exists` (`23505`) cualquier segundo reclamo distinto o de otro participante. `public.list_student_claims` expone los reclamos visibles con identificadores públicos y nombre del autor.
+- **Capa de aplicación:** [`lib/claims/validation.ts`](../../../portfolio-coursse/lib/claims/validation.ts), [`lib/claims/submit-claim.ts`](../../../portfolio-coursse/lib/claims/submit-claim.ts) y Server Actions en [`app/student/claims/actions.ts`](../../../portfolio-coursse/app/student/claims/actions.ts), sin acoplar la persistencia al aviso por correo (`REC-06 #36`).
+
+### Comprobaciones ejecutadas
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Validación y mapeo de errores (`claims-submission.test.ts`) | Validar UUIDs, ID positivo de movimiento y motivo (`1..2000` caracteres); mapear conflictos (`23505`), permisos (`42501`), curso inactivo y objetivo ausente a mensajes claros en español. | Aprobado en Vitest (`3/3` pruebas). |
+| Presentación grupal, individual, reintento idempotente y consulta (`claims-submission.test.ts`) | Creación en `pending` (`created: true`), reintento equivalente del mismo autor devuelve `created: false` con el mismo `claimPublicId`, duplicado de otro participante devuelve `conflict`, acceso ajeno devuelve `forbidden` y `listStudentClaims` normaliza filas históricas. | Aprobado en Vitest (`4/4` pruebas; `62/62` en 11 archivos). |
+| Calidad y build de aplicación | Sin errores de lint, tipos ni compilación de producción. | `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI) aprobados. |
+
+**Pendientes:** ejecutar `0050` + `0052` y las suites SQL [`rec_01_claims_model.sql`](../../../portfolio-coursse/supabase/qa/rec_01_claims_model.sql) y [`rec_02_claim_submission.sql`](../../../portfolio-coursse/supabase/qa/rec_02_claim_submission.sql) en Supabase local con Docker, integrar el formulario en la vista del alumno (`REC-04 #34`), conectar el aviso docente (`REC-06 #36`), ejecutar QA integral (`REC-07 #37`) y completar la revisión independiente de R3 (`@MathiMomos`) en PR. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
+
+## REC-03 #33 · Transiciones y respuesta final docente
+
+**Fecha:** 2026-11-23 · **Base:** `feature/r5-reclamos-exportacion` · **Migración nueva:** [`0053_claim_teacher_transitions.sql`](../../../portfolio-coursse/supabase/migrations/0053_claim_teacher_transitions.sql) · **Entorno:** Windows 11, Node 22.14.0, pnpm 11.20.0. Docker no estuvo disponible; no se ejecutó contra Supabase local ni producción.
+
+### Transiciones válidas e inválidas implementadas
+
+- **Válidas (docente responsable `is_teacher_of_course`):** `pending → in_review` vía `public.start_claim_review` (idempotente si ya está `in_review`, retornando `transitioned = false` sin alterar `in_review_at`); `in_review → responded` vía `public.respond_to_claim` con respuesta motivada (`1..2000` caracteres).
+- **Inválidas rechazadas:** saltar de `pending` a `responded` (`claim_must_be_in_review`), reabrir o editar tras `responded` (`claim_response_is_final`), motivo vacío o >2000 caracteres (`claim_response_invalid`), acceso por docente ajeno, alumno o `anon` (`claim_teacher_access_denied` / `42501`).
+- **Separación académica:** responder nunca modifica `group_grades` ni `point_transactions`; cualquier ajuste académico sigue siendo una operación expresa del docente en Notas o Puntos.
+
+### Comprobaciones ejecutadas
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Validación y mapeo de transiciones (`claims-transitions.test.ts`) | Validar UUID y respuesta (`1..2000` caracteres); mapear `claim_must_be_in_review`, `claim_response_is_final`, `claim_teacher_access_denied` y `claim_not_found`. | Aprobado en Vitest (`2/2` pruebas). |
+| Flujo ordenado, idempotencia, cierre final y bandeja (`claims-transitions.test.ts`) | `pending → in_review` idempotente, rechazo de salto directo y de reapertura tras `responded`, respuesta motivada final y normalización en `listTeacherClaims`. | Aprobado en Vitest (`4/4` pruebas; `68/68` en 12 archivos). |
+| Calidad y build de aplicación | Sin errores de ESLint, tipos ni build. | `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI) aprobados. |
+
+**Pendientes:** ejecutar `0050`/`0052`/`0053` y [`rec_03_claim_transitions.sql`](../../../portfolio-coursse/supabase/qa/rec_03_claim_transitions.sql) en Supabase local con Docker, completar bandeja/detalle docente (`REC-05 #35`), QA integral (`REC-07 #37`) y revisión independiente de R4 (`@fabrizio25504`) en PR. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
+
+## REC-06 #36 · Correo docente y recuperación de fallos
+
+**Fecha:** 2026-11-23 · **Base:** `feature/r5-reclamos-exportacion` · **Migración nueva:** [`0054_claim_email_notifications.sql`](../../../portfolio-coursse/supabase/migrations/0054_claim_email_notifications.sql) · **Entorno:** Windows 11, Node 22.14.0, pnpm 11.20.0. Docker no estuvo disponible; las pruebas de despacho usaron transporte SMTP simulado.
+
+### Diseño de aviso y recuperación
+
+- **Unicidad y persistencia desacoplada (`0054`):** trigger `tr_create_claim_notification` crea una fila `pending` única por reclamo en `public.claim_notifications` (RLS solo docente). `prepare_claim_email_dispatch` permite un único despacho automático inicial al crearse el reclamo (`created === true`, `attempt_count = 0`) y reintentos posteriores exclusivamente al docente responsable mientras el estado no sea `sent`.
+- **Privacidad y señales seguras:** [`lib/mail/claim-notice.ts`](../../../portfolio-coursse/lib/mail/claim-notice.ts) reutiliza `BASE-08` con enlace relativo autenticado `/teacher/claims?claim=<claim_public_id>`, sin notas, puntos, nombres ni texto del reclamo. Los fallos se registran solo con códigos técnicos (`MAIL_CONFIG_INCOMPLETE`, `MAIL_RECIPIENT_MISSING`, `MAIL_SEND_FAILED`, `MAIL_DISPATCH_ERROR`) sin exponer `SMTP_PASS`. El estado `sent` representa aceptación técnica SMTP, nunca entrega ni lectura.
+
+### Comprobaciones ejecutadas
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Envío exitoso y privacidad (`claim-notice.test.ts`) | Envía aviso breve al correo docente con enlace `/teacher/claims?claim=...`, sin credenciales ni contenido académico, y registra `did_send: true` (`sent`). | Aprobado en Vitest. |
+| Prevención de duplicados (`claim-notice.test.ts`) | Si `should_send` es `false` (`status: sent`), omite SMTP (`sendMail` 0 llamadas) y devuelve `skipped: true`. | Aprobado en Vitest. |
+| Fallo por configuración incompleta o error SMTP (`claim-notice.test.ts`) | No lanza excepciones ni revierte el reclamo; registra `MAIL_CONFIG_INCOMPLETE` o `MAIL_SEND_FAILED` sin filtrar `SMTP_PASS`. | Aprobado en Vitest (`5/5` pruebas; `73/73` en 13 archivos). |
+| Calidad y build de aplicación | Sin errores de ESLint, tipos ni build. | `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI) aprobados. |
+
+**Pendientes:** ejecutar `0054` y [`rec_06_claim_notifications.sql`](../../../portfolio-coursse/supabase/qa/rec_06_claim_notifications.sql) en Supabase local con Docker, integrar la visibilidad del estado técnico y botón de reintento en la bandeja docente (`REC-05 #35`), prueba integrada en `REC-07 #37` y revisión independiente de R1 (`@NickSalA`) en PR. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
+
+## REC-05 #35 · Bandeja y detalle docente de reclamos
+
+**Fecha:** 2026-11-23 · **Base:** `feature/r5-reclamos-exportacion` · **Migración nueva:** ninguna (reutiliza `0053` y `0054`) · **Entorno:** Windows 11, Node 22.14.0, pnpm 11.20.0. No se ejecutó recorrido visual en navegador en vivo ni contra Supabase local (Docker no estuvo disponible).
+
+### Recorrido implementado en código
+
+- **Navegación identificada:** entrada «Reclamos» en [`teacher-sidebar.tsx`](../../../portfolio-coursse/components/teacher/shell/teacher-sidebar.tsx) hacia `/teacher/claims` conservando `?period=` y `?course=`, y soporte de enlace profundo `?claim=<uuid>` desde el aviso `REC-06`.
+- **Bandeja y detalle:** [`TeacherClaimsInbox`](../../../portfolio-coursse/components/teacher/claims/teacher-claims-inbox.tsx) diferencia `Nota grupal` / `Puntos` y `Pendiente` / `En revisión` / `Respondido`, muestra contexto histórico, autor, motivo, acciones bloqueadas durante envío (`busyAction`), respuesta final sin controles de reapertura, enlace explícito a corrección académica separada (`/teacher/grades` o `/teacher/points`) y estado/reintento del aviso SMTP (`REC-06`).
+
+### Comprobaciones ejecutadas
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Helpers de bandeja (`teacher-claims-inbox.test.ts`) | Resumen por estado/tipo, filtros combinados, resolución de enlace profundo `?claim=` y enlaces separados a Notas/Puntos. | Aprobado en Vitest (`4/4` pruebas; `77/77` en 14 archivos). |
+| Calidad y build de aplicación | Sin errores de ESLint, tipos ni build de producción. | `pnpm lint`, `pnpm typecheck` y `pnpm build` aprobados; ruta dinámica `/teacher/claims` compilada. |
+
+**Dimensiones verificadas y pendientes:** se verificaron **implementación en código**, **navegación identificada en código** y **pruebas unitarias/build**. Quedan pendientes el recorrido visual y pruebas de usabilidad/teclado en navegador en vivo, la verificación integrada en `REC-07 #37`, la revisión de accesibilidad `QA-01 #42` y la revisión independiente de R2 (`@RobertoPizarro`) en PR. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
+
+## QA-03 #44 · Operación y demostración reproducible
+
+**Fecha:** 2026-11-23 · **Base:** `feature/r5-reclamos-exportacion` · **Entorno:** Windows 11, Node 22.14.0, pnpm 11.20.0 (sin Docker ni conexión a producción).
+
+- **Artefactos creados:** guía [`operacion-y-demostracion.md`](../../03-calidad-y-operacion/operacion-y-demostracion.md) (configuración sin secretos, matriz local vs. externo con responsables, recuperación de correo, guion sintético de 7 pasos y Plan B con evidencia previa) y script [`demo-readiness.mjs`](../../../portfolio-coursse/scripts/demo-readiness.mjs) (`pnpm demo:check`).
+- **Comprobación ejecutada:** `pnpm demo:check` verificó sin exponer secretos la disponibilidad de 54 migraciones (`0001`–`0054`) y suites SQL sintéticas; `pnpm test` (`77/77`), `pnpm lint`, `pnpm typecheck`, `pnpm build` y `git diff --check` sin errores.
+- **Pendientes:** reproducción del guion completo en vivo por otro integrante con Docker/Supabase local activo, revisión independiente de R1 (`@NickSalA`) en PR y consolidación en `QA-04 #45`. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
