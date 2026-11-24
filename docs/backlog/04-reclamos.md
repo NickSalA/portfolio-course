@@ -50,18 +50,23 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). No se encontró implementación de estados/respuesta. La respuesta final debe permanecer separada de las correcciones de notas/puntos, cuya trazabilidad también requiere trabajo.
 
-**Rol:** R5 · **Revisor:** R4 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-02
+**Rol:** R5 · **Revisor:** R4 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** In review · **Bloqueado por:** REC-02
 
 **GitHub:** [#33](https://github.com/NickSalA/portfolio-course/issues/33) · **Asignado:** @Forex549 · **Revisión propuesta:** @fabrizio25504
 
-- [ ] Verificar e implementar el recorrido Pendiente → En revisión → Respondido.
-- [ ] Autorizar únicamente al docente responsable a revisar y emitir una respuesta motivada.
-- [ ] Impedir réplica, reapertura y nueva solicitud sobre el mismo registro tras responder.
-- [ ] Mantener la respuesta separada de cualquier corrección académica expresa del docente.
+- [x] Verificar e implementar el recorrido Pendiente → En revisión → Respondido.
+- [x] Autorizar únicamente al docente responsable a revisar y emitir una respuesta motivada.
+- [x] Impedir réplica, reapertura y nueva solicitud sobre el mismo registro tras responder.
+- [x] Mantener la respuesta separada de cualquier corrección académica expresa del docente.
 
 **Aceptación:** solo el docente autorizado completa las transiciones en orden y responde con fundamento. Respondido es final; acciones posteriores o repetidas no reabren ni duplican el caso. Responder no cambia por sí mismo la nota ni los puntos.
 
 **Documentación:** actualizar [modelo de datos](../02-diseno/modelo-datos.md) con estados y restricciones; registrar transiciones válidas e inválidas en [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md).
+
+**Seguimiento local de REC-03 (no sincronizado con GitHub):**
+- **Implementación:** migración [`0053_claim_teacher_transitions.sql`](../../portfolio-coursse/supabase/migrations/0053_claim_teacher_transitions.sql) (`public.start_claim_review`, `public.respond_to_claim` y `public.list_teacher_claims`), validaciones en [`lib/claims/validation.ts`](../../portfolio-coursse/lib/claims/validation.ts), servicio [`lib/claims/teacher-claims.ts`](../../portfolio-coursse/lib/claims/teacher-claims.ts) y Server Actions en [`app/teacher/claims/actions.ts`](../../portfolio-coursse/app/teacher/claims/actions.ts). Las mutaciones quedan centralizadas en RPCs (`authenticated` sigue sin `UPDATE`/`DELETE` directo en `public.claims`), exigen `is_teacher_of_course`, bloquean la fila `FOR UPDATE`, imponen orden estricto `pending → in_review → responded` (con `start_claim_review` idempotente si ya está `in_review`), impiden reapertura tras `responded` (`claim_response_is_final`) y nunca alteran `group_grades` ni `point_transactions`.
+- **Pruebas ejecutadas:** `pnpm test` (`6/6` en [`claims-transitions.test.ts`](../../portfolio-coursse/tests/unit/claims-transitions.test.ts), `68/68` en 12 archivos), `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI).
+- **Pendientes para cierre y aceptación:** aplicar `0050`/`0052`/`0053` y ejecutar [`rec_03_claim_transitions.sql`](../../portfolio-coursse/supabase/qa/rec_03_claim_transitions.sql) en Supabase local (Docker no estuvo disponible en este entorno), bandeja e interfaz docente (`REC-05 #35`), QA integral (`REC-07 #37`) y revisión independiente de R4 (`@fabrizio25504`) en PR. Este seguimiento se actualizó solo localmente, no en GitHub.
 
 ### REC-04 · Interfaz estudiantil para presentar y consultar
 

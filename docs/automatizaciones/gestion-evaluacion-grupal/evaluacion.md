@@ -619,3 +619,23 @@ La suite separada `test:db --pending` confirmó el caso de preservación de GRP-
 | Calidad y build de aplicación | Sin errores de lint, tipos ni compilación de producción. | `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI) aprobados. |
 
 **Pendientes:** ejecutar `0050` + `0052` y las suites SQL [`rec_01_claims_model.sql`](../../../portfolio-coursse/supabase/qa/rec_01_claims_model.sql) y [`rec_02_claim_submission.sql`](../../../portfolio-coursse/supabase/qa/rec_02_claim_submission.sql) en Supabase local con Docker, integrar el formulario en la vista del alumno (`REC-04 #34`), conectar el aviso docente (`REC-06 #36`), ejecutar QA integral (`REC-07 #37`) y completar la revisión independiente de R3 (`@MathiMomos`) en PR. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
+
+## REC-03 #33 · Transiciones y respuesta final docente
+
+**Fecha:** 2026-11-23 · **Base:** `feature/r5-reclamos-exportacion` · **Migración nueva:** [`0053_claim_teacher_transitions.sql`](../../../portfolio-coursse/supabase/migrations/0053_claim_teacher_transitions.sql) · **Entorno:** Windows 11, Node 22.14.0, pnpm 11.20.0. Docker no estuvo disponible; no se ejecutó contra Supabase local ni producción.
+
+### Transiciones válidas e inválidas implementadas
+
+- **Válidas (docente responsable `is_teacher_of_course`):** `pending → in_review` vía `public.start_claim_review` (idempotente si ya está `in_review`, retornando `transitioned = false` sin alterar `in_review_at`); `in_review → responded` vía `public.respond_to_claim` con respuesta motivada (`1..2000` caracteres).
+- **Inválidas rechazadas:** saltar de `pending` a `responded` (`claim_must_be_in_review`), reabrir o editar tras `responded` (`claim_response_is_final`), motivo vacío o >2000 caracteres (`claim_response_invalid`), acceso por docente ajeno, alumno o `anon` (`claim_teacher_access_denied` / `42501`).
+- **Separación académica:** responder nunca modifica `group_grades` ni `point_transactions`; cualquier ajuste académico sigue siendo una operación expresa del docente en Notas o Puntos.
+
+### Comprobaciones ejecutadas
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Validación y mapeo de transiciones (`claims-transitions.test.ts`) | Validar UUID y respuesta (`1..2000` caracteres); mapear `claim_must_be_in_review`, `claim_response_is_final`, `claim_teacher_access_denied` y `claim_not_found`. | Aprobado en Vitest (`2/2` pruebas). |
+| Flujo ordenado, idempotencia, cierre final y bandeja (`claims-transitions.test.ts`) | `pending → in_review` idempotente, rechazo de salto directo y de reapertura tras `responded`, respuesta motivada final y normalización en `listTeacherClaims`. | Aprobado en Vitest (`4/4` pruebas; `68/68` en 12 archivos). |
+| Calidad y build de aplicación | Sin errores de ESLint, tipos ni build. | `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI) aprobados. |
+
+**Pendientes:** ejecutar `0050`/`0052`/`0053` y [`rec_03_claim_transitions.sql`](../../../portfolio-coursse/supabase/qa/rec_03_claim_transitions.sql) en Supabase local con Docker, completar bandeja/detalle docente (`REC-05 #35`), QA integral (`REC-07 #37`) y revisión independiente de R4 (`@fabrizio25504`) en PR. Este seguimiento se actualizó solo en archivos locales, no en GitHub.

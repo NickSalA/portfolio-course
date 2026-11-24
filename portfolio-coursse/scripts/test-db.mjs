@@ -58,6 +58,7 @@ try {
                 "grp_06_activity_participants.sql",
                 "rec_01_claims_model.sql",
                 "rec_02_claim_submission.sql",
+                "rec_03_claim_transitions.sql",
                 "exp_03_course_export.sql",
             ];
     for (const script of scripts) {

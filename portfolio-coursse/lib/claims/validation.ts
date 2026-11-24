@@ -1,4 +1,5 @@
 export const CLAIM_REASON_MAX_LENGTH = 2000;
+export const CLAIM_RESPONSE_MAX_LENGTH = 2000;
 
 const UUID_PATTERN =
 	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -13,6 +14,15 @@ export type ClaimSubmissionErrorCode =
 	| "not_found"
 	| "conflict"
 	| "course_inactive"
+	| "server_error";
+
+export type ClaimTransitionErrorCode =
+	| "invalid_input"
+	| "unauthorized"
+	| "forbidden"
+	| "not_found"
+	| "invalid_state"
+	| "already_final"
 	| "server_error";
 
 export type ClaimValidationResult<T> =
@@ -160,6 +170,90 @@ export function mapClaimSubmissionError(
 	return {
 		code: "server_error",
 		error: "No se pudo registrar el reclamo. Tus notas y puntos no fueron modificados; inténtalo nuevamente.",
+	};
+}
+
+export function validateClaimPublicId(
+	rawPublicId: string,
+): ClaimValidationResult<string> {
+	const trimmed = rawPublicId.trim();
+	if (!UUID_PATTERN.test(trimmed)) {
+		return {
+			ok: false,
+			code: "invalid_input",
+			error: "El identificador del reclamo no es válido.",
+		};
+	}
+	return { ok: true, value: trimmed };
+}
+
+export function validateTeacherResponse(
+	rawResponse: string,
+): ClaimValidationResult<string> {
+	const trimmed = rawResponse.trim();
+	if (!trimmed) {
+		return {
+			ok: false,
+			code: "invalid_input",
+			error: "Ingresa una respuesta motivada antes de cerrar el reclamo.",
+		};
+	}
+	if (trimmed.length > CLAIM_RESPONSE_MAX_LENGTH) {
+		return {
+			ok: false,
+			code: "invalid_input",
+			error: `La respuesta no puede superar los ${CLAIM_RESPONSE_MAX_LENGTH} caracteres.`,
+		};
+	}
+	return { ok: true, value: trimmed };
+}
+
+export function mapClaimTransitionError(
+	message: string | null | undefined,
+	pgCode?: string | null,
+): { code: ClaimTransitionErrorCode; error: string } {
+	const raw = (message ?? "").toLowerCase();
+
+	if (raw.includes("claim_response_is_final")) {
+		return {
+			code: "already_final",
+			error: "Este reclamo ya fue respondido de forma definitiva y no admite reapertura ni cambios.",
+		};
+	}
+	if (raw.includes("claim_must_be_in_review")) {
+		return {
+			code: "invalid_state",
+			error: "Debes pasar el reclamo a «En revisión» antes de emitir una respuesta final.",
+		};
+	}
+	if (raw.includes("claim_teacher_access_denied")) {
+		return {
+			code: "forbidden",
+			error: "Solo el docente responsable del curso puede gestionar este reclamo.",
+		};
+	}
+	if (raw.includes("claim_auth_required")) {
+		return {
+			code: "unauthorized",
+			error: "Tu sesión académica no está verificada. Vuelve a iniciar sesión e inténtalo nuevamente.",
+		};
+	}
+	if (raw.includes("claim_not_found") || pgCode === "P0002") {
+		return {
+			code: "not_found",
+			error: "No se encontró el reclamo solicitado. Recarga la bandeja e inténtalo de nuevo.",
+		};
+	}
+	if (raw.includes("claim_response_invalid")) {
+		return {
+			code: "invalid_input",
+			error: `Ingresa una respuesta motivada de hasta ${CLAIM_RESPONSE_MAX_LENGTH} caracteres.`,
+		};
+	}
+
+	return {
+		code: "server_error",
+		error: "No se pudo actualizar el estado del reclamo. Inténtalo nuevamente.",
 	};
 }
 
