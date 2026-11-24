@@ -600,3 +600,22 @@ La suite separada `test:db --pending` confirmó el caso de preservación de GRP-
 | Calidad y build de aplicación | Sin errores de ESLint, tipos ni build de Next.js. | `pnpm lint`, `pnpm typecheck` (`next typegen && tsc --noEmit`) y `pnpm build` (con variables placeholder de CI) aprobados; ruta dinámica `/api/teacher/courses/[coursePublicId]/export` compilada. |
 
 **Dimensiones verificadas y pendientes:** se verificaron **implementación en código**, **navegación identificada en código** (`/teacher/grades` y `/teacher/courses/[coursePublicId]`) y **pruebas unitarias/binarias XLSX y de autorización en servidor**. Quedan pendientes: ejecutar `supabase db reset --local` y `pnpm test:db` para validar `0051` y [`exp_03_course_export.sql`](../../../portfolio-coursse/supabase/qa/exp_03_course_export.sql) en PostgreSQL/Supabase local (Docker no estuvo disponible), comprobar el recorrido visual y la descarga en navegador en vivo, la revisión independiente de R2 (`@RobertoPizarro`) en PR y la matriz QA de `EXP-04 #41`. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
+
+## REC-02 #32 · Presentación de ambos tipos de reclamo
+
+**Fecha:** 2026-11-23 · **Base:** `feature/r5-reclamos-exportacion` (`7091fd8`) · **Migración nueva:** [`0052_submit_claims_rpc.sql`](../../../portfolio-coursse/supabase/migrations/0052_submit_claims_rpc.sql) · **Entorno:** Windows 11, Node 22.14.0, pnpm 11.20.0. Docker no estuvo disponible; no se ejecutó contra Supabase local ni producción.
+
+### Operaciones implementadas
+
+- **RPCs transaccionales (`0052`):** `public.submit_group_grade_claim(target_group_public_id, target_evaluation_public_id, claim_reason)` y `public.submit_point_transaction_claim(target_point_transaction_id, claim_reason)` resuelven curso, matrícula y permisos directamente desde `auth.uid()` y `REC-01` (`is_historical_group_participant` / `can_read_enrollment`), crean el registro en estado `pending`, devuelven `created = false` en reintentos equivalentes del mismo autor y rechazan con `claim_already_exists` (`23505`) cualquier segundo reclamo distinto o de otro participante. `public.list_student_claims` expone los reclamos visibles con identificadores públicos y nombre del autor.
+- **Capa de aplicación:** [`lib/claims/validation.ts`](../../../portfolio-coursse/lib/claims/validation.ts), [`lib/claims/submit-claim.ts`](../../../portfolio-coursse/lib/claims/submit-claim.ts) y Server Actions en [`app/student/claims/actions.ts`](../../../portfolio-coursse/app/student/claims/actions.ts), sin acoplar la persistencia al aviso por correo (`REC-06 #36`).
+
+### Comprobaciones ejecutadas
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Validación y mapeo de errores (`claims-submission.test.ts`) | Validar UUIDs, ID positivo de movimiento y motivo (`1..2000` caracteres); mapear conflictos (`23505`), permisos (`42501`), curso inactivo y objetivo ausente a mensajes claros en español. | Aprobado en Vitest (`3/3` pruebas). |
+| Presentación grupal, individual, reintento idempotente y consulta (`claims-submission.test.ts`) | Creación en `pending` (`created: true`), reintento equivalente del mismo autor devuelve `created: false` con el mismo `claimPublicId`, duplicado de otro participante devuelve `conflict`, acceso ajeno devuelve `forbidden` y `listStudentClaims` normaliza filas históricas. | Aprobado en Vitest (`4/4` pruebas; `62/62` en 11 archivos). |
+| Calidad y build de aplicación | Sin errores de lint, tipos ni compilación de producción. | `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI) aprobados. |
+
+**Pendientes:** ejecutar `0050` + `0052` y las suites SQL [`rec_01_claims_model.sql`](../../../portfolio-coursse/supabase/qa/rec_01_claims_model.sql) y [`rec_02_claim_submission.sql`](../../../portfolio-coursse/supabase/qa/rec_02_claim_submission.sql) en Supabase local con Docker, integrar el formulario en la vista del alumno (`REC-04 #34`), conectar el aviso docente (`REC-06 #36`), ejecutar QA integral (`REC-07 #37`) y completar la revisión independiente de R3 (`@MathiMomos`) en PR. Este seguimiento se actualizó solo en archivos locales, no en GitHub.

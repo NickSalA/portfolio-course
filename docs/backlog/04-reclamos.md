@@ -28,18 +28,23 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). No se encontró operación de presentación. Conservar identidad del autor y registro académico original; comprobar concurrencia e idempotencia sin supeditar persistencia al correo.
 
-**Rol:** R5 · **Revisor:** R3 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-01
+**Rol:** R5 · **Revisor:** R3 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** In review · **Bloqueado por:** REC-01
 
 **GitHub:** [#32](https://github.com/NickSalA/portfolio-course/issues/32) · **Asignado:** @Forex549 · **Revisión propuesta:** @MathiMomos
 
-- [ ] Verificar y reutilizar las operaciones de presentación que cumplan el caso vigente.
-- [ ] Permitir presentar el reclamo grupal a cualquier participante de aquella actividad, en nombre del grupo.
-- [ ] Permitir al titular presentar el reclamo sobre su movimiento de puntos, conservando autor y motivo.
-- [ ] Crear en estado Pendiente y tratar envíos repetidos o simultáneos sin duplicados, con errores comprensibles.
+- [x] Verificar y reutilizar las operaciones de presentación que cumplan el caso vigente.
+- [x] Permitir presentar el reclamo grupal a cualquier participante de aquella actividad, en nombre del grupo.
+- [x] Permitir al titular presentar el reclamo sobre su movimiento de puntos, conservando autor y motivo.
+- [x] Crear en estado Pendiente y tratar envíos repetidos o simultáneos sin duplicados, con errores comprensibles.
 
 **Aceptación:** cada tipo crea un único reclamo Pendiente sobre un registro autorizado; el reclamo grupal queda disponible para los participantes históricos y el individual solo para su titular y docente. Repetir el envío no crea otra solicitud ni altera notas o puntos.
 
 **Documentación:** actualizar [estado actual](../03-calidad-y-operacion/estado-actual.md) con las operaciones verificadas y [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md) con casos de presentación y repetición.
+
+**Seguimiento local de REC-02 (no sincronizado con GitHub):**
+- **Implementación:** migración [`0052_submit_claims_rpc.sql`](../../portfolio-coursse/supabase/migrations/0052_submit_claims_rpc.sql) (`public.submit_group_grade_claim`, `public.submit_point_transaction_claim` y `public.list_student_claims`), validaciones y mapeo de errores en [`lib/claims/validation.ts`](../../portfolio-coursse/lib/claims/validation.ts), servicio [`lib/claims/submit-claim.ts`](../../portfolio-coursse/lib/claims/submit-claim.ts) y Server Actions en [`app/student/claims/actions.ts`](../../portfolio-coursse/app/student/claims/actions.ts). La identidad del autor, curso y matrícula se resuelven exclusivamente en PostgreSQL/servidor desde `auth.uid()`; reintentos equivalentes del mismo autor en estado `pending` convergen de forma idempotente (`created: false`) sin duplicar ni alterar notas/puntos; envíos de terceros o motivos distintos sobre el mismo registro devuelven conflicto (`23505`). La persistencia no depende del aviso por correo (`REC-06 #36`).
+- **Pruebas ejecutadas:** `pnpm test` (`7/7` en [`claims-submission.test.ts`](../../portfolio-coursse/tests/unit/claims-submission.test.ts), `62/62` en 11 archivos), `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI).
+- **Pendientes para cierre y aceptación:** aplicar `0050` y `0052` y ejecutar [`rec_01_claims_model.sql`](../../portfolio-coursse/supabase/qa/rec_01_claims_model.sql) y [`rec_02_claim_submission.sql`](../../portfolio-coursse/supabase/qa/rec_02_claim_submission.sql) en Supabase local (Docker no estuvo disponible en este entorno), integración en la interfaz estudiantil (`REC-04 #34`), conexión del aviso docente (`REC-06 #36`), QA integral (`REC-07 #37`) y revisión independiente de R3 (`@MathiMomos`) en PR. Este seguimiento se actualizó solo localmente, no en GitHub.
 
 ### REC-03 · Transiciones y respuesta final docente
 

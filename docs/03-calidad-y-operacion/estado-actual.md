@@ -52,6 +52,13 @@ Se incorporó la descarga individual por curso en [`GET /api/teacher/courses/[co
 - **Reglas implementadas:** autorización docente por sesión verificada y propiedad del curso en servidor y RPC; lectura exclusiva de notas confirmadas (`revision > 0`) vinculadas a `academic_access.group_grade_participants` (sin inferencia por grupo actual ni inclusión de notas legacy `revision = 0`); pendientes en blanco, cero explícito numérico, cálculo derivado con el supuesto revisable del equipo y cero mutaciones sobre notas o saldo al repetir descargas.
 - **Límites vigentes:** la migración `0051` y la suite SQL [`exp_03_course_export.sql`](../../portfolio-coursse/supabase/qa/exp_03_course_export.sql) no se ejecutaron en Docker/Supabase local en esta sesión; el recorrido visual en navegador en vivo, la revisión independiente de R2 (`@RobertoPizarro`), la validación QA de `EXP-04 #41` y cualquier entorno desplegado siguen pendientes. No es acta oficial ni integración SUM.
 
+### Presentación de reclamos (`REC-02 #32`)
+
+Se incorporaron las operaciones de presentación y consulta estudiantil sobre el modelo `REC-01` (`0050`): migración [`0052_submit_claims_rpc.sql`](../../portfolio-coursse/supabase/migrations/0052_submit_claims_rpc.sql) (`submit_group_grade_claim`, `submit_point_transaction_claim` y `list_student_claims`), servicio [`lib/claims/submit-claim.ts`](../../portfolio-coursse/lib/claims/submit-claim.ts), validaciones [`lib/claims/validation.ts`](../../portfolio-coursse/lib/claims/validation.ts) y Server Actions [`app/student/claims/actions.ts`](../../portfolio-coursse/app/student/claims/actions.ts).
+
+- **Reglas implementadas:** creación exclusiva en estado `pending`, autorización en servidor/BD por participación histórica (`group_grade`) o titularidad (`point_transaction`), convergencia idempotente ante reintento equivalente del mismo autor (`created: false`), rechazo con error comprensible ante duplicados o accesos no autorizados, y persistencia desacoplada del envío de correo (`REC-06`).
+- **Límites vigentes:** las migraciones `0050`/`0052` y las suites SQL [`rec_01_claims_model.sql`](../../portfolio-coursse/supabase/qa/rec_01_claims_model.sql) y [`rec_02_claim_submission.sql`](../../portfolio-coursse/supabase/qa/rec_02_claim_submission.sql) quedan pendientes de ejecución en Docker/Supabase local; la interfaz estudiantil corresponde a `REC-04 #34` y la atención docente a `REC-03 #33` / `REC-05 #35`.
+
 ## Datos de operación aún no confirmados
 
 El responsable indicó que aún no dispone de monitoreo, alertas, respaldos o procedimientos de
