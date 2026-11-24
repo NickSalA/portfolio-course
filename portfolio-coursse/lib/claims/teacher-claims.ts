@@ -280,3 +280,66 @@ export async function listTeacherClaims({
 	};
 }
 
+export type TeacherClaimNotificationSummary = {
+	claimPublicId: string;
+	status: "pending" | "sent" | "failed";
+	attemptCount: number;
+	lastErrorCode: string | null;
+	lastAttemptAt: string | null;
+	sentAt: string | null;
+};
+
+type RawTeacherNotificationRow = {
+	claim_public_id: string;
+	status: "pending" | "sent" | "failed";
+	attempt_count: number;
+	last_error_code: string | null;
+	last_attempt_at: string | null;
+	sent_at: string | null;
+};
+
+/**
+ * Lists technical email-notice status per claim for courses owned by the
+ * authenticated teacher (REC-06 / REC-05).
+ */
+export async function listTeacherClaimNotifications({
+	supabase,
+	courseId = null,
+}: {
+	supabase: SupabaseClient;
+	courseId?: number | null;
+}): Promise<
+	| { ok: true; notifications: Record<string, TeacherClaimNotificationSummary> }
+	| { ok: false; error: string }
+> {
+	const { data, error } = await supabase.rpc(
+		"list_teacher_claim_notifications",
+		{ target_course_id: courseId },
+	);
+
+	if (error) {
+		return {
+			ok: false,
+			error: "No se pudo consultar el estado técnico de los avisos por correo.",
+		};
+	}
+
+	const rows = Array.isArray(data)
+		? (data as RawTeacherNotificationRow[])
+		: [];
+
+	const notifications: Record<string, TeacherClaimNotificationSummary> = {};
+	for (const row of rows) {
+		notifications[row.claim_public_id] = {
+			claimPublicId: row.claim_public_id,
+			status: row.status,
+			attemptCount: Number(row.attempt_count),
+			lastErrorCode: row.last_error_code,
+			lastAttemptAt: row.last_attempt_at,
+			sentAt: row.sent_at,
+		};
+	}
+
+	return { ok: true, notifications };
+}
+

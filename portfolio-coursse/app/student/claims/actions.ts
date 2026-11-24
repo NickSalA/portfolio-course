@@ -6,6 +6,7 @@ import {
 	submitPointTransactionClaim,
 	type SubmitClaimResult,
 } from "@/lib/claims/submit-claim";
+import { dispatchClaimTeacherNotice } from "@/lib/mail/claim-notice";
 import { createClient } from "@/lib/supabase/server";
 
 export async function submitGroupGradeClaimAction(
@@ -37,7 +38,14 @@ export async function submitGroupGradeClaimAction(
 	});
 
 	if (result.ok) {
+		if (result.created) {
+			await dispatchClaimTeacherNotice({
+				supabase,
+				claimPublicId: result.claim.claimPublicId,
+			});
+		}
 		revalidatePath("/student");
+		revalidatePath("/teacher/claims");
 	}
 
 	return result;
@@ -75,7 +83,14 @@ export async function submitPointTransactionClaimAction(
 	});
 
 	if (result.ok) {
+		if (result.created) {
+			await dispatchClaimTeacherNotice({
+				supabase,
+				claimPublicId: result.claim.claimPublicId,
+			});
+		}
 		revalidatePath("/student");
+		revalidatePath("/teacher/claims");
 	}
 
 	return result;

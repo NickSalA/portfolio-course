@@ -106,18 +106,23 @@ Antes de implementar, verificar capacidades existentes y conservar las que pasen
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). No se encontró aviso académico implementado. Reutilizar preparación de BASE-08; conservar reclamo ante fallo y distinguir envío técnico de entrega/lectura.
 
-**Rol:** R5 · **Revisor:** R1 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-02, BASE-08
+**Rol:** R5 · **Revisor:** R1 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** In review · **Bloqueado por:** REC-02, BASE-08
 
 **GitHub:** [#36](https://github.com/NickSalA/portfolio-course/issues/36) · **Asignado:** @Forex549 · **Revisión propuesta:** @NickSalA
 
-- [ ] Verificar el mecanismo disponible y preparar su configuración segura desde M1–M2, sin imponer una biblioteca nueva ni documentar secretos.
-- [ ] Generar por nuevo reclamo un aviso breve al docente responsable con enlace que requiera autorización, sin notas, puntos ni texto de la solicitud.
-- [ ] Conservar el reclamo aunque falle el aviso y registrar el resultado técnico sin contenido sensible.
-- [ ] Definir e implementar recuperación, reintentos y visibilidad del fallo para el actor autorizado, evitando avisos duplicados ante repetición de la solicitud.
+- [x] Verificar el mecanismo disponible y preparar su configuración segura desde M1–M2, sin imponer una biblioteca nueva ni documentar secretos.
+- [x] Generar por nuevo reclamo un aviso breve al docente responsable con enlace que requiera autorización, sin notas, puntos ni texto de la solicitud.
+- [x] Conservar el reclamo aunque falle el aviso y registrar el resultado técnico sin contenido sensible.
+- [x] Definir e implementar recuperación, reintentos y visibilidad del fallo para el actor autorizado, evitando avisos duplicados ante repetición de la solicitud.
 
 **Aceptación:** cada nuevo reclamo activa el aviso al destinatario correcto; una creación repetida no dispara otro aviso lógico. Un fallo no pierde ni bloquea la atención del reclamo y puede recuperarse según la política documentada. El estado técnico no afirma entrega ni lectura sin evidencia; no se añaden correos al alumno, recordatorios ni escalamiento.
 
 **Documentación:** actualizar [controles operativos](../03-calidad-y-operacion/controles-operativos.md) con configuración sin secretos y recuperación; registrar éxito, fallo y reintento en [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md).
+
+**Seguimiento local de REC-06 (no sincronizado con GitHub):**
+- **Implementación:** migración [`0054_claim_email_notifications.sql`](../../portfolio-coursse/supabase/migrations/0054_claim_email_notifications.sql) (`public.claim_notifications` 1:1 por reclamo, trigger `tr_create_claim_notification`, RLS solo docente y RPCs `prepare_claim_email_dispatch`, `record_claim_email_outcome`, `list_teacher_claim_notifications`); despacho seguro en [`lib/mail/claim-notice.ts`](../../portfolio-coursse/lib/mail/claim-notice.ts) reutilizando `BASE-08` (`readMailConfig` y `buildTeacherNoticeEmail` con enlace `/teacher/claims?claim=<public_id>` sin datos académicos ni secretos); conexión no bloqueante en [`app/student/claims/actions.ts`](../../portfolio-coursse/app/student/claims/actions.ts) solo cuando `created === true`; y acción docente de recuperación `retryClaimNoticeAction` en [`app/teacher/claims/actions.ts`](../../portfolio-coursse/app/teacher/claims/actions.ts).
+- **Pruebas ejecutadas:** `pnpm test` (`5/5` en [`claim-notice.test.ts`](../../portfolio-coursse/tests/unit/claim-notice.test.ts), `73/73` en 13 archivos), `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI).
+- **Pendientes para cierre y aceptación:** aplicar `0054` y ejecutar [`rec_06_claim_notifications.sql`](../../portfolio-coursse/supabase/qa/rec_06_claim_notifications.sql) en Supabase local (Docker no estuvo disponible), exponer el indicador y botón de reintento en la bandeja docente (`REC-05 #35`), prueba integrada en `REC-07 #37` y revisión independiente de R1 (`@NickSalA`) en PR. Este seguimiento se actualizó solo localmente, no en GitHub.
 
 ### REC-07 · QA de reclamos y correo
 

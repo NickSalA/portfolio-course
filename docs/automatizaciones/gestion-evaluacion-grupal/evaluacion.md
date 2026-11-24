@@ -639,3 +639,23 @@ La suite separada `test:db --pending` confirmó el caso de preservación de GRP-
 | Calidad y build de aplicación | Sin errores de ESLint, tipos ni build. | `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI) aprobados. |
 
 **Pendientes:** ejecutar `0050`/`0052`/`0053` y [`rec_03_claim_transitions.sql`](../../../portfolio-coursse/supabase/qa/rec_03_claim_transitions.sql) en Supabase local con Docker, completar bandeja/detalle docente (`REC-05 #35`), QA integral (`REC-07 #37`) y revisión independiente de R4 (`@fabrizio25504`) en PR. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
+
+## REC-06 #36 · Correo docente y recuperación de fallos
+
+**Fecha:** 2026-11-23 · **Base:** `feature/r5-reclamos-exportacion` · **Migración nueva:** [`0054_claim_email_notifications.sql`](../../../portfolio-coursse/supabase/migrations/0054_claim_email_notifications.sql) · **Entorno:** Windows 11, Node 22.14.0, pnpm 11.20.0. Docker no estuvo disponible; las pruebas de despacho usaron transporte SMTP simulado.
+
+### Diseño de aviso y recuperación
+
+- **Unicidad y persistencia desacoplada (`0054`):** trigger `tr_create_claim_notification` crea una fila `pending` única por reclamo en `public.claim_notifications` (RLS solo docente). `prepare_claim_email_dispatch` permite un único despacho automático inicial al crearse el reclamo (`created === true`, `attempt_count = 0`) y reintentos posteriores exclusivamente al docente responsable mientras el estado no sea `sent`.
+- **Privacidad y señales seguras:** [`lib/mail/claim-notice.ts`](../../../portfolio-coursse/lib/mail/claim-notice.ts) reutiliza `BASE-08` con enlace relativo autenticado `/teacher/claims?claim=<claim_public_id>`, sin notas, puntos, nombres ni texto del reclamo. Los fallos se registran solo con códigos técnicos (`MAIL_CONFIG_INCOMPLETE`, `MAIL_RECIPIENT_MISSING`, `MAIL_SEND_FAILED`, `MAIL_DISPATCH_ERROR`) sin exponer `SMTP_PASS`. El estado `sent` representa aceptación técnica SMTP, nunca entrega ni lectura.
+
+### Comprobaciones ejecutadas
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Envío exitoso y privacidad (`claim-notice.test.ts`) | Envía aviso breve al correo docente con enlace `/teacher/claims?claim=...`, sin credenciales ni contenido académico, y registra `did_send: true` (`sent`). | Aprobado en Vitest. |
+| Prevención de duplicados (`claim-notice.test.ts`) | Si `should_send` es `false` (`status: sent`), omite SMTP (`sendMail` 0 llamadas) y devuelve `skipped: true`. | Aprobado en Vitest. |
+| Fallo por configuración incompleta o error SMTP (`claim-notice.test.ts`) | No lanza excepciones ni revierte el reclamo; registra `MAIL_CONFIG_INCOMPLETE` o `MAIL_SEND_FAILED` sin filtrar `SMTP_PASS`. | Aprobado en Vitest (`5/5` pruebas; `73/73` en 13 archivos). |
+| Calidad y build de aplicación | Sin errores de ESLint, tipos ni build. | `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI) aprobados. |
+
+**Pendientes:** ejecutar `0054` y [`rec_06_claim_notifications.sql`](../../../portfolio-coursse/supabase/qa/rec_06_claim_notifications.sql) en Supabase local con Docker, integrar la visibilidad del estado técnico y botón de reintento en la bandeja docente (`REC-05 #35`), prueba integrada en `REC-07 #37` y revisión independiente de R1 (`@NickSalA`) en PR. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
