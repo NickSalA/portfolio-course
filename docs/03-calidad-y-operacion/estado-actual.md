@@ -45,6 +45,13 @@ conserva los FR verificados del alcance anterior y añade historias vigentes pen
 al [backlog BK-01–BK-24](../04-gestion/backlog-y-responsabilidades.md). BK-01 exige sincronizar
 `specs`, que todavía contiene reglas contradictorias. Ningún estado histórico certifica esas ampliaciones.
 
+### Recorrido de descarga XLSX por curso (`EXP-03 #40`)
+
+Se incorporó la descarga individual por curso en [`GET /api/teacher/courses/[coursePublicId]/export`](../../portfolio-coursse/app/api/teacher/courses/[coursePublicId]/export/route.ts), respaldada por la RPC de solo lectura [`list_course_export_grade_attributions`](../../portfolio-coursse/supabase/migrations/0051_course_export_historical_data.sql) (`0051`, `STABLE SECURITY DEFINER`), el módulo puro [`course-export.ts`](../../portfolio-coursse/lib/export/course-export.ts) sobre `EXP-02` ([`adjusted-average.ts`](../../portfolio-coursse/lib/export/adjusted-average.ts)) y el botón [`CourseExportButton`](../../portfolio-coursse/components/teacher/grades/course-export-button.tsx) en `/teacher/grades` y `/teacher/courses/[coursePublicId]`.
+
+- **Reglas implementadas:** autorización docente por sesión verificada y propiedad del curso en servidor y RPC; lectura exclusiva de notas confirmadas (`revision > 0`) vinculadas a `academic_access.group_grade_participants` (sin inferencia por grupo actual ni inclusión de notas legacy `revision = 0`); pendientes en blanco, cero explícito numérico, cálculo derivado con el supuesto revisable del equipo y cero mutaciones sobre notas o saldo al repetir descargas.
+- **Límites vigentes:** la migración `0051` y la suite SQL [`exp_03_course_export.sql`](../../portfolio-coursse/supabase/qa/exp_03_course_export.sql) no se ejecutaron en Docker/Supabase local en esta sesión; el recorrido visual en navegador en vivo, la revisión independiente de R2 (`@RobertoPizarro`), la validación QA de `EXP-04 #41` y cualquier entorno desplegado siguen pendientes. No es acta oficial ni integración SUM.
+
 ## Datos de operación aún no confirmados
 
 El responsable indicó que aún no dispone de monitoreo, alertas, respaldos o procedimientos de

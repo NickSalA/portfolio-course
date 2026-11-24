@@ -1,6 +1,7 @@
 "use client";
 
 import { archiveCourse } from "@/app/teacher/courses/actions";
+import { CourseExportButton } from "@/components/teacher/grades/course-export-button";
 import { CourseStudentImportForm } from "@/components/teacher/students/course-student-import-form";
 
 export function CourseDetailActions({
@@ -13,7 +14,11 @@ export function CourseDetailActions({
 	periodPublicId: string;
 }) {
 	return (
-		<div className="flex items-center gap-2">
+		<div className="flex flex-wrap items-start justify-end gap-2">
+			<CourseExportButton
+				coursePublicId={coursePublicId}
+				courseName={courseName}
+			/>
 			<CourseStudentImportForm
 				periodPublicId={periodPublicId}
 				courseName={courseName}
