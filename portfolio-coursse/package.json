@@ -13,7 +13,8 @@
         "test:db": "node scripts/test-db.mjs",
         "test:db:pending": "node scripts/test-db.mjs --pending",
         "test:mail": "node scripts/test-mail.mjs",
-        "test:node": "node --test lib/**/*.test.mjs"
+        "test:node": "node --test lib/**/*.test.mjs",
+        "demo:check": "node scripts/demo-readiness.mjs"
     },
     "dependencies": {
         "@supabase/ssr": "^0.12.5",

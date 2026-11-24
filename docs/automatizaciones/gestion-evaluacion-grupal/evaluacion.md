@@ -677,3 +677,11 @@ La suite separada `test:db --pending` confirmó el caso de preservación de GRP-
 | Calidad y build de aplicación | Sin errores de ESLint, tipos ni build de producción. | `pnpm lint`, `pnpm typecheck` y `pnpm build` aprobados; ruta dinámica `/teacher/claims` compilada. |
 
 **Dimensiones verificadas y pendientes:** se verificaron **implementación en código**, **navegación identificada en código** y **pruebas unitarias/build**. Quedan pendientes el recorrido visual y pruebas de usabilidad/teclado en navegador en vivo, la verificación integrada en `REC-07 #37`, la revisión de accesibilidad `QA-01 #42` y la revisión independiente de R2 (`@RobertoPizarro`) en PR. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
+
+## QA-03 #44 · Operación y demostración reproducible
+
+**Fecha:** 2026-11-23 · **Base:** `feature/r5-reclamos-exportacion` · **Entorno:** Windows 11, Node 22.14.0, pnpm 11.20.0 (sin Docker ni conexión a producción).
+
+- **Artefactos creados:** guía [`operacion-y-demostracion.md`](../../03-calidad-y-operacion/operacion-y-demostracion.md) (configuración sin secretos, matriz local vs. externo con responsables, recuperación de correo, guion sintético de 7 pasos y Plan B con evidencia previa) y script [`demo-readiness.mjs`](../../../portfolio-coursse/scripts/demo-readiness.mjs) (`pnpm demo:check`).
+- **Comprobación ejecutada:** `pnpm demo:check` verificó sin exponer secretos la disponibilidad de 54 migraciones (`0001`–`0054`) y suites SQL sintéticas; `pnpm test` (`77/77`), `pnpm lint`, `pnpm typecheck`, `pnpm build` y `git diff --check` sin errores.
+- **Pendientes:** reproducción del guion completo en vivo por otro integrante con Docker/Supabase local activo, revisión independiente de R1 (`@NickSalA`) en PR y consolidación en `QA-04 #45`. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
