@@ -13,6 +13,7 @@ const modules = [
 	{ href: "/teacher/students", label: "Alumnos", symbol: "◌", preserveCourse: true },
 	{ href: "/teacher/points", label: "Puntos", symbol: "+", preserveCourse: true },
 	{ href: "/teacher/grades", label: "Notas", symbol: "★", preserveCourse: true },
+	{ href: "/teacher/claims", label: "Reclamos", symbol: "!", preserveCourse: true },
 ];
 
 export function TeacherSidebar({ name }: { name: string }) {

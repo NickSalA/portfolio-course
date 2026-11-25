@@ -39,18 +39,23 @@
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). El inventario identifica rutas/componentes, no demostración ejecutada. Preparar cuentas y recorrido reproducible, diferenciando servicios externos, navegación en vivo y evidencia previa.
 
-**Rol:** R5 · **Revisor:** R1 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** REC-06, EXP-03
+**Rol:** R5 · **Revisor:** R1 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** In review · **Bloqueado por:** REC-06, EXP-03
 
 **GitHub:** [#44](https://github.com/NickSalA/portfolio-course/issues/44) · **Asignado:** @Forex549 · **Revisión propuesta:** @NickSalA
 
-- [ ] Documentar configuración de prueba, requisitos de ejecución y tratamiento de fallo de correo sin secretos.
-- [ ] Preparar conjunto sintético para demostrar registro, cambio de grupo, consulta, reclamo y XLSX.
-- [ ] Comprobar qué se puede ejecutar y qué depende de un servicio externo; registrar limitaciones y responsable.
-- [ ] Preparar alternativa de demostración con evidencia real previa, sin presentarla como ejecución en vivo.
+- [x] Documentar configuración de prueba, requisitos de ejecución y tratamiento de fallo de correo sin secretos.
+- [x] Preparar conjunto sintético para demostrar registro, cambio de grupo, consulta, reclamo y XLSX.
+- [x] Comprobar qué se puede ejecutar y qué depende de un servicio externo; registrar limitaciones y responsable.
+- [x] Preparar alternativa de demostración con evidencia real previa, sin presentarla como ejecución en vivo.
 
 **Aceptación:** otro integrante reproduce el recorrido documentado; se distingue prueba local, envío/entrega de correo y cualquier configuración remota no verificada. No se exige un proveedor, despliegue o respaldo nuevo por analogía con otro proyecto.
 
 **Documentación:** instrucciones operativas y evidencia de demostración.
+
+**Seguimiento local de QA-03 (no sincronizado con GitHub):**
+- **Implementación:** guía operativa y de demostración reproducible en [`operacion-y-demostracion.md`](../03-calidad-y-operacion/operacion-y-demostracion.md) (requisitos sin secretos, matriz local vs. servicios externos con responsables y límites, política de fallo/reintento de correo, conjunto sintético y guion paso a paso de 7 etapas, y Plan B con evidencia previa claramente separada de ejecución en vivo) y script [`scripts/demo-readiness.mjs`](../../portfolio-coursse/scripts/demo-readiness.mjs) (`pnpm demo:check`).
+- **Comprobaciones ejecutadas:** `pnpm demo:check`, `pnpm test` (`77/77`), `pnpm lint`, `pnpm typecheck`, `pnpm build` y `git diff --check`.
+- **Pendientes para cierre y aceptación:** que otro integrante reproduzca el recorrido completo en un entorno con Docker/Supabase local activo (`supabase db reset --local`, `pnpm test:db`, `pnpm dev`), revisión independiente de R1 (`@NickSalA`) en PR y evaluación integrada en `QA-04 #45`. Este seguimiento se actualizó solo localmente, no en GitHub.
 
 ### QA-04 · Evaluar registro y seguimiento con escenarios acordados
 

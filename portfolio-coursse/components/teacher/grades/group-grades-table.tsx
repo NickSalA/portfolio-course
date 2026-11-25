@@ -593,7 +593,7 @@ export function GroupGradesTable({
 					<button
 						type="button"
 						onClick={exportToExcel}
-						title="Exporta notas confirmadas en formato Excel (.xlsx)"
+						title="Exporta la matriz actual de notas por grupo en formato Excel (.xlsx)"
 						className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground transition hover:border-accent hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 					>
 						<svg
@@ -610,7 +610,7 @@ export function GroupGradesTable({
 								d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
 							/>
 						</svg>
-						Exportar Notas (.xlsx)
+						Exportar matriz por grupo (.xlsx)
 					</button>
 				</div>
 

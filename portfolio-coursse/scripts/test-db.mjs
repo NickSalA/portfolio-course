@@ -57,6 +57,10 @@ try {
                 "grp_03_group_selection.sql",
                 "grp_06_activity_participants.sql",
                 "rec_01_claims_model.sql",
+                "rec_02_claim_submission.sql",
+                "rec_03_claim_transitions.sql",
+                "rec_06_claim_notifications.sql",
+                "exp_03_course_export.sql",
             ];
     for (const script of scripts) {
         console.log(`\nRunning ${script}`);

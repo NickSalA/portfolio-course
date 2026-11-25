@@ -48,19 +48,25 @@ Antes de implementar, verificar lo existente y conservar lo que pase los criteri
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#6-descargas-reclamos-y-correo). Reutilizar generación XLSX, no la atribución actual: exporta integrantes actuales y notas locales incluso no confirmadas, con pendiente «-». Integrar datos históricos confirmados y cálculo sin mutaciones.
 
-**Rol:** R5 · **Revisor:** R2 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EXP-02
+**Rol:** R5 · **Revisor:** R2 · **Milestone:** M3 · **Prioridad:** Alta · **Estado:** In review · **Bloqueado por:** EXP-02
 
 **GitHub:** [#40](https://github.com/NickSalA/portfolio-course/issues/40) · **Asignado:** @Forex549 · **Revisión propuesta:** @RobertoPizarro
 
-- [ ] Verificar y reutilizar la generación XLSX existente que cumpla el contrato y las columnas acordadas en EXP-01.
-- [ ] Obtener notas de cada alumno según participantes históricos de cada actividad, no desde el grupo actual ni inventando pertenencias.
-- [ ] Integrar el cálculo puro y las columnas acordadas, manteniendo notas pendientes vacías, cero explícito y promedio final ajustado pendiente cuando corresponda.
-- [ ] Permitir la descarga solo al docente autorizado del curso, con carga, error y confirmación comprensibles.
-- [ ] Garantizar que generar o repetir la descarga no consume puntos ni escribe calificaciones ajustadas en los registros base.
+- [x] Verificar y reutilizar la generación XLSX existente que cumpla el contrato y las columnas acordadas en EXP-01.
+- [x] Obtener notas de cada alumno según participantes históricos de cada actividad, no desde el grupo actual ni inventando pertenencias.
+- [x] Integrar el cálculo puro y las columnas acordadas, manteniendo notas pendientes vacías, cero explícito y promedio final ajustado pendiente cuando corresponda.
+- [x] Permitir la descarga solo al docente autorizado del curso, con carga, error y confirmación comprensibles.
+- [x] Garantizar que generar o repetir la descarga no consume puntos ni escribe calificaciones ajustadas en los registros base.
 
 **Aceptación:** el docente descarga un XLSX legible de su curso con los datos y columnas acordados. Un alumno que cambia de grupo conserva las notas de sus actividades originales; una atribución no establecida no se completa desde el grupo actual. El archivo distingue vacío de cero y muestra el cálculo acordado, sin convertirlo en acta oficial ni modificar registros. Un actor no autorizado no puede obtenerlo.
 
 **Documentación:** actualizar [estado actual](../03-calidad-y-operacion/estado-actual.md) con el recorrido de descarga y sus límites; registrar archivo sintético y comprobaciones en [evidencia](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md).
+
+**Seguimiento local de EXP-03 (no sincronizado con GitHub):**
+- **Implementación:** migración de solo lectura [`0051_course_export_historical_data.sql`](../../portfolio-coursse/supabase/migrations/0051_course_export_historical_data.sql) (`public.list_course_export_grade_attributions`, `STABLE SECURITY DEFINER`, restringida a `is_teacher_of_course` y notas confirmadas `revision > 0` respaldadas por `academic_access.group_grade_participants`); módulo puro [`course-export.ts`](../../portfolio-coursse/lib/export/course-export.ts) reutilizando `xlsx` y [`adjusted-average.ts`](../../portfolio-coursse/lib/export/adjusted-average.ts); cargador y endpoint autenticado [`get-course-export.ts`](../../portfolio-coursse/lib/export/get-course-export.ts) y [`GET /api/teacher/courses/[coursePublicId]/export`](../../portfolio-coursse/app/api/teacher/courses/[coursePublicId]/export/route.ts); botón accesible [`course-export-button.tsx`](../../portfolio-coursse/components/teacher/grades/course-export-button.tsx) integrado en `/teacher/grades` y `/teacher/courses/[coursePublicId]`, con carga, confirmación y error.
+- **Antecedentes BASE-01 atendidos:** reemplaza la dependencia del grupo actual y del estado local no guardado para la exportación individual por curso; elimina marcadores `"-"` usando celdas vacías para pendientes y `0` numérico para cero explícito; integra saldo activo, promedio base, puntos aplicados, excedente y promedio ajustado sin mutar registros ni consumir saldo. La descarga secundaria de matriz por grupo en `GroupGradesTable` se conservó y etiquetó explícitamente como *Exportar matriz por grupo (.xlsx)*.
+- **Pruebas ejecutadas:** `pnpm test` (`10/10` pruebas en [`course-export.test.ts`](../../portfolio-coursse/tests/unit/course-export.test.ts), `55/55` en 10 archivos), `node --experimental-strip-types --test lib/export/adjusted-average.test.mjs` (`14/14`), `pnpm lint`, `pnpm typecheck` y `pnpm build` (con variables placeholder de CI).
+- **Pendientes para cierre y aceptación:** aplicar `0051` y ejecutar [`exp_03_course_export.sql`](../../portfolio-coursse/supabase/qa/exp_03_course_export.sql) en Supabase local (Docker no estuvo disponible en este entorno), ejecutar recorrido visual y descarga en navegador en vivo (en esta revisión se acreditan implementación en código, navegación identificada y generación/lectura binaria del `.xlsx`, no recorrido visual ni usabilidad en navegador), revisión independiente de R2 (`@RobertoPizarro`) en PR y QA integral en `EXP-04 #41`. Este seguimiento se actualizó solo localmente, no en GitHub.
 
 ### EXP-04 · QA de descarga, cálculo, privacidad y repetición
 

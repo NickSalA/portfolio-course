@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CourseContextSwitcher } from "@/components/teacher/courses/course-context-switcher";
 import { ModuleHeader } from "@/components/teacher/shared/module-header";
+import { CourseExportButton } from "@/components/teacher/grades/course-export-button";
 import { EvaluationManagerDialog } from "@/components/teacher/grades/evaluation-manager-dialog";
 import { GroupGradesTable } from "@/components/teacher/grades/group-grades-table";
 import { getTeacherContext } from "@/lib/teacher/get-context";
@@ -223,7 +224,11 @@ export default async function GradesPage({
 
                 {selectedCourse ? (
                     <div className="mt-6 space-y-6">
-                        <div className="flex justify-end">
+                        <div className="flex flex-wrap items-start justify-end gap-3">
+                            <CourseExportButton
+                                coursePublicId={selectedCourse.public_id}
+                                courseName={selectedCourse.name}
+                            />
                             <EvaluationManagerDialog
                                 coursePublicId={selectedCourse.public_id}
                                 courseId={selectedCourse.id}
