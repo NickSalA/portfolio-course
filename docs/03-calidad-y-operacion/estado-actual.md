@@ -63,6 +63,14 @@ Se incorporaron las operaciones de presentación y consulta estudiantil sobre el
 
 Se implementó la vista docente [`/teacher/claims`](../../portfolio-coursse/app/teacher/claims/page.tsx) con entrada «Reclamos» en el sidebar docente ([`teacher-sidebar.tsx`](../../portfolio-coursse/components/teacher/shell/teacher-sidebar.tsx)), filtros por estado y tipo, detalle del registro histórico asociado, acciones ordenadas (`Iniciar revisión` → `Enviar respuesta final`), aviso explícito con enlace separado a Notas/Puntos para correcciones académicas y control técnico de reintento de correo (`REC-06`). El recorrido visual en navegador en vivo, la ejecución SQL local y la revisión independiente de R2 (`@RobertoPizarro`) siguen pendientes.
 
+### Interfaz estudiantil de reclamos (`REC-04 #34`)
+
+Se integró la presentación y consulta de reclamos en [`/student`](../../portfolio-coursse/app/student/page.tsx) mediante [`lib/claims/student-claims.ts`](../../portfolio-coursse/lib/claims/student-claims.ts), [`getStudentDashboard`](../../portfolio-coursse/lib/student/get-dashboard.ts) (`listStudentClaims`), [`StudentCourseAcademicRecords`](../../portfolio-coursse/components/student-portal/student-claims-panel.tsx) y [`StudentCourseCard`](../../portfolio-coursse/components/student-portal/student-course-card.tsx):
+
+- **Presentación contextual y unicidad visible:** desde cada fila de *Notas grupales* históricas (`group_grade`, identificando evaluación, grupo histórico y nota o `Pendiente`) y desde cada movimiento de *Puntos* (`point_transaction`), el alumno abre un `<dialog>` accesible con validación (`1–2000` caracteres), contador, prevención de doble envío (`inFlightRef`) y conservación del motivo ante error o conflicto (`23505`). Cuando ya existe un reclamo sobre ese registro (propio o presentado por un compañero histórico en notas grupales), la fila reemplaza el botón por su badge de estado e impide crear otro.
+- **Consulta, privacidad y cierre definitivo:** la sección *Reclamos* de cada curso filtra por estado (`Todos`, `Pendiente`, `En revisión`, `Respondido`), identifica autor (`Tú` o compañero histórico), tipo/alcance (*Visible para tu grupo histórico* vs. *Privado entre tú y el docente*), fechas `America/Lima`, motivo y **Respuesta final del docente** sin controles de réplica, edición ni reapertura, manteniendo las notas y puntos sin mutación automática y el estado `claimsError` aislado con botón «Reintentar».
+- **Límites vigentes:** la revisión independiente en PR (`@fabrizio25504`, R4), la batería integral de `REC-07 #37` y la revisión transversal de `QA-01 #42` quedan pendientes; en la base local también se observó un fallo preexistente en `rec_01_claims_model.sql:145` al validar `DELETE`/`UPDATE` directo, mientras `rec_02`, `rec_03` y `rec_06` pasaron completos.
+
 ## Datos de operación aún no confirmados
 
 El responsable indicó que aún no dispone de monitoreo, alertas, respaldos o procedimientos de
