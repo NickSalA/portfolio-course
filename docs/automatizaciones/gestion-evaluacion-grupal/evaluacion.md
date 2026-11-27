@@ -712,3 +712,33 @@ La suite separada `test:db --pending` confirmó el caso de preservación de GRP-
 - **Artefactos creados:** guía [`operacion-y-demostracion.md`](../../03-calidad-y-operacion/operacion-y-demostracion.md) (configuración sin secretos, matriz local vs. externo con responsables, recuperación de correo, guion sintético de 7 pasos y Plan B con evidencia previa) y script [`demo-readiness.mjs`](../../../portfolio-coursse/scripts/demo-readiness.mjs) (`pnpm demo:check`).
 - **Comprobación ejecutada:** `pnpm demo:check` verificó sin exponer secretos la disponibilidad de 54 migraciones (`0001`–`0054`) y suites SQL sintéticas; `pnpm test` (`77/77`), `pnpm lint`, `pnpm typecheck`, `pnpm build` y `git diff --check` sin errores.
 - **Pendientes:** reproducción del guion completo en vivo por otro integrante con Docker/Supabase local activo, revisión independiente de R1 (`@NickSalA`) en PR y consolidación en `QA-04 #45`. Este seguimiento se actualizó solo en archivos locales, no en GitHub.
+
+## REC-04 #34 · Interfaz estudiantil para presentar y consultar
+
+**Fecha:** 2026-11-25 · **Base:** `develop` `121a157` · **Rama:** `feature/REC-04-interfaz-reclamos-alumno` · **Migración nueva:** ninguna (`D1 Opción A` y `D2 Opción A`, reutiliza `0050`, `0052`–`0054`, `listStudentClaims` y `app/student/claims/actions.ts`) · **Entorno:** Supabase local aislado en Docker (`0001`–`0054`), Node 22.18.0, Next.js 16.3.0 (`pnpm build` + `pnpm start`) y Chrome headless (`1280×800` y `375×812`) con datos sintéticos `@example.test`.
+
+### Recorrido estudiantil integrado en `/student`
+
+```text
+/student (StudentPage → getStudentDashboard [list_student_group_grades + list_student_claims])
+  └── StudentCourseCard → StudentCourseAcademicRecords (student-claims-panel.tsx)
+        ├── Notas grupales (EVA-05): botón «Presentar reclamo» o badge «Reclamo: <estado> · por <autor>»
+        ├── Puntos: botón «Presentar reclamo» por movimiento o badge «Reclamo: <estado>»
+        ├── <dialog> Presentar reclamo (aria-labelledby, aria-describedby, Esc, 1–2000 chars, inFlightRef, «Enviando reclamo…»)
+        │     └── submitGroupGradeClaimAction / submitPointTransactionClaimAction ──▶ role="status" o role="alert" conservando motivo
+        └── Sección Reclamos: filtro por estado (Todos / Pendiente / En revisión / Respondido), claimsError con «Reintentar»,
+              autor («Tú» o compañero histórico), alcance (grupal histórico vs. privado), fechas America/Lima, motivo y
+              «Respuesta final del docente» sin botones de réplica, edición ni reapertura
+```
+
+### Comprobaciones ejecutadas
+
+| Comprobación | Esperado | Observado |
+| --- | --- | --- |
+| Pruebas unitarias (`student-claims-ui.test.ts` y `get-student-dashboard.test.ts`) | Emparejamiento nota/movimiento ↔ reclamo, resúmenes, filtros, autor `Tú` vs. compañero histórico, alcance grupal vs. privado, descripción diferenciando `0` vs. `Pendiente`, mapeo en `getStudentDashboard` y aislamiento de `claimsError`. | `3/3` en `student-claims-ui.test.ts` y `6/6` en `get-student-dashboard.test.ts` aprobados (`16` archivos / `85` pruebas Vitest en total). |
+| Suites SQL en Docker local (`0001`–`0054`) | Validar contratos subyacentes de reclamos (`rec_01`, `rec_02`, `rec_03`, `rec_06`). | `rec_02_claim_submission.sql`, `rec_03_claim_transitions.sql` y `rec_06_claim_notifications.sql` aprobaron (`PASS`). *Nota preexistente:* `rec_01_claims_model.sql:145` falló (`student deleted claims`), ajeno a `REC-04`. |
+| `C1–C5` y `C9–C10` en navegador local (`1280×800`) | Estado vacío y disparadores en *Notas grupales* y *Puntos*; validación de motivo vacío (`"   "`) y `> 2000` chars con `role="alert"`; reclamo grupal histórico (`T1 = 16`, incluso tras traslado a `Grupo 2`, y `T2 = 0` vs. `T3 = Pendiente`) visible para compañero histórico sin botón duplicador; reclamo de puntos (`+3`) privado y oculto para compañeros; persistencia aun sin SMTP (`REC-06`); aislamiento total para tercero en otro grupo (`Alumno Tres`). | Aprobado con datos sintéticos `@example.test` (3 contextos estudiantiles simultáneos). |
+| `C6–C8` y `C12–C14` (ciclo docente, conflicto, red, filtros, A11y y móvil `375px`) | Desde `/teacher/claims`, docente pasa a `En revisión` y luego `Respondido`; ambos participantes históricos ven la **Respuesta final del docente** y fecha `(Lima)` sin controles de réplica/reapertura ni cambios en nota o saldo (`+2`). Conflicto concurrente (`conflict` `23505`) entre dos pestañas y fallo de red abortado conservan el motivo escrito con `role="alert"`; doble clic dispara `1` solo `POST`; filtros `Todos`/`Respondido`, foco/cierre con `Esc` y móvil `375×812` sin desborde horizontal. | Aprobado en Chrome local; capturas (`modal`, `responded`, `mobile`) verificadas visualmente. |
+| Comprobaciones de aplicación | Lint, generación de tipos, TypeScript y build de producción sin errores. | `pnpm lint`, `pnpm typecheck` (`next typegen && tsc --noEmit`) y `pnpm build` aprobados después del último cambio de código y pruebas. |
+
+**Dimensiones verificadas y pendientes:** se verificaron **implementación en código**, **descubrimiento** (acceso directo en tarjetas de `/student`), **funcionamiento visible** (`C1–C14` en `next start` + Supabase Docker local con `0001`–`0054`) y **usabilidad básica / accesibilidad** (`<dialog>` nativo con `aria-labelledby`/`aria-describedby`, `Esc` con retorno de foco, `role="alert"`, `role="status"`, teclado y móvil `375×812`). Quedan pendientes la batería integral de reclamos `REC-07 #37` (R4), la revisión transversal de accesibilidad `QA-01 #42` (R2) y la revisión independiente en PR por `@fabrizio25504` (R4). Este seguimiento se actualizó solo localmente, no en GitHub.

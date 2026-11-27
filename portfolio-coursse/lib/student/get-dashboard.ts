@@ -1,4 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+	listStudentClaims,
+	type StudentClaimRecord,
+} from "../claims/submit-claim";
 
 type Relationship<T> = T | T[] | null;
 
@@ -59,6 +63,8 @@ export type StudentEnrollmentSummary = {
 	balance: number;
 	grades: StudentGroupGrade[];
 	gradesError: boolean;
+	claims: StudentClaimRecord[];
+	claimsError: boolean;
 };
 
 function parseGradeValue(
@@ -136,16 +142,32 @@ export async function getStudentDashboard(
 					created_at: transaction.created_at,
 				}));
 
-			const { data: rawGrades, error: gradesRpcError } =
-				await supabase.rpc("list_student_group_grades", {
+			const [
+				{ data: rawGrades, error: gradesRpcError },
+				claimsResult,
+			] = await Promise.all([
+				supabase.rpc("list_student_group_grades", {
 					target_course_id: enrollment.course_id,
-				});
+				}),
+				listStudentClaims({
+					supabase,
+					courseId: enrollment.course_id,
+				}),
+			]);
 
 			if (gradesRpcError) {
 				console.error("Student group grades query failed", {
 					studentId,
 					courseId: enrollment.course_id,
 					error: gradesRpcError,
+				});
+			}
+
+			if (!claimsResult.ok) {
+				console.error("Student claims query failed", {
+					studentId,
+					courseId: enrollment.course_id,
+					error: claimsResult.error,
 				});
 			}
 
@@ -179,6 +201,8 @@ export async function getStudentDashboard(
 				),
 				grades,
 				gradesError: Boolean(gradesRpcError),
+				claims: claimsResult.ok ? claimsResult.claims : [],
+				claimsError: !claimsResult.ok,
 			};
 		}),
 	);

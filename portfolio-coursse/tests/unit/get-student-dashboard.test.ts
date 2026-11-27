@@ -8,6 +8,7 @@ function createDashboardClient({
 	syncResult = { data: true as boolean | null, error: null as unknown },
 	queryResult = { data: [] as unknown[] | null, error: null as unknown },
 	gradesByCourse = {} as Record<number, RpcResult>,
+	claimsByCourse = {} as Record<number, RpcResult>,
 } = {}) {
 	const eqStatus = vi.fn(async () => queryResult);
 	const eqStudent = vi.fn(() => ({ eq: eqStatus }));
@@ -21,6 +22,13 @@ function createDashboardClient({
 				const courseId = args?.target_course_id;
 				if (courseId !== undefined && courseId in gradesByCourse) {
 					return gradesByCourse[courseId];
+				}
+				return { data: [], error: null };
+			}
+			if (fnName === "list_student_claims") {
+				const courseId = args?.target_course_id;
+				if (courseId !== undefined && courseId in claimsByCourse) {
+					return claimsByCourse[courseId];
 				}
 				return { data: [], error: null };
 			}
@@ -277,6 +285,128 @@ describe("getStudentDashboard", () => {
 
 		const result = await getStudentDashboard(client, "student-1");
 		expect(result).toEqual({ enrollments: [], error: "query-failed" });
+		spy.mockRestore();
+	});
+
+	it("maps course claims including teammate historical group claims and isolates claimsError per course", async () => {
+		const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+		const { client } = createDashboardClient({
+			queryResult: {
+				data: [
+					{
+						id: 20,
+						course_id: 201,
+						group_id: 2,
+						groups: { name: "Grupo 2" },
+						courses: {
+							name: "Curso Con Reclamos",
+							group_selection_opens_at: null,
+							group_selection_closes_at: null,
+							academic_periods: { code: "2026-II" },
+						},
+						authorized_students: {
+							point_transactions: [
+								{
+									id: 55,
+									points: 2,
+									reason: "Participación",
+									created_at: "2026-10-05T10:00:00Z",
+									is_voided: false,
+								},
+							],
+						},
+					},
+					{
+						id: 21,
+						course_id: 202,
+						group_id: 3,
+						groups: { name: "Grupo 3" },
+						courses: {
+							name: "Curso Error Reclamos",
+							group_selection_opens_at: null,
+							group_selection_closes_at: null,
+							academic_periods: { code: "2026-II" },
+						},
+						authorized_students: { point_transactions: [] },
+					},
+				],
+				error: null,
+			},
+			claimsByCourse: {
+				201: {
+					data: [
+						{
+							claim_public_id: "c-group-1",
+							course_id: 201,
+							claim_type: "group_grade",
+							status: "responded",
+							group_public_id: "grp-1",
+							group_name: "Grupo 1",
+							evaluation_public_id: "ev-1",
+							evaluation_name: "T1",
+							point_transaction_id: null,
+							submitted_by_name: "Alumno Dos",
+							is_submitted_by_me: false,
+							reason: "Revisión grupal",
+							teacher_response: "Se revisó el caso.",
+							created_at: "2026-11-24T14:00:00Z",
+							in_review_at: "2026-11-24T15:00:00Z",
+							responded_at: "2026-11-24T16:00:00Z",
+						},
+						{
+							claim_public_id: "c-point-1",
+							course_id: 201,
+							claim_type: "point_transaction",
+							status: "pending",
+							group_public_id: null,
+							group_name: null,
+							evaluation_public_id: null,
+							evaluation_name: null,
+							point_transaction_id: 55,
+							submitted_by_name: "Alumno Uno",
+							is_submitted_by_me: true,
+							reason: "Revisión de puntos",
+							teacher_response: null,
+							created_at: "2026-11-24T17:00:00Z",
+							in_review_at: null,
+							responded_at: null,
+						},
+					],
+					error: null,
+				},
+				202: {
+					data: null,
+					error: new Error("claims rpc down"),
+				},
+			},
+		});
+
+		const result = await getStudentDashboard(client, "student-1");
+		expect(result.error).toBeNull();
+		expect(result.enrollments[0]).toMatchObject({
+			courseId: 201,
+			claimsError: false,
+			balance: 2,
+		});
+		expect(result.enrollments[0]?.claims).toHaveLength(2);
+		expect(result.enrollments[0]?.claims[0]).toMatchObject({
+			claimPublicId: "c-group-1",
+			isSubmittedByMe: false,
+			submittedByName: "Alumno Dos",
+			teacherResponse: "Se revisó el caso.",
+		});
+		expect(result.enrollments[1]).toMatchObject({
+			courseId: 202,
+			claims: [],
+			claimsError: true,
+		});
+		expect(spy).toHaveBeenCalledWith(
+			"Student claims query failed",
+			expect.objectContaining({
+				studentId: "student-1",
+				courseId: 202,
+			}),
+		);
 		spy.mockRestore();
 	});
 });
