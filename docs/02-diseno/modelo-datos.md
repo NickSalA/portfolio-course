@@ -2,9 +2,10 @@
 
 La fuente ejecutable del esquema es la secuencia de
 [migraciones](../../portfolio-coursse/supabase/migrations/), no este resumen. Las migraciones se
-han versionado desde `0001` hasta `0029` y se aplicaron en la instancia local con
-`db reset --local`. Las pruebas de RLS con identidades sintéticas están en
-[`supabase/tests/group_grades_rls.sql`](../../portfolio-coursse/supabase/tests/group_grades_rls.sql);
+han versionado desde `0001` hasta `0029`. La evidencia histórica registra su aplicación local
+con `db reset --local`; esta actualización solo inspeccionó archivos y no repitió esa ejecución.
+Las pruebas de RLS con identidades sintéticas están en
+[`supabase/qa/group_grades_rls.sql`](../../portfolio-coursse/supabase/qa/group_grades_rls.sql);
 esto **no** certifica la aplicación en un entorno remoto.
 
 | Entidad               | Relación principal                                                                                                                                   |
@@ -53,17 +54,31 @@ consultando la membresía actual.
 
 **Diseño propuesto para especificar e implementar (no disponible hoy):**
 
+El [consolidado vigente](../../development/PLAN-REFINAMIENTO-PARTE-I.md), secciones 4–6,
+prevalece para el objetivo acordado. La especificación anterior queda pendiente de sincronización
+mediante BK-01 del [backlog vigente](../04-gestion/backlog-y-responsabilidades.md). Las menciones a traslados describen cambios de pertenencia, no una
+función adicional obligatoria de traslado directo docente.
+
 1. Registrar en `course_evaluations` la fecha de realización de la actividad; precisar zona
    horaria institucional y cómo tratar actividades y traslados del mismo día. No usar `created_at`
    ni `group_grades.updated_at` como fecha académica. Definir qué ocurre si se cambia esa fecha
    después de guardar notas o traslados: solo el docente del curso podrá hacerlo y deberá
    revisar explícitamente las atribuciones afectadas.
 2. Persistir intervalos de pertenencia a grupo por matrícula y curso, incluido el grupo vacío,
-   sin solapamientos. Al seleccionar o trasladar, cerrar el intervalo anterior y abrir el nuevo
-   en una sola transacción, validando curso, autorización, cupo y ventana (o facultad docente).
+   sin solapamientos. Al seleccionar o cambiar de grupo, cerrar el intervalo anterior y abrir el nuevo
+   en una sola transacción, validando curso, autorización, cupo y ventana. El docente puede ampliar
+   o reabrir la ventana para todo el curso; no se exige un traslado directo docente.
    Revisar **todas** las escrituras de `course_students.group_id`, incluida la sincronización
    desde autorizaciones: ninguna debe modificar el grupo sin mantener la historia. Impedir que
    se borren grupos con atribuciones históricas necesarias para explicar notas.
+   **GRP-02, migración 0039.** `academic_access.group_membership_history` guarda intervalos
+   `[inicio, fin)` en `timestamptz`. Registra las matrículas existentes coherentes desde el
+   instante de migración. Una consulta anterior o sin intervalo devuelve historial desconocido.
+   La RPC `student_group_membership_at` permite al docente responsable consultar grupo conocido,
+   activo sin grupo o inactivo. Los cambios de grupo y estado se registran con la matrícula en la
+   misma transacción. Una resincronización sin cambio conserva el intervalo. Los grupos con
+   referencias e historial académico se conservan aunque sean excedentes al ajustar capacidad.
+
 3. Resolver el grupo aplicable por matrícula y fecha de actividad, independientemente de cuándo
    se haya guardado o corregido la nota. Mantener la nota grupal como fuente: una corrección del
    grupo antiguo debe alcanzar a sus miembros de esa actividad.
@@ -77,23 +92,74 @@ consultando la membresía actual.
    restricciones para cubrir también escrituras privilegiadas y cambios en las entidades
    referenciadas. La política `students read group grades` de `0028` permite `SELECT` al alumno
    del grupo actual; `0029` la elimina y restringe las escrituras docentes al mismo curso al
-   aplicarse. Probar que el
-   alumno no puede leer notas directamente y que un docente no altera las de otro curso.
+   aplicarse. Ese bloqueo describe la implementación anterior, no la aceptación vigente.
+   El objetivo es permitir lectura desde el registro confirmado a participantes históricos de la
+   actividad, negar acceso a otros alumnos y mantener el aislamiento entre cursos. No revertir
+   `0029`: la política de `0028`, basada en grupo actual, tampoco satisface la historia.
 6. Antes de migrar registros existentes, definir con el docente cómo reconstruir fechas y
    membresías anteriores no registradas: no inferir retrospectivamente el grupo histórico desde
    `course_students.group_id` ni inventar fechas de actividad. Marcar los casos inciertos para
    revisión manual antes de usar resultados individuales o exportarlos.
 
-**Pruebas mínimas:** traslado antes/después de la fecha de actividad, corrección tardía de la
-nota grupal, cambio de fecha, actividad/traslado en el mismo día, cambio fuera de ventana por
-docente, concurrencia/cupo, reintento y acceso entre cursos. En una etapa posterior, agregar
+**Pruebas mínimas propuestas, no ejecutadas aquí:** cambio de grupo antes/después de la actividad,
+corrección tardía de la nota grupal, cambio de fecha, actividad/cambio coincidentes, reapertura
+general de ventana, concurrencia/cupo, reintento y acceso histórico propio frente a acceso ajeno. En una etapa posterior, agregar
 pruebas de la excepción individual y su revocación.
 Ejecutarlas con datos sintéticos en Supabase aislado y contrastar los resultados con el docente.
+
+## Objetivo de datos acordado pendiente de implementación
+
+- **Consulta histórica desde guardar:** notas y puntos visibles a sus destinatarios al confirmar
+  el registro, sin publicación posterior. Resolver participantes de cada actividad, no el grupo
+  actual. No inventar historia ausente; las coincidencias temporales y casos inciertos requieren
+  definición y revisión docente.
+- **Reclamo grupal histórico:** uno por grupo/evaluación; cualquier participante de la actividad
+  puede crearlo y todos esos participantes y el docente pueden consultarlo, aun tras cambiar de
+  grupo. La pertenencia actual no concede acceso a otros reclamos.
+- **Reclamo individual de puntos:** uno por movimiento propio, privado entre alumno y docente.
+  Ambos tipos requieren unicidad por registro, estados Pendiente → En revisión → Respondido,
+  decisión docente final motivada, sin réplica, reapertura ni segundo reclamo del mismo registro.
+  La respuesta favorable no cambia la nota o los puntos automáticamente: corrección explícita.
+- **Aviso docente:** cada reclamo nuevo genera correo breve con enlace, sin notas, puntos ni
+  texto del reclamo. No hay correo al alumno, recordatorios ni escalamiento. El reclamo persiste
+  si falla el correo; recuperación pendiente de definición. No se observan tablas de reclamos
+  ni persistencia de avisos en las migraciones inspeccionadas.
+- **XLSX por curso:** resolver notas base por participación histórica y puntos individuales,
+  separados de la nota grupal fuente. Vacío es pendiente y cero es registro explícito. La
+  exportación no consume ni modifica saldo ni resultados de compañeros, y con iguales entradas
+  reproduce los mismos resultados académicos; no es integración SUM ni acta oficial.
+
+### Supuesto del equipo para el cálculo XLSX
+
+No es una regla confirmada por el profesor: todos los trabajos tienen igual peso; cada punto
+incrementa una unidad de nota individual con tope 20 por trabajo, distribuido automáticamente
+una sola vez en el cálculo. Para `n` trabajos con notas completas y saldo no negativo:
+
+`aplicados = min(saldo, suma(20 - nota_base_i))`
+
+`promedio_ajustado = (suma(notas_base) + aplicados) / n`
+
+No sumar el saldo completo a cada trabajo ni otra vez al promedio. El excedente sin margen no
+tiene efecto adicional ni se borra. No hace falta mostrar una distribución por trabajo para
+obtener el promedio; no inventar una política de reparto. Una nota pendiente permanece vacía y,
+si falta alguna del conjunto incluido, no se presenta promedio final ajustado completo. Redondear
+solo el promedio final a dos decimales. Antes de implementar: definir saldo negativo, movimientos
+incluidos, columnas e identificadores mínimos del XLSX y precisión decimal de notas base.
+
+Estas historias se organizan en el [backlog vigente](../04-gestion/backlog-y-responsabilidades.md):
+BK-09 para historia, BK-13 para consulta, BK-14–BK-18 para reclamos y aviso y BK-19–BK-20 para
+cálculo y exportación. BK-01 registra la sincronización pendiente de la especificación anterior. Véase la [capa de alcance vigente de evaluación](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#alcance-vigente-y-backlog-pendiente).
 
 **Integridad por revisar:** el esquema referencia `group_id` y `evaluation_id` por separado; no
 expresa con una restricción compuesta que ambos pertenezcan al mismo curso. `0029` valida la
 coincidencia en escrituras autenticadas vía RLS, pero aún se necesita integridad a nivel de base
-de datos para otros caminos; la interfaz actual no presenta notas al alumno,
-pero la política de `0028` permite leer las del grupo actual. `0029` corrige ese permiso en el
-repositorio, pero debe aplicarse y verificarse en cada entorno antes de declarar las notas
-exclusivas del docente.
+de datos para otros caminos. La interfaz actual no presenta notas al alumno y `0029` elimina
+el permiso basado en grupo actual de `0028`. El objetivo vigente requiere una autorización
+histórica nueva y pruebas propias; no declarar esa lectura implementada ni certificar entornos.
+
+## Extensiones implementadas en migraciones recientes (GRP-03, REC-01 y contrato EXP-02)
+
+- **Selección e invariantes de grupo (`0049_grp03_group_selection_concurrency_and_history.sql`, GRP-03):** retira las políticas directas de escritura docente sobre `public.course_students` e introduce el trigger `guard_course_student_group_write` para canalizar cambios de `group_id` mediante RPC (`select_course_group` y `sync_authorized_student`). `select_course_group` adquiere `courses ... for share` y `pg_advisory_xact_lock(selected_group_id)` antes de leer capacidad e historial, haciendo idempotente repetir la selección vigente. `sync_authorized_student` valida capacidad disponible al crear matrículas preasignadas sin sobrescribir elecciones existentes. *Estado:* definido en SQL; ejecución en Supabase local pendiente de Docker.
+- **Reclamos (`0050_claims_model_and_rls.sql`, REC-01):** define `public.claims` con `claim_type` (`group_grade` | `point_transaction`), estados `pending` → `in_review` → `responded`, autoría (`submitted_by_enrollment_id`, `submitted_by_student_id`) y FKs compuestas hacia `groups`, `course_evaluations`, `authorized_students`, `point_transactions` y `course_students` para impedir cruces entre cursos o titulares. Los índices únicos parciales `claims_group_evaluation_unique_idx` y `claims_point_transaction_unique_idx` garantizan unicidad permanente (incluso tras `responded`). Las políticas RLS restringen `group_grade` a participantes históricos (`academic_access.is_historical_group_participant`, reutilizando `group_grade_participants` o `group_membership_history` en actividades fechadas sin nota) y docente del curso, y `point_transaction` al titular y docente del curso; el trigger `guard_claim_mutation` impide borrados y reapertura de casos respondidos. *Estado:* definido en SQL; ejecución en Supabase local pendiente de Docker.
+- **Cálculo derivado de exportación (`lib/export/adjusted-average.ts`, EXP-02):** `calculateAdjustedAverage(grades, balance)` y `calculateActivePointsBalance(movements)` implementan el contrato puro acordado en `EXP-01 #38` sin persistir promedios ajustados ni descontar puntos de `point_transactions`. Aritmética entera en centésimos para notas `0..20`, pendientes (`null`) sin resultado final completo, saldos negativos con piso `0`, exclusión de `isVoided` y redondeo half-up solo en `adjustedAverage`. *Estado:* verificado mediante pruebas unitarias en Vitest y `node:test`.
+- **Presentación y transiciones de reclamos (`0052_submit_claims_rpc.sql`, `0053_claim_teacher_transitions.sql`, REC-02/REC-03):** `submit_group_grade_claim` y `submit_point_transaction_claim` centralizan el alta en `pending` desde `auth.uid()` con idempotencia en reintentos equivalentes del mismo autor. `start_claim_review` (`pending → in_review`, idempotente si ya está en revisión) y `respond_to_claim` (`in_review → responded`, respuesta motivada `1..2000` caracteres) restringen las transiciones al docente responsable (`is_teacher_of_course`) con bloqueo `FOR UPDATE`, impiden saltar `in_review` o reabrir `responded` y no alteran `group_grades` ni `point_transactions`. *Estado:* definido en SQL y validado en pruebas unitarias de aplicación; ejecución en Supabase local pendiente de Docker.

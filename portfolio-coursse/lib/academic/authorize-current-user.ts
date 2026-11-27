@@ -4,6 +4,11 @@ type AuthorizationResult =
 	| { ok: true; role: "teacher" | "student" }
 	| { ok: false; reason: "missing-user" | "sync-failed" | "not-authorized" };
 
+export async function hasAcademicIdentity(supabase: SupabaseClient) {
+	const { data, error } = await supabase.rpc("has_academic_identity");
+	return !error && data === true;
+}
+
 export async function authorizeCurrentUser(
 	supabase: SupabaseClient,
 ): Promise<AuthorizationResult> {
@@ -13,6 +18,10 @@ export async function authorizeCurrentUser(
 
 	if (!user?.email) {
 		return { ok: false, reason: "missing-user" };
+	}
+
+	if (!(await hasAcademicIdentity(supabase))) {
+		return { ok: false, reason: "not-authorized" };
 	}
 
 	const { data: profile } = await supabase
@@ -25,23 +34,21 @@ export async function authorizeCurrentUser(
 		return { ok: true, role: "teacher" };
 	}
 
-	const { error: syncError } = await supabase.rpc("sync_authorized_student");
+	const sync = await supabase.rpc("sync_authorized_student");
+	if (sync.error) {
+		return { ok: false, reason: "sync-failed" };
+	}
+	if (sync.data === true) {
+		return { ok: true, role: "student" };
+	}
 
-	if (syncError) {
+	// The roster may have been saved while the first request was in flight.
+	const retry = await supabase.rpc("sync_authorized_student");
+	if (retry.error) {
 		return { ok: false, reason: "sync-failed" };
 	}
 
-	const { data: authorization, error: authorizationError } = await supabase
-		.from("authorized_students")
-		.select("id")
-		.eq("email", user.email.trim().toLowerCase())
-		.eq("status", "active")
-		.limit(1)
-		.maybeSingle();
-
-	if (authorizationError || !authorization) {
-		return { ok: false, reason: "not-authorized" };
-	}
-
-	return { ok: true, role: "student" };
+	return retry.data === true
+		? { ok: true, role: "student" }
+		: { ok: false, reason: "not-authorized" };
 }

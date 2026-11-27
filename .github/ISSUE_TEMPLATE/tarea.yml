@@ -1,0 +1,117 @@
+name: Tarea del backlog
+description: Proponer trabajo verificable para el proyecto académico
+title: "[tipo(alcance)] "
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Describe un único resultado verificable. No incluyas secretos, datos personales ni resultados no comprobados.
+
+    - type: textarea
+      id: problem
+      attributes:
+          label: Problema y propósito
+          description: ¿Qué problema se resolverá, para quién y por qué importa?
+          placeholder: Describe el estado actual y el resultado esperado.
+      validations:
+          required: true
+
+    - type: dropdown
+      id: area
+      attributes:
+          label: Área principal
+          options:
+              - Gestión y gobernanza
+              - Proceso académico
+              - Aplicación y experiencia
+              - Datos y seguridad
+              - Calidad
+              - Operación
+              - Evidencia y entregables
+      validations:
+          required: true
+
+    - type: dropdown
+      id: delivery
+      attributes:
+          label: Entrega
+          options:
+              - Parte I — análisis, diseño y prototipo
+              - Parte II — implementación, pruebas y evaluación
+              - Operación
+              - No aplica
+      validations:
+          required: true
+
+    - type: textarea
+      id: scope
+      attributes:
+          label: Alcance
+          description: Enumera lo incluido y, cuando sea útil, lo que queda fuera.
+          placeholder: |
+              Incluye:
+              - ...
+
+              Fuera de alcance:
+              - ...
+      validations:
+          required: true
+
+    - type: textarea
+      id: acceptance
+      attributes:
+          label: Criterios de aceptación
+          description: Usa resultados observables y comprobables.
+          placeholder: |
+              - [ ] ...
+              - [ ] ...
+      validations:
+          required: true
+
+    - type: textarea
+      id: controls
+      attributes:
+          label: Reglas, eventos y excepciones
+          description: Indica validaciones, permisos, eventos, errores, reintentos o recuperación aplicables. Escribe "No aplica" cuando corresponda.
+          placeholder: |
+              - Reglas y validaciones:
+              - Eventos o estados:
+              - Errores y excepciones:
+              - Seguridad/RLS:
+      validations:
+          required: true
+
+    - type: textarea
+      id: validation
+      attributes:
+          label: Plan de validación y evidencia
+          description: ¿Cómo se demostrará el resultado sin usar datos sensibles?
+          placeholder: Incluye casos válidos, inválidos y excepcionales, entorno y evidencia esperada.
+      validations:
+          required: true
+
+    - type: textarea
+      id: dependencies
+      attributes:
+          label: Dependencias y riesgos
+          description: Enlaza Issues bloqueantes e indica riesgos conocidos.
+          placeholder: Depende de #... / Bloquea #... / Riesgos...
+
+    - type: textarea
+      id: references
+      attributes:
+          label: Referencias
+          description: Enlaza especificaciones, decisiones, documentación o diseños relacionados.
+          placeholder: "- docs/...\n- specs/..."
+
+    - type: checkboxes
+      id: ready
+      attributes:
+          label: Preparación
+          options:
+              - label: La Issue no contiene secretos ni datos personales innecesarios.
+                required: true
+              - label: Distinguí trabajo pendiente de resultados ya implementados o medidos.
+                required: true
+              - label: La tarea tiene un único resultado principal y puede dividirse si crece demasiado.
+                required: true

@@ -1,12 +1,13 @@
 import { redirect } from "next/navigation";
 import { StudentDashboard } from "@/components/student-portal/student-dashboard";
+import { hasAcademicIdentity } from "@/lib/academic/authorize-current-user";
+import { STUDENT_GROUP_ERROR_MESSAGES } from "@/lib/student/group-selection";
 import { getStudentDashboard } from "@/lib/student/get-dashboard";
 import { createClient } from "@/lib/supabase/server";
 
-const groupMessages: Record<string, string> = {
-	group: "No se pudo seleccionar ese grupo. Inténtalo nuevamente.",
-	"group-full": "Ese grupo acaba de llenarse. Elige otro disponible.",
-	"group-closed": "La ventana de selección de grupos está cerrada.",
+const studentMessages: Record<string, string> = {
+	forbidden: "Tu cuenta no tiene permisos para acceder al panel docente.",
+	...STUDENT_GROUP_ERROR_MESSAGES,
 };
 
 export default async function StudentPage({
@@ -21,6 +22,8 @@ export default async function StudentPage({
 		data: { user },
 	} = await supabase.auth.getUser();
 	if (!user) redirect("/login");
+	if (!(await hasAcademicIdentity(supabase)))
+		redirect("/login?error=unauthorized");
 
 	const { data: profile } = await supabase
 		.from("profiles")
@@ -29,7 +32,10 @@ export default async function StudentPage({
 		.maybeSingle();
 	if (profile?.role === "teacher") redirect("/teacher");
 
-	const enrollments = await getStudentDashboard(supabase, user.id);
+	const { enrollments, error: dashboardError } = await getStudentDashboard(
+		supabase,
+		user.id,
+	);
 	const displayName = profile?.full_name ?? user.email;
 	const greetingName = profile?.full_name?.split(" ")[0] ?? "estudiante";
 
@@ -37,8 +43,9 @@ export default async function StudentPage({
 		<StudentDashboard
 			displayName={displayName}
 			greetingName={greetingName}
-			groupMessage={errorCode ? groupMessages[errorCode] : null}
+			statusMessage={errorCode ? studentMessages[errorCode] ?? null : null}
 			groupUpdated={Boolean(selectedGroup)}
+			dashboardError={dashboardError}
 			enrollments={enrollments}
 		/>
 	);

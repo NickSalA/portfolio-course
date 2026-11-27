@@ -51,7 +51,7 @@ export function LoginCard({ initialError }: LoginCardProps) {
 		});
 
 		if (signInError) {
-			setError(signInError.message);
+			setError("oauth");
 			setLoading(false);
 		}
 	}

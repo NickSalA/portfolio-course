@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Reglas de backlog y responsabilidades
+    url: https://github.com/NickSalA/portfolio-course/blob/main/docs/04-gestion/backlog-y-responsabilidades.md
+    about: Revisa responsabilidades, estados, Definition of Ready y Definition of Done antes de crear una tarea.

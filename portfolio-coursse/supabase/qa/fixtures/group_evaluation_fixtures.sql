@@ -1,0 +1,68 @@
+-- Synthetic fixtures for local group-evaluation tests.
+-- Include after BEGIN; callers own ROLLBACK. Never use against production.
+-- After BEGIN create temporary table qa_fixture_transaction () on commit drop.
+\set ON_ERROR_STOP on
+do $$
+begin
+  if to_regclass('pg_temp.qa_fixture_transaction') is null then
+    raise exception 'Fixtures require a caller-owned transaction and qa_fixture_transaction marker';
+  end if;
+end;
+$$;
+
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password,
+  email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
+  created_at, updated_at
+) values
+  ('00000000-0000-0000-0000-000000000000', 'f1000000-0000-4000-8000-000000000001', 'authenticated', 'authenticated', 'fixture-teacher-a@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now()),
+  ('00000000-0000-0000-0000-000000000000', 'f2000000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'fixture-teacher-b@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now()),
+  ('00000000-0000-0000-0000-000000000000', 'f3000000-0000-4000-8000-000000000003', 'authenticated', 'authenticated', 'fixture-student-a@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now()),
+  ('00000000-0000-0000-0000-000000000000', 'f4000000-0000-4000-8000-000000000004', 'authenticated', 'authenticated', 'fixture-student-b@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now()),
+  ('00000000-0000-0000-0000-000000000000', 'f5000000-0000-4000-8000-000000000005', 'authenticated', 'authenticated', 'fixture-unauthorized@example.test', '', now(), '{"provider":"google","providers":["google"]}', '{}', now(), now());
+
+insert into auth.identities (provider_id, user_id, identity_data, provider)
+select u.id::text, u.id, jsonb_build_object('email', u.email, 'email_verified', true), 'google'
+from auth.users u
+where u.email in ('fixture-teacher-a@example.test', 'fixture-teacher-b@example.test',
+                  'fixture-student-a@example.test', 'fixture-student-b@example.test',
+                  'fixture-unauthorized@example.test');
+
+update public.profiles set role = 'teacher'
+where id in ('f1000000-0000-4000-8000-000000000001', 'f2000000-0000-4000-8000-000000000002');
+
+insert into public.academic_periods (academic_year, semester, status)
+values (2098, 2, 'current') returning id as fixture_period_id \gset
+
+insert into public.courses (teacher_id, period_id, name)
+values ('f1000000-0000-4000-8000-000000000001', :fixture_period_id, 'Fixture course A')
+returning id as fixture_course_a_id \gset
+insert into public.courses (teacher_id, period_id, name)
+values ('f2000000-0000-4000-8000-000000000002', :fixture_period_id, 'Fixture course B')
+returning id as fixture_course_b_id \gset
+
+insert into public.authorized_students (course_id, full_name, email, student_number, status)
+values
+  (:fixture_course_a_id, 'Synthetic Student A', 'fixture-student-a@example.test', 'SYN-001', 'active'),
+  (:fixture_course_a_id, 'Synthetic Student B', 'fixture-student-b@example.test', 'SYN-002', 'active');
+
+insert into public.groups (course_id, name, position, capacity)
+values (:fixture_course_a_id, 'Fixture group A1', 1, 1) returning id as fixture_group_a1_id \gset
+insert into public.groups (course_id, name, position, capacity)
+values (:fixture_course_a_id, 'Fixture group A2', 2, 2) returning id as fixture_group_a2_id \gset
+insert into public.groups (course_id, name, position, capacity)
+values (:fixture_course_b_id, 'Fixture group B1', 1, 2) returning id as fixture_group_b1_id \gset
+
+insert into public.course_students (course_id, student_id, authorized_student_id, group_id, status)
+select a.course_id, u.id, a.id, students.group_id, 'active'
+from (values
+  ('fixture-student-a@example.test', :fixture_group_a1_id::bigint),
+  ('fixture-student-b@example.test', null::bigint)
+) students(email, group_id)
+join auth.users u on u.email = students.email
+join public.authorized_students a on a.email = students.email and a.course_id = :fixture_course_a_id;
+
+insert into public.point_transactions (authorized_student_id, points, reason, created_by)
+select id, 3, 'Synthetic fixture points', 'f1000000-0000-4000-8000-000000000001'
+from public.authorized_students
+where course_id = :fixture_course_a_id and email = 'fixture-student-a@example.test';

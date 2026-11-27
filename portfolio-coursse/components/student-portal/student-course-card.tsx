@@ -1,13 +1,6 @@
 import { GroupSelection } from "@/components/student-portal/group-selection";
+import { StudentCourseAcademicRecords } from "@/components/student-portal/student-claims-panel";
 import type { StudentEnrollmentSummary } from "@/lib/student/get-dashboard";
-
-function movementDate(value: string) {
-	return new Intl.DateTimeFormat("es-PE", {
-		dateStyle: "medium",
-		timeStyle: "short",
-		timeZone: "America/Lima",
-	}).format(new Date(value));
-}
 
 export function StudentCourseCard({
 	enrollment,
@@ -36,10 +29,21 @@ export function StudentCourseCard({
 			</div>
 			<div className="mt-6 grid grid-cols-2 gap-4 border-t border-border pt-4">
 				<div>
-					<p className="text-xs text-muted">Grupo</p>
-					<p className="mt-1 text-sm font-medium">
-						{enrollment.groupName ?? "Aún no asignado"}
-					</p>
+					<p className="text-xs text-muted">Grupo actual</p>
+					<div className="mt-1 flex flex-wrap items-center gap-2">
+						<p className="text-sm font-medium">
+							{enrollment.groupName ?? "Aún no asignado"}
+						</p>
+						<span
+							className={
+								enrollment.groupName
+									? "inline-block rounded-full border border-accent/30 bg-accent-soft px-2 py-0.5 text-[11px] font-medium text-accent-strong"
+									: "inline-block rounded-full border border-border bg-surface px-2 py-0.5 text-[11px] font-medium text-muted"
+							}
+						>
+							{enrollment.groupName ? "Confirmado" : "Sin asignar"}
+						</span>
+					</div>
 				</div>
 				<div>
 					<p className="text-xs text-muted">Movimientos</p>
@@ -50,48 +54,12 @@ export function StudentCourseCard({
 			</div>
 			<GroupSelection
 				enrollmentId={enrollment.id}
+				courseName={enrollment.courseName ?? "Curso"}
 				currentGroupId={enrollment.groupId}
 				opensAt={enrollment.groupSelectionOpensAt}
 				closesAt={enrollment.groupSelectionClosesAt}
 			/>
-			<details className="mt-5 border-t border-border pt-4">
-				<summary className="cursor-pointer text-sm font-medium text-accent">
-					Ver historial de puntos ({enrollment.transactions.length})
-				</summary>
-				<div className="mt-3 divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface-muted/45">
-					{enrollment.transactions.map((transaction, index) => (
-						<div
-							key={`${transaction.created_at}-${index}`}
-							className="flex items-start justify-between gap-4 px-4 py-3"
-						>
-							<div>
-								<p className="text-sm">
-									{transaction.reason || "Sin motivo"}
-								</p>
-								<p className="mt-1 text-xs text-muted">
-									{movementDate(transaction.created_at)}
-								</p>
-							</div>
-							<p
-								className={
-									transaction.points > 0
-										? "font-semibold tabular-nums text-accent"
-										: "font-semibold tabular-nums text-danger"
-								}
-							>
-								{transaction.points > 0
-									? `+${transaction.points}`
-									: transaction.points}
-							</p>
-						</div>
-					))}
-					{!enrollment.transactions.length && (
-						<p className="px-4 py-5 text-sm text-muted">
-							Aún no hay movimientos registrados.
-						</p>
-					)}
-				</div>
-			</details>
+			<StudentCourseAcademicRecords enrollment={enrollment} />
 		</article>
 	);
 }
