@@ -22,10 +22,10 @@ export function StudentDashboard({
 	enrollments,
 }: StudentDashboardProps) {
 	return (
-		<div className="min-h-dvh bg-background text-foreground">
+		<div className="min-h-dvh overflow-x-hidden bg-background text-foreground">
 			<a
 				href="#student-content"
-				className="sr-only z-50 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
+				className="sr-only z-50 rounded-lg bg-accent text-sm font-semibold text-on-accent focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:inline-flex focus:min-h-10 focus:items-center focus:px-4 focus:py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
 			>
 				Saltar al contenido
 			</a>
@@ -39,16 +39,16 @@ export function StudentDashboard({
 							Mi espacio académico
 						</p>
 					</div>
-					<div className="flex items-center gap-3">
+					<div className="flex shrink-0 items-center gap-3">
 						<ThemeToggle />
-						<SignOutButton />
+						<SignOutButton compact />
 					</div>
 				</div>
 			</header>
 			<main
 				id="student-content"
 				tabIndex={-1}
-				className="px-5 py-8 outline-none sm:px-8 sm:py-12"
+				className="scroll-mt-24 px-5 py-8 outline-none sm:px-8 sm:py-12"
 			>
 				<div className="mx-auto max-w-6xl">
 					<p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
@@ -91,7 +91,7 @@ export function StudentDashboard({
 							</p>
 							<Link
 								href="/student"
-								className="mt-4 inline-flex min-h-10 items-center justify-center rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+								className="mt-4 inline-flex min-h-10 items-center justify-center rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
 							>
 								Reintentar
 							</Link>

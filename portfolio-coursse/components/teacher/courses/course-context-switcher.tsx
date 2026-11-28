@@ -38,7 +38,7 @@ export function CourseContextSwitcher({
 			<select
 				value={selectedCourse}
 				onChange={(event) => selectCourse(event.target.value)}
-				className="max-w-60 rounded-lg border border-border bg-surface-muted px-3 py-2 font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent"
+				className="min-h-10 max-w-60 rounded-lg border border-border bg-surface-muted px-3 py-2 font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent"
 			>
 				<option value="">Todos los cursos</option>
 				{courses.map((course) => (

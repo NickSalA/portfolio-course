@@ -7,14 +7,22 @@ export function StudentCourseCard({
 }: {
 	enrollment: StudentEnrollmentSummary;
 }) {
+	const courseHeadingId = `course-card-${enrollment.id}`;
+
 	return (
-		<article className="glass rounded-3xl border border-white/25 p-6 shadow-[0_20px_55px_rgb(15_23_42/8%)]">
+		<article
+			aria-labelledby={courseHeadingId}
+			className="glass rounded-3xl border border-white/25 p-6 shadow-[0_20px_55px_rgb(15_23_42/8%)]"
+		>
 			<div className="flex items-start justify-between gap-4">
 				<div className="min-w-0">
 					<p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
 						{enrollment.periodCode}
 					</p>
-					<h2 className="mt-2 truncate text-xl font-semibold">
+					<h2
+						id={courseHeadingId}
+						className="mt-2 truncate text-xl font-semibold"
+					>
 						{enrollment.courseName ?? "Curso"}
 					</h2>
 				</div>

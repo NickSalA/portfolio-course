@@ -38,7 +38,7 @@ function WindowSubmitButton({
 		<button
 			type="submit"
 			disabled={pending || invalid}
-			className="min-h-10 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-60"
+			className="min-h-10 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-60"
 		>
 			{pending ? "Guardando ventana…" : idleLabel}
 		</button>
@@ -187,7 +187,7 @@ export function GroupSelectionWindowDialog({
 							<button
 								type="button"
 								onClick={applyReopenDefaults}
-								className="rounded-lg border border-accent/40 bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+								className="min-h-9 rounded-lg border border-accent/40 bg-accent-soft px-3 py-1.5 text-xs font-semibold text-accent transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 							>
 								Prellenar desde ahora (+48 h)
 							</button>

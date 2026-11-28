@@ -15,7 +15,7 @@ export default async function TeacherLayout({
 		<div className="min-h-screen overflow-x-hidden bg-background text-foreground md:pl-60">
 			<a
 				href="#teacher-content"
-				className="sr-only z-50 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
+				className="sr-only z-50 rounded-lg bg-accent text-sm font-semibold text-on-accent focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:inline-flex focus:min-h-10 focus:items-center focus:px-4 focus:py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 			>
 				Saltar al contenido
 			</a>
@@ -34,7 +34,11 @@ export default async function TeacherLayout({
 						<ThemeToggle />
 					</div>
 				</header>
-				<div id="teacher-content" tabIndex={-1} className="min-w-0 outline-none">
+				<div
+					id="teacher-content"
+					tabIndex={-1}
+					className="min-w-0 scroll-mt-24 outline-none"
+				>
 					{children}
 				</div>
 			</div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useId, useRef, useState } from "react";
 import { importStudents } from "@/app/teacher/students/actions";
 import { ImportResults } from "@/components/teacher/students/import-results";
 import { CsvImporter } from "@/components/teacher/students/csv-importer";
@@ -20,6 +20,7 @@ export function CourseStudentImportForm({
     courseName: string;
 }) {
     const dialogRef = useRef<HTMLDialogElement>(null);
+    const titleId = useId();
     const [result, submit, pending] = useActionState(importStudents, {});
     const [showResult, setShowResult] = useState(false);
     const [importerKey, setImporterKey] = useState(0);
@@ -33,12 +34,13 @@ export function CourseStudentImportForm({
             <button
                 type="button"
                 onClick={() => dialogRef.current?.showModal()}
-                className="rounded-xl border border-border bg-surface-muted px-3 py-2 text-sm font-semibold text-foreground transition-[background-color,border-color,color,transform] hover:-translate-y-0.5 hover:border-accent hover:bg-accent-soft hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="min-h-9 rounded-xl border border-border bg-surface-muted px-3 py-2 text-sm font-semibold text-foreground transition-[background-color,border-color,color,transform] hover:-translate-y-0.5 hover:border-accent hover:bg-accent-soft hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
                 Importar alumnos
             </button>
             <dialog
                 ref={dialogRef}
+                aria-labelledby={titleId}
                 onCancel={(event) => {
                     if (pending) event.preventDefault();
                 }}
@@ -69,7 +71,7 @@ export function CourseStudentImportForm({
                             <p className="text-xs font-semibold uppercase tracking-[.18em] text-accent">
                                 Importar alumnos
                             </p>
-                            <h2 className="mt-2 text-xl font-semibold">
+                            <h2 id={titleId} className="mt-2 text-xl font-semibold">
                                 {courseName}
                             </h2>
                             <p className="mt-2 text-sm text-muted">
@@ -86,7 +88,7 @@ export function CourseStudentImportForm({
                             }}
                             disabled={pending}
                             aria-label="Cerrar"
-                            className="grid size-9 place-items-center rounded-lg border border-border text-lg text-muted"
+                            className="grid size-9 place-items-center rounded-lg border border-border text-lg text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                         >
                             ×
                         </button>
@@ -122,13 +124,14 @@ export function CourseStudentImportForm({
                                             dialogRef.current?.close();
                                     }}
                                     disabled={pending}
-                                    className="rounded-xl border border-border px-4 py-2 text-sm font-medium"
+                                    className="min-h-9 rounded-xl border border-border px-4 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                                 >
                                     Cancelar
                                 </button>
                                 <button
+                                    type="submit"
                                     disabled={pending}
-                                    className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                                    className="min-h-9 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
                                 >
                                     Importar alumnos
                                 </button>

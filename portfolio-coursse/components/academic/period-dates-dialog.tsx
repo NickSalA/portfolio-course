@@ -19,7 +19,7 @@ export function PeriodDatesDialog({
 			<button
 				type="button"
 				onClick={() => dialogRef.current?.showModal()}
-				className="mt-5 text-sm font-semibold text-accent transition hover:text-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+				className="mt-5 inline-flex min-h-9 items-center rounded-lg px-2 py-1 text-sm font-semibold text-accent transition hover:text-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 			>
 				Editar fechas
 			</button>
@@ -49,7 +49,7 @@ export function PeriodDatesDialog({
 							type="button"
 							onClick={() => dialogRef.current?.close()}
 							aria-label="Cerrar edición de fechas"
-							className="grid size-9 place-items-center rounded-lg border border-border bg-surface-muted text-lg text-muted"
+							className="grid size-9 place-items-center rounded-lg border border-border bg-surface-muted text-lg text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 						>
 							×
 						</button>
@@ -77,7 +77,10 @@ export function PeriodDatesDialog({
 						</label>
 					</div>
 					<div className="mt-6 flex justify-end border-t border-border pt-5">
-						<button className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white">
+						<button
+							type="submit"
+							className="min-h-9 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+						>
 							Guardar fechas
 						</button>
 					</div>

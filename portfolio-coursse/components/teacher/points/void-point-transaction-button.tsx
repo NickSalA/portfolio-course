@@ -17,6 +17,7 @@ export function VoidPointTransactionButton({
 		<button
 			type="button"
 			disabled={isPending}
+			aria-label="Anular movimiento de puntos"
 			onClick={() => {
 				const reason = window.prompt(
 					"Indica el motivo de la anulación:",
@@ -37,7 +38,7 @@ export function VoidPointTransactionButton({
 					await voidPointTransaction(data);
 				});
 			}}
-			className="text-xs font-medium text-danger hover:underline disabled:cursor-wait disabled:opacity-50"
+			className="inline-flex min-h-8 items-center rounded-lg px-2 py-1 text-xs font-medium text-danger hover:bg-danger-soft hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-wait disabled:opacity-50"
 		>
 			{isPending ? "Anulando…" : "Anular"}
 		</button>

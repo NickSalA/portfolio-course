@@ -53,6 +53,10 @@ export function ThemeToggle() {
 		document.documentElement.classList.toggle("dark", isDark);
 		document.documentElement.classList.toggle("light", !isDark);
 		darkRef.current = isDark;
+		const frame = window.requestAnimationFrame(() => {
+			setDark(isDark);
+		});
+		return () => window.cancelAnimationFrame(frame);
 	}, []);
 
 	function toggleTheme() {
@@ -68,8 +72,9 @@ export function ThemeToggle() {
 		<button
 			type="button"
 			onClick={toggleTheme}
+			aria-pressed={dark}
 			aria-label={dark ? "Activar tema claro" : "Activar tema oscuro"}
-			className="grid size-9 place-items-center rounded-lg border border-border bg-surface-muted text-sm text-muted transition-[background-color,color,border-color] hover:border-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+			className="grid min-h-9 min-w-9 size-9 place-items-center rounded-lg border border-border bg-surface-muted text-sm text-muted transition-[background-color,color,border-color] hover:border-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 		>
 			{dark ? <SunIcon /> : <MoonIcon />}
 		</button>

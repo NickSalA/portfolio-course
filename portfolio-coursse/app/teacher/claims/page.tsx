@@ -48,6 +48,13 @@ export default async function TeacherClaimsPage({
 		}),
 	]);
 
+	const reloadParams = new URLSearchParams();
+	if (requestedPeriod) reloadParams.set("period", requestedPeriod);
+	if (requestedCourse) reloadParams.set("course", requestedCourse);
+	const reloadHref = reloadParams.toString()
+		? `/teacher/claims?${reloadParams.toString()}`
+		: "/teacher/claims";
+
 	return (
 		<main className="px-5 py-8 sm:px-8 sm:py-10">
 			<div className="mx-auto max-w-6xl">
@@ -87,7 +94,7 @@ export default async function TeacherClaimsPage({
 						>
 							<p>{claimsResult.error}</p>
 							<Link
-								href="/teacher/claims"
+								href={reloadHref}
 								className="inline-flex min-h-10 items-center rounded-xl border border-danger/40 bg-surface px-4 py-2 font-medium text-foreground transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 							>
 								Recargar bandeja

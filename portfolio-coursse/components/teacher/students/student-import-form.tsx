@@ -80,7 +80,7 @@ export function StudentImportForm({
             <button
                 type="button"
                 onClick={openDialog}
-                className="shrink-0 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="min-h-9 shrink-0 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
                 Importar lista
             </button>
@@ -247,7 +247,7 @@ export function StudentImportForm({
                                                     )
                                                 }
                                                 disabled={previewPage === 0}
-                                                className="rounded-lg border border-border px-3 py-1.5 disabled:opacity-40"
+                                                className="min-h-9 rounded-lg border border-border px-3 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40"
                                             >
                                                 Anterior
                                             </button>
@@ -265,7 +265,7 @@ export function StudentImportForm({
                                                     previewPage ===
                                                     previewPages - 1
                                                 }
-                                                className="rounded-lg border border-border px-3 py-1.5 disabled:opacity-40"
+                                                className="min-h-9 rounded-lg border border-border px-3 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40"
                                             >
                                                 Siguiente
                                             </button>
@@ -278,13 +278,14 @@ export function StudentImportForm({
                                     type="button"
                                     onClick={closeDialog}
                                     disabled={pending}
-                                    className="rounded-xl border border-border bg-surface-muted px-4 py-3 text-sm font-medium text-muted transition hover:border-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                                    className="min-h-9 rounded-xl border border-border bg-surface-muted px-4 py-3 text-sm font-medium text-muted transition hover:border-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                                 >
                                     Cancelar
                                 </button>
                                 <button
+                                    type="submit"
                                     disabled={pending}
-                                    className="rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-60"
+                                    className="min-h-9 rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-60"
                                 >
                                     Importar {students.length} alumnos
                                 </button>

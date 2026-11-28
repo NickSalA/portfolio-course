@@ -82,7 +82,7 @@ export function ExportPointsButton({
 			type="button"
 			onClick={handleExport}
 			disabled={students.length === 0}
-			className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
+			className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition hover:border-accent hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-40"
 			title="Exportar a archivo Excel"
 		>
 			<svg

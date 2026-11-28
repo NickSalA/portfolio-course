@@ -24,19 +24,8 @@ import {
 	CLAIM_REASON_MAX_LENGTH,
 	validateClaimReason,
 } from "@/lib/claims/validation";
+import type { StudentClaimRecord } from "@/lib/claims/submit-claim";
 import type { StudentEnrollmentSummary } from "@/lib/student/get-dashboard";
-
-function formatLimaDateTime(value: string) {
-	const parsed = new Date(value);
-	if (Number.isNaN(parsed.getTime())) {
-		return value;
-	}
-	return new Intl.DateTimeFormat("es-PE", {
-		dateStyle: "medium",
-		timeStyle: "short",
-		timeZone: "America/Lima",
-	}).format(parsed);
-}
 
 function formatGroupGrade(grade: number | null) {
 	return grade === null ? "Pendiente" : String(grade);
@@ -69,6 +58,8 @@ export function StudentCourseAcademicRecords({
 	const claimsHeadingId = useId();
 	const dialogTitleId = useId();
 	const dialogDescId = useId();
+	const reasonErrorId = useId();
+	const reasonCounterId = useId();
 
 	const courseName = enrollment.courseName ?? "Curso";
 
@@ -96,6 +87,30 @@ export function StudentCourseAcademicRecords({
 		setSubmitError(null);
 		setIsSubmitting(false);
 		triggerButtonRef.current?.focus();
+	}
+
+	function jumpToClaim(
+		claimPublicId: string,
+		claimStatus: StudentClaimRecord["status"],
+	) {
+		if (statusFilter !== "all" && statusFilter !== claimStatus) {
+			setStatusFilter("all");
+		}
+		requestAnimationFrame(() => {
+			const el = document.getElementById(`claim-${claimPublicId}`);
+			if (el) {
+				el.scrollIntoView({ behavior: "smooth", block: "start" });
+				el.focus();
+				return;
+			}
+			requestAnimationFrame(() => {
+				const retryEl = document.getElementById(
+					`claim-${claimPublicId}`,
+				);
+				retryEl?.scrollIntoView({ behavior: "smooth", block: "start" });
+				retryEl?.focus();
+			});
+		});
 	}
 
 	async function handleSubmit() {
@@ -215,6 +230,7 @@ export function StudentCourseAcademicRecords({
 
 						{submitError && (
 							<p
+								id={reasonErrorId}
 								role="alert"
 								className="rounded-xl border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-xs font-medium text-danger"
 							>
@@ -232,6 +248,12 @@ export function StudentCourseAcademicRecords({
 								rows={4}
 								value={reason}
 								disabled={isSubmitting}
+								aria-invalid={Boolean(submitError)}
+								aria-describedby={
+									submitError
+										? `${reasonCounterId} ${reasonErrorId}`
+										: reasonCounterId
+								}
 								onChange={(event) => {
 									setReason(event.target.value);
 									if (submitError) {
@@ -241,7 +263,10 @@ export function StudentCourseAcademicRecords({
 								placeholder="Explica de forma clara qué aspecto solicitas revisar (máx. 2000 caracteres)"
 								className="w-full rounded-xl border border-border bg-surface p-2.5 text-sm text-foreground outline-none transition focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
 							/>
-							<span className="block text-right text-xs text-muted">
+							<span
+								id={reasonCounterId}
+								className="block text-right text-xs text-muted"
+							>
 								{reason.trim().length}/{CLAIM_REASON_MAX_LENGTH}
 							</span>
 						</label>
@@ -259,7 +284,7 @@ export function StudentCourseAcademicRecords({
 								type="submit"
 								disabled={isSubmitting}
 								aria-busy={isSubmitting}
-								className="min-h-10 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+								className="min-h-10 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
 							>
 								{isSubmitting
 									? "Enviando reclamo…"
@@ -278,8 +303,8 @@ export function StudentCourseAcademicRecords({
 					Notas grupales
 				</h3>
 				<p className="mt-1 text-xs text-muted">
-					Resultados registrados por actividad según el grupo con el
-					que participaste.
+					Notas grupales base confirmadas según el grupo con el que
+					participaste (los puntos individuales se consultan aparte).
 				</p>
 				{enrollment.gradesError ? (
 					<p
@@ -315,9 +340,9 @@ export function StudentCourseAcademicRecords({
 											</p>
 											<p className="mt-1 text-xs text-muted">
 												Realizada:{" "}
-												{formatLimaDateTime(
+												{formatClaimDateTimeLima(
 													item.performedAt,
-												)}
+												) ?? item.performedAt}
 											</p>
 											<p className="mt-1 text-xs text-muted">
 												Grupo de la actividad:{" "}
@@ -338,11 +363,16 @@ export function StudentCourseAcademicRecords({
 													Pendiente
 												</span>
 											) : (
-												<p className="text-base font-semibold tabular-nums">
-													{formatGroupGrade(
-														item.grade,
-													)}
-												</p>
+												<div className="space-y-1">
+													<p className="text-base font-semibold tabular-nums">
+														{formatGroupGrade(
+															item.grade,
+														)}
+													</p>
+													<span className="inline-block rounded-full border border-accent/30 bg-accent-soft px-2 py-0.5 text-[11px] font-medium text-accent-strong">
+														Calificada · Nota base
+													</span>
+												</div>
 											)}
 										</div>
 									</div>
@@ -352,7 +382,14 @@ export function StudentCourseAcademicRecords({
 											{existingClaim ? (
 												<a
 													href={`#claim-${existingClaim.claimPublicId}`}
-													className="inline-flex items-center rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+													onClick={(event) => {
+														event.preventDefault();
+														jumpToClaim(
+															existingClaim.claimPublicId,
+															existingClaim.status,
+														);
+													}}
+													className="inline-flex min-h-8 items-center rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 												>
 													Reclamo:{" "}
 													{getClaimStatusLabel(
@@ -414,7 +451,7 @@ export function StudentCourseAcademicRecords({
 					Puntos
 				</h3>
 				<details className="mt-2">
-					<summary className="cursor-pointer text-sm font-medium text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+					<summary className="inline-flex min-h-9 cursor-pointer items-center rounded-lg px-1 text-sm font-medium text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
 						Ver historial de puntos (
 						{enrollment.transactions.length})
 					</summary>
@@ -441,9 +478,9 @@ export function StudentCourseAcademicRecords({
 													"Sin motivo"}
 											</p>
 											<p className="mt-1 text-xs text-muted">
-												{formatLimaDateTime(
+												{formatClaimDateTimeLima(
 													transaction.created_at,
-												)}
+												) ?? transaction.created_at}
 											</p>
 										</div>
 										<p
@@ -462,7 +499,14 @@ export function StudentCourseAcademicRecords({
 											{existingClaim ? (
 												<a
 													href={`#claim-${existingClaim.claimPublicId}`}
-													className="inline-flex items-center rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+													onClick={(event) => {
+														event.preventDefault();
+														jumpToClaim(
+															existingClaim.claimPublicId,
+															existingClaim.status,
+														);
+													}}
+													className="inline-flex min-h-8 items-center rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-medium text-foreground transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 												>
 													Reclamo:{" "}
 													{getClaimStatusLabel(
@@ -653,7 +697,8 @@ export function StudentCourseAcademicRecords({
 										<li
 											key={claim.claimPublicId}
 											id={`claim-${claim.claimPublicId}`}
-											className="space-y-2 rounded-xl border border-border bg-surface-muted/45 p-4 text-sm"
+											tabIndex={-1}
+											className="scroll-mt-24 space-y-2 rounded-xl border border-border bg-surface-muted/45 p-4 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 										>
 											<div className="flex flex-wrap items-center justify-between gap-2">
 												<div className="flex flex-wrap items-center gap-1.5">
