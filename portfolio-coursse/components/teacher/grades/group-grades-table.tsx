@@ -545,7 +545,7 @@ export function GroupGradesTable({
 							<button
 								type="submit"
 								disabled={correctionSaving}
-								className="min-h-10 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+								className="min-h-10 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
 							>
 								{correctionSaving
 									? "Guardando corrección…"
@@ -1108,7 +1108,7 @@ export function GroupGradesTable({
 												{confirmedParticipants !==
 												null ? (
 													<details className="text-xs text-muted">
-														<summary className="cursor-pointer font-medium text-foreground/80">
+														<summary className="min-h-7 cursor-pointer rounded py-1 font-medium text-foreground/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
 															Destinatarios
 															históricos (
 															{
@@ -1129,7 +1129,7 @@ export function GroupGradesTable({
 													ev.performed_at &&
 													!legacy && (
 														<details className="text-xs text-muted">
-															<summary className="cursor-pointer">
+															<summary className="min-h-7 cursor-pointer rounded py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
 																Destinatarios
 																previstos (
 																{

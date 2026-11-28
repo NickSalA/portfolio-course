@@ -36,7 +36,7 @@ function SubmitButton({
 		<button
 			type="submit"
 			disabled={disabled || pending}
-			className="min-h-10 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-60 sm:ml-auto"
+			className="min-h-10 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-60 sm:ml-auto"
 		>
 			{pending ? "Guardando grupos…" : idleLabel}
 		</button>
@@ -165,7 +165,7 @@ export function GroupCapacityForm({
 										setCountEditedManually(false);
 										setGroupCount(String(suggestedCount));
 									}}
-									className="self-start text-xs font-medium text-accent underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+									className="inline-flex min-h-9 items-center self-start rounded-lg px-2 py-1 text-xs font-medium text-accent underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
 								>
 									Usar sugerido ({suggestedCount})
 								</button>

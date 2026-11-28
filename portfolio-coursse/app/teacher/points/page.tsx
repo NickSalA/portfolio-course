@@ -103,7 +103,7 @@ export default async function PointsPage({
                                 <Link
                                     key={course.id}
                                     href={`/teacher/points?period=${selectedPeriod?.public_id}&course=${course.public_id}`}
-                                    className="glass flex items-center justify-between rounded-2xl border border-white/25 p-5 transition hover:border-accent"
+                                    className="glass flex items-center justify-between rounded-2xl border border-white/25 p-5 transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                                 >
                                     <span className="font-medium">
                                         {course.name}

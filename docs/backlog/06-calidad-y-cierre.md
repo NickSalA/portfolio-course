@@ -6,17 +6,22 @@
 
 **Antecedentes BASE-01:** [Contraste de referencia](../03-calidad-y-operacion/inventario-capacidades-base-01.md#interfaces-y-recorrido-visible). No se ejecutó recorrido visual en BASE-01. Comprobar navegación real, teclado/foco, estados, contexto y diseño adaptable; no declarar usabilidad o accesibilidad por inspección de componentes.
 
-**Rol:** R2 · **Revisor:** R4 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** Backlog · **Bloqueado por:** EVA-05, REC-04, REC-05, EXP-03
+**Rol:** R2 · **Revisor:** R4 · **Milestone:** M4 · **Prioridad:** Alta · **Estado:** In review · **Bloqueado por:** EVA-05, REC-04, REC-05, EXP-03
 
 **GitHub:** [#42](https://github.com/NickSalA/portfolio-course/issues/42) · **Asignado:** @RobertoPizarro · **Revisión propuesta:** @fabrizio25504
 
-- [ ] Recorrer con teclado registro, consulta, presentación/atención de reclamo y descarga.
-- [ ] Revisar foco, etiquetas, mensajes de error y estados identificados con texto.
-- [ ] Comprobar distinción pendiente/cero, resultado base/ajustado y decisión final del reclamo.
+- [x] Recorrer con teclado registro, consulta, presentación/atención de reclamo y descarga.
+- [x] Revisar foco, etiquetas, mensajes de error y estados identificados con texto.
+- [x] Comprobar distinción pendiente/cero, resultado base/ajustado y decisión final del reclamo.
 
 **Aceptación:** no quedan bloqueos de interacción en los recorridos esenciales; registrar y corregir hallazgos sin declarar conformidad total de accesibilidad por una revisión parcial.
 
 **Documentación:** casos, hallazgos, correcciones y limitaciones de revisión.
+
+**Seguimiento local de QA-01 (no sincronizado con GitHub):**
+- **Implementación:** corrección de los hallazgos `Q1`–`Q10` en `app/globals.css`, portal estudiantil (`/student`), módulos docentes (`/teacher/*`) y shell/acceso (`--on-accent`, contraste AA claro/oscuro, `<dialog>` nativo con focus trap en `EvaluationManagerDialog`, `scroll-margin-top: 6rem` y `jumpToClaim`, foco directo al detalle en `/teacher/claims`, `focus-visible:ring-2` homogéneo, skip links `min-h-10` y objetivos `>= 24×24 px`, etiquetas ARIA/errores `role="alert"`, distinción explícita `0` vs. `Pendiente` y nota base vs. puntos/ajustado, y responsividad `1280×800` / `375×812`), más [`lib/quality/wcag-contrast.ts`](../../portfolio-coursse/lib/quality/wcag-contrast.ts), [`tests/unit/wcag-contrast.test.ts`](../../portfolio-coursse/tests/unit/wcag-contrast.test.ts) y [`tests/e2e/qa-01-integrated-accessibility.spec.ts`](../../portfolio-coursse/tests/e2e/qa-01-integrated-accessibility.spec.ts) en la rama `feature/QA-01-accesibilidad-recorridos-integrados` (sin migraciones nuevas).
+- **Comprobaciones ejecutadas:** `wcag-contrast.test.ts` (`5/5`), `pnpm test` (`17` archivos / `90` pruebas), `pnpm test:e2e` (`16/16` pruebas en `38.6s` cubriendo `Q-E01`–`Q-E18` en Chrome headless `1280×800` y `375×812` contra Docker/Supabase local `0001`–`0054`, incluyendo lectura `.xlsx`), `pnpm lint`, `pnpm typecheck` y `pnpm build`; registro de resultados y limitaciones (sin declarar conformidad total WCAG 2.2 AA) en [`evaluacion.md`](../automatizaciones/gestion-evaluacion-grupal/evaluacion.md#qa-01-42--accesibilidad-y-claridad-de-los-recorridos-integrados) y [`estado-actual.md`](../03-calidad-y-operacion/estado-actual.md#revisión-de-accesibilidad-y-claridad-de-recorridos-integrados-qa-01-42).
+- **Pendientes para cierre y aceptación:** revisión independiente de `@fabrizio25504` (R4) en PR hacia `develop` y entrada a la evaluación integrada en `QA-04 #45` (junto con `QA-02 #43`). Este seguimiento se actualizó solo localmente, no en GitHub.
 
 ### QA-02 · Integrar privacidad, integridad y recuperación
 

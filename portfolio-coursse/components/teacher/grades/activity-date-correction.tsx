@@ -107,7 +107,7 @@ export function ActivityDateCorrection({
 
     return (
         <details className="rounded-lg border border-border p-3">
-            <summary className="cursor-pointer font-medium">
+            <summary className="min-h-9 cursor-pointer rounded-lg py-1.5 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
                 Corregir fecha de realización
             </summary>
             <form onSubmit={requestReview} className="mt-3 space-y-2">
@@ -122,7 +122,7 @@ export function ActivityDateCorrection({
                             resetReview();
                             setDate(event.target.value);
                         }}
-                        className="mt-1 block w-full rounded-lg border border-border bg-surface px-2 py-1"
+                        className="mt-1 block min-h-9 w-full rounded-lg border border-border bg-surface px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     />
                 </label>
                 <label className="block">
@@ -135,19 +135,19 @@ export function ActivityDateCorrection({
                             resetReview();
                             setReason(event.target.value);
                         }}
-                        className="mt-1 block w-full rounded-lg border border-border bg-surface px-2 py-1"
+                        className="mt-1 block min-h-9 w-full rounded-lg border border-border bg-surface px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     />
                 </label>
                 <button
                     type="submit"
                     disabled={pending || !date || !reason.trim()}
-                    className="rounded-lg border border-border px-2 py-1 disabled:opacity-50"
+                    className="min-h-9 rounded-lg border border-border px-2 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
                 >
                     {pending ? "Procesando…" : "Revisar impacto"}
                 </button>
             </form>
             {error && (
-                <p role="alert" className="mt-2 text-red-400">
+                <p role="alert" className="mt-2 text-danger">
                     {error}
                 </p>
             )}
@@ -228,6 +228,7 @@ export function ActivityDateCorrection({
                             onChange={(event) =>
                                 setAcknowledged(event.target.checked)
                             }
+                            className="mt-0.5 size-4 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                         />{" "}
                         He revisado el impacto y los límites del padrón
                         histórico.
@@ -236,7 +237,7 @@ export function ActivityDateCorrection({
                         type="button"
                         onClick={confirm}
                         disabled={pending || !acknowledged}
-                        className="rounded-lg border border-border px-2 py-1 font-semibold disabled:opacity-50"
+                        className="min-h-9 rounded-lg border border-border px-2 py-1 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
                     >
                         Confirmar corrección de fecha
                     </button>

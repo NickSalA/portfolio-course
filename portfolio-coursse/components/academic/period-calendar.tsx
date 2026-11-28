@@ -73,7 +73,7 @@ export function PeriodCalendar({
                                     {period.code}
                                 </p>
                                 <span
-                                    className={`rounded-full px-2.5 py-1 text-xs font-medium ${period.status === "current" ? "bg-accent text-white" : "border border-border bg-surface text-muted"}`}
+                                    className={`rounded-full px-2.5 py-1 text-xs font-medium ${period.status === "current" ? "bg-accent text-on-accent" : "border border-border bg-surface text-muted"}`}
                                 >
                                     {period.status === "current"
                                         ? "En curso"

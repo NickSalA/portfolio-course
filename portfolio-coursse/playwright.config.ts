@@ -1,5 +1,10 @@
+import fs from "node:fs";
 import { defineConfig } from "@playwright/test";
 import { requireLocalSupabase } from "./tests/e2e/support/environment";
+
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL && fs.existsSync(".env.local")) {
+	process.loadEnvFile(".env.local");
+}
 
 requireLocalSupabase();
 
@@ -15,7 +20,7 @@ export default defineConfig({
 		screenshot: "only-on-failure",
 	},
 	webServer: {
-		command: "pnpm dev",
+		command: process.platform === "win32" ? "corepack pnpm dev" : "pnpm dev",
 		url: "http://127.0.0.1:3000",
 		reuseExistingServer: !process.env.CI,
 		timeout: 120_000,

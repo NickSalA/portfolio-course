@@ -16,7 +16,7 @@ export default function Home() {
 					</Link>
 					<Link
 						href="/login"
-						className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+						className="rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 					>
 						Iniciar sesión
 					</Link>

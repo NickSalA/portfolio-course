@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 
 import { registerPointTransaction } from "@/app/teacher/points/actions";
 import { VoidPointTransactionButton } from "@/components/teacher/points/void-point-transaction-button";
+import { formatLimaDateTime } from "@/lib/teacher/group-config";
 
 type Transaction = {
     id: number;
@@ -19,11 +20,7 @@ type Transaction = {
 };
 
 function movementDate(value: string) {
-    return new Intl.DateTimeFormat("es-PE", {
-        dateStyle: "medium",
-        timeStyle: "short",
-        timeZone: "America/Lima",
-    }).format(new Date(value));
+    return formatLimaDateTime(value) ?? value;
 }
 
 export function PointTransactionDialog({
@@ -45,6 +42,7 @@ export function PointTransactionDialog({
 }) {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const submittingRef = useRef(false);
+    const titleId = useId();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState("");
     const storageKey = `point-pending:${userId}:${period}:${course}:${student.id}`;
@@ -95,12 +93,13 @@ export function PointTransactionDialog({
             <button
                 type="button"
                 onClick={openDialog}
-                className="rounded-xl border border-border bg-surface-muted px-3 py-2 text-sm font-semibold text-foreground transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="min-h-9 rounded-xl border border-border bg-surface-muted px-3 py-2 text-sm font-semibold text-foreground transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
                 Ver movimientos
             </button>
             <dialog
                 ref={dialogRef}
+                aria-labelledby={titleId}
                 className="m-auto w-[min(100%-2rem,42rem)] overscroll-contain rounded-3xl border border-white/25 bg-transparent p-0 text-foreground shadow-2xl backdrop:bg-slate-950/55 backdrop:backdrop-blur-sm"
             >
                 <form
@@ -166,9 +165,9 @@ export function PointTransactionDialog({
                     />
                     <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold">
+                            <h2 id={titleId} className="truncate text-sm font-semibold">
                                 {student.name}
-                            </p>
+                            </h2>
                             <p className="mt-1 truncate text-sm text-muted">
                                 {student.email}
                             </p>
@@ -185,17 +184,17 @@ export function PointTransactionDialog({
                             type="button"
                             onClick={() => dialogRef.current?.close()}
                             aria-label="Cerrar movimientos"
-                            className="grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-surface-muted text-lg text-muted"
+                            className="grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-surface-muted text-lg text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                         >
                             ×
                         </button>
                     </div>
                     {message && (
-                        <div role="status" className="mt-4 text-sm text-danger">
+                        <div role="alert" className="mt-4 text-sm text-danger">
                             <p>{message}</p>
                             <button
                                 type="button"
-                                className="mt-2 underline"
+                                className="mt-2 inline-flex min-h-9 items-center rounded-lg px-2 py-1 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                                 onClick={() => {
                                     if (
                                         window.confirm(
@@ -232,7 +231,7 @@ export function PointTransactionDialog({
                                     required
                                     placeholder="Ej. +2"
                                     autoComplete="off"
-                                    className="mt-2 w-full rounded-xl border border-border bg-surface-muted px-3 py-2 text-foreground"
+                                    className="mt-2 min-h-9 w-full rounded-xl border border-border bg-surface-muted px-3 py-2 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent"
                                 />
                             </label>
                             <label className="text-sm text-muted">
@@ -240,7 +239,7 @@ export function PointTransactionDialog({
                                 <select
                                     name="reason"
                                     defaultValue=""
-                                    className="mt-2 w-full rounded-xl border border-border bg-surface-muted px-3 py-2 text-foreground"
+                                    className="mt-2 min-h-9 w-full rounded-xl border border-border bg-surface-muted px-3 py-2 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-accent"
                                 >
                                     <option value="">Sin motivo</option>
                                     <option>Participación</option>
@@ -251,8 +250,9 @@ export function PointTransactionDialog({
                                 </select>
                             </label>
                             <button
+                                type="submit"
                                 disabled={isSubmitting}
-                                className="self-end rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white disabled:cursor-wait disabled:opacity-60"
+                                className="min-h-9 self-end rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-wait disabled:opacity-60"
                             >
                                 Registrar
                             </button>

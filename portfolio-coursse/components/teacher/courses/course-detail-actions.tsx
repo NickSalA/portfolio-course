@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { archiveCourse } from "@/app/teacher/courses/actions";
 import { CourseExportButton } from "@/components/teacher/grades/course-export-button";
 import { CourseStudentImportForm } from "@/components/teacher/students/course-student-import-form";
@@ -13,6 +14,9 @@ export function CourseDetailActions({
 	courseName: string;
 	periodPublicId: string;
 }) {
+	const detailsRef = useRef<HTMLDetailsElement>(null);
+	const summaryRef = useRef<HTMLElement>(null);
+
 	return (
 		<div className="flex flex-wrap items-start justify-end gap-2">
 			<CourseExportButton
@@ -23,8 +27,22 @@ export function CourseDetailActions({
 				periodPublicId={periodPublicId}
 				courseName={courseName}
 			/>
-			<details className="relative">
-				<summary className="grid size-10 cursor-pointer place-items-center rounded-xl border border-border text-lg text-muted transition hover:border-accent hover:text-foreground">
+			<details
+				ref={detailsRef}
+				className="relative"
+				onKeyDown={(event) => {
+					if (event.key === "Escape" && detailsRef.current?.open) {
+						event.preventDefault();
+						detailsRef.current.open = false;
+						summaryRef.current?.focus();
+					}
+				}}
+			>
+				<summary
+					ref={summaryRef}
+					aria-label="Más acciones del curso"
+					className="grid size-10 cursor-pointer list-none place-items-center rounded-xl border border-border text-lg text-muted transition hover:border-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent [&::-webkit-details-marker]:hidden"
+				>
 					⋯
 				</summary>
 				<div className="absolute right-0 z-10 mt-2 w-48 rounded-xl border border-border bg-surface p-2 shadow-xl">
@@ -49,7 +67,10 @@ export function CourseDetailActions({
 							name="period_public_id"
 							value={periodPublicId}
 						/>
-						<button className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-danger hover:bg-danger-soft">
+						<button
+							type="submit"
+							className="min-h-9 w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-danger hover:bg-danger-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+						>
 							Ocultar curso
 						</button>
 					</form>

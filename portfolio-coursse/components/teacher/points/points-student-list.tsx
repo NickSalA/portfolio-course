@@ -76,7 +76,7 @@ export function PointsStudentList({
                 </div>
             </div>
             <section className="glass mt-5 overflow-hidden rounded-3xl border border-white/25 shadow-[0_20px_55px_rgb(15_23_42/8%)]">
-                <div className="grid grid-cols-[minmax(0,1fr)_7rem_9rem] gap-4 border-b border-border px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted sm:px-6">
+                <div className="hidden gap-4 border-b border-border px-5 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted sm:grid sm:grid-cols-[minmax(0,1fr)_7rem_9rem] sm:px-6">
                     <span>Alumno</span>
                     <span className="text-right">Saldo</span>
                     <span className="text-right">Movimientos</span>
@@ -95,7 +95,7 @@ export function PointsStudentList({
                         return (
                             <article
                                 key={student.id}
-                                className="grid grid-cols-[minmax(0,1fr)_7rem_9rem] items-center gap-4 px-5 py-4 sm:px-6"
+                                className="flex flex-col gap-3 px-5 py-4 sm:grid sm:grid-cols-[minmax(0,1fr)_7rem_9rem] sm:items-center sm:gap-4 sm:px-6"
                             >
                                 <div className="min-w-0">
                                     <p className="truncate font-medium">
@@ -105,10 +105,13 @@ export function PointsStudentList({
                                         {student.email}
                                     </p>
                                 </div>
-                                <p className="text-right text-lg font-semibold tabular-nums">
+                                <p className="text-left text-lg font-semibold tabular-nums sm:text-right">
+                                    <span className="text-xs font-normal text-muted sm:hidden">
+                                        Saldo:{" "}
+                                    </span>
                                     {balance > 0 ? `+${balance}` : balance}
                                 </p>
-                                <div className="flex justify-end">
+                                <div className="flex justify-start sm:justify-end">
                                     <PointTransactionDialog
                                         course={course}
                                         userId={userId}
@@ -152,7 +155,7 @@ export function PointsStudentList({
                                     )
                                 }
                                 disabled={page === 0}
-                                className="rounded-lg border border-border px-3 py-1.5 font-medium disabled:opacity-40"
+                                className="min-h-9 rounded-lg border border-border px-3 py-1.5 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40"
                             >
                                 Anterior
                             </button>
@@ -164,7 +167,7 @@ export function PointsStudentList({
                                     )
                                 }
                                 disabled={page === pages - 1}
-                                className="rounded-lg border border-border px-3 py-1.5 font-medium disabled:opacity-40"
+                                className="min-h-9 rounded-lg border border-border px-3 py-1.5 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40"
                             >
                                 Siguiente
                             </button>

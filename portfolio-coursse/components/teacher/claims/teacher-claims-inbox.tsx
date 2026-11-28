@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useId, useRef, useState, useTransition } from "react";
 import {
 	respondToClaimAction,
 	retryClaimNoticeAction,
@@ -54,6 +54,10 @@ export function TeacherClaimsInbox({
 }) {
 	const router = useRouter();
 	const [, startRefreshTransition] = useTransition();
+	const detailRef = useRef<HTMLElement>(null);
+	const detailHeadingId = useId();
+	const responseTextareaRef = useRef<HTMLTextAreaElement>(null);
+	const responseErrorId = useId();
 
 	const [statusFilter, setStatusFilter] = useState<ClaimStatusFilter>("all");
 	const [typeFilter, setTypeFilter] = useState<ClaimTypeFilter>("all");
@@ -120,6 +124,7 @@ export function TeacherClaimsInbox({
 			setErrorMessage(
 				"Ingresa una respuesta motivada antes de cerrar el reclamo.",
 			);
+			responseTextareaRef.current?.focus();
 			return;
 		}
 
@@ -134,6 +139,7 @@ export function TeacherClaimsInbox({
 			const result = await respondToClaimAction(formData);
 			if (!result.ok) {
 				setErrorMessage(result.error);
+				responseTextareaRef.current?.focus();
 				return;
 			}
 			setResponseDrafts((prev) => {
@@ -151,6 +157,7 @@ export function TeacherClaimsInbox({
 			setErrorMessage(
 				"No se pudo conectar con el servidor. Tu borrador de respuesta se conserva para reintentar.",
 			);
+			responseTextareaRef.current?.focus();
 		} finally {
 			setBusyAction(null);
 		}
@@ -267,6 +274,7 @@ export function TeacherClaimsInbox({
 
 				{errorMessage && (
 					<p
+						id={responseErrorId}
 						role="alert"
 						className="rounded-xl border border-danger/30 bg-danger-soft/70 px-3.5 py-2.5 text-xs font-medium text-danger"
 					>
@@ -318,6 +326,9 @@ export function TeacherClaimsInbox({
 										setSelectedId(claim.claimPublicId);
 										setErrorMessage(null);
 										setStatusMessage(null);
+										requestAnimationFrame(() =>
+											detailRef.current?.focus(),
+										);
 									}}
 									aria-current={isSelected ? "true" : undefined}
 									className={`w-full rounded-2xl border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
@@ -363,8 +374,10 @@ export function TeacherClaimsInbox({
 
 					{selectedClaim && (
 						<article
-							aria-label="Detalle del reclamo"
-							className="glass space-y-5 rounded-3xl border border-white/25 p-5 sm:p-6"
+							ref={detailRef}
+							tabIndex={-1}
+							aria-labelledby={detailHeadingId}
+							className="glass space-y-5 rounded-3xl border border-white/25 p-5 sm:p-6 scroll-mt-24 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 						>
 							<header className="space-y-2 border-b border-border pb-4">
 								<div className="flex flex-wrap items-center justify-between gap-2">
@@ -392,7 +405,10 @@ export function TeacherClaimsInbox({
 										</span>
 									)}
 								</div>
-								<h2 className="text-xl font-semibold text-foreground">
+								<h2
+									id={detailHeadingId}
+									className="text-xl font-semibold text-foreground"
+								>
 									{selectedClaim.courseName}
 								</h2>
 								<p className="text-xs text-muted">
@@ -449,8 +465,8 @@ export function TeacherClaimsInbox({
 											</dt>
 											<dd className="font-medium text-foreground">
 												{selectedClaim.groupGrade === null
-													? "Pendiente"
-													: selectedClaim.groupGrade}
+													? "Pendiente (sin nota confirmada)"
+													: `${selectedClaim.groupGrade} (Calificada — nota grupal base)`}
 											</dd>
 										</div>
 									</dl>
@@ -537,12 +553,13 @@ export function TeacherClaimsInbox({
 									<button
 										type="button"
 										disabled={busyAction !== null}
+										aria-busy={busyAction === "review"}
 										onClick={() =>
 											handleStartReview(
 												selectedClaim.claimPublicId,
 											)
 										}
-										className="inline-flex min-h-10 items-center rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+										className="inline-flex min-h-10 items-center rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
 									>
 										{busyAction === "review"
 											? "Pasando a revisión…"
@@ -567,19 +584,29 @@ export function TeacherClaimsInbox({
 											Respuesta final motivada
 										</span>
 										<textarea
+											ref={responseTextareaRef}
 											name="teacher_response"
 											required
 											maxLength={CLAIM_RESPONSE_MAX_LENGTH}
 											rows={4}
 											disabled={busyAction !== null}
+											aria-invalid={Boolean(errorMessage)}
+											aria-describedby={
+												errorMessage
+													? responseErrorId
+													: undefined
+											}
 											value={currentDraft}
-											onChange={(event) =>
+											onChange={(event) => {
+												if (errorMessage) {
+													setErrorMessage(null);
+												}
 												setResponseDrafts((prev) => ({
 													...prev,
 													[selectedClaim.claimPublicId]:
 														event.target.value,
-												}))
-											}
+												}));
+											}}
 											placeholder="Explica el fundamento de tu decisión final (máx. 2000 caracteres). Esta decisión no se puede reabrir."
 											className="w-full rounded-xl border border-border bg-surface p-3 text-sm text-foreground outline-none transition focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
 										/>
@@ -591,7 +618,8 @@ export function TeacherClaimsInbox({
 									<button
 										type="submit"
 										disabled={busyAction !== null}
-										className="inline-flex min-h-10 items-center rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
+										aria-busy={busyAction === "respond"}
+										className="inline-flex min-h-10 items-center rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-60"
 									>
 										{busyAction === "respond"
 											? "Registrando respuesta final…"

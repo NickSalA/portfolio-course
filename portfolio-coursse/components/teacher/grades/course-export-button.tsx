@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { buildCourseExportFilename } from "@/lib/export/course-export";
 
 function extractFilename(
@@ -22,6 +22,7 @@ export function CourseExportButton({
 	const [isDownloading, setIsDownloading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [statusMessage, setStatusMessage] = useState<string | null>(null);
+	const hintId = useId();
 
 	async function handleDownload() {
 		if (isDownloading) return;
@@ -85,14 +86,15 @@ export function CourseExportButton({
 	}
 
 	return (
-		<div className="flex flex-col items-end gap-2">
+		<div className="flex flex-col items-stretch sm:items-end gap-2">
 			<button
 				type="button"
 				onClick={handleDownload}
 				disabled={isDownloading}
 				aria-busy={isDownloading}
-				title="Descarga un archivo Excel (.xlsx) por alumno con atribución histórica confirmada y cálculo individual de puntos"
-				className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70"
+				aria-label={`Exportar resultados del curso ${courseName} en formato Excel (.xlsx)`}
+				aria-describedby={hintId}
+				className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70"
 			>
 				<svg
 					aria-hidden="true"
@@ -114,6 +116,9 @@ export function CourseExportButton({
 						: "Exportar resultados del curso (.xlsx)"}
 				</span>
 			</button>
+			<p id={hintId} className="text-[11px] text-muted sm:text-right">
+				Incluye nota base histórica, puntos y promedio ajustado sin modificar saldos.
+			</p>
 
 			{error && (
 				<p

@@ -142,7 +142,7 @@ export function CsvImporter({
                     <p className="min-w-0 truncate text-sm font-medium">
                         {fileName}
                     </p>
-                    <label className="shrink-0 cursor-pointer text-sm font-semibold text-accent transition hover:text-accent-strong">
+                    <label className="inline-flex min-h-9 shrink-0 cursor-pointer items-center rounded-lg px-2 py-1 text-sm font-semibold text-accent transition hover:text-accent-strong focus-within:ring-2 focus-within:ring-accent">
                         Cambiar archivo
                         <input
                             type="file"

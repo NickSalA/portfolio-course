@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useId, useRef } from "react";
 import { renameCourse } from "@/app/teacher/courses/actions";
 
 export function EditCourseNameDialog({
@@ -15,6 +15,7 @@ export function EditCourseNameDialog({
 	compact?: boolean;
 }) {
 	const dialogRef = useRef<HTMLDialogElement>(null);
+	const titleId = useId();
 	return (
 		<>
 			<button
@@ -24,8 +25,8 @@ export function EditCourseNameDialog({
 				title="Editar nombre"
 				className={
 					compact
-						? "ml-2 inline-grid size-7 place-items-center rounded-lg border border-border text-sm text-muted transition hover:border-accent hover:text-foreground"
-						: "rounded-xl border border-border px-3 py-2 text-sm font-semibold text-foreground transition hover:border-accent"
+						? "ml-2 inline-grid size-8 place-items-center rounded-lg border border-border text-sm text-muted transition hover:border-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+						: "min-h-9 rounded-xl border border-border px-3 py-2 text-sm font-semibold text-foreground transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 				}
 			>
 				{compact ? (
@@ -48,6 +49,7 @@ export function EditCourseNameDialog({
 			</button>
 			<dialog
 				ref={dialogRef}
+				aria-labelledby={titleId}
 				className="m-auto w-[min(100%-2rem,30rem)] rounded-3xl border border-white/25 bg-transparent p-0 text-foreground shadow-2xl backdrop:bg-slate-950/55 backdrop:backdrop-blur-sm"
 			>
 				<form
@@ -59,7 +61,7 @@ export function EditCourseNameDialog({
 							<p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
 								Curso
 							</p>
-							<h2 className="mt-2 text-xl font-semibold">
+							<h2 id={titleId} className="mt-2 text-xl font-semibold">
 								Editar nombre
 							</h2>
 						</div>
@@ -67,7 +69,7 @@ export function EditCourseNameDialog({
 							type="button"
 							onClick={() => dialogRef.current?.close()}
 							aria-label="Cerrar"
-							className="grid size-9 place-items-center rounded-lg border border-border text-lg text-muted"
+							className="grid size-9 place-items-center rounded-lg border border-border text-lg text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 						>
 							×
 						</button>
@@ -96,11 +98,14 @@ export function EditCourseNameDialog({
 						<button
 							type="button"
 							onClick={() => dialogRef.current?.close()}
-							className="rounded-xl border border-border px-4 py-2 text-sm font-medium"
+							className="min-h-9 rounded-xl border border-border px-4 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 						>
 							Cancelar
 						</button>
-						<button className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white">
+						<button
+							type="submit"
+							className="min-h-9 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-on-accent transition hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+						>
 							Guardar nombre
 						</button>
 					</div>

@@ -110,7 +110,7 @@ export default async function TeacherPage({
                                     <Link
                                         key={course.id}
                                         href={`/teacher/courses/${course.public_id}?period=${selectedPeriod.public_id}`}
-                                        className="glass flex items-center justify-between gap-4 rounded-2xl border border-white/25 p-5 transition hover:border-accent"
+                                        className="glass flex items-center justify-between gap-4 rounded-2xl border border-white/25 p-5 transition hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                                     >
                                         <div className="min-w-0">
                                             <h3 className="truncate font-semibold">

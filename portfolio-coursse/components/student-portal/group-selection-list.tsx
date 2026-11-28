@@ -128,7 +128,9 @@ export function GroupSelectionList({
 			{feedback && (
 				<p
 					role={feedback.kind === "error" ? "alert" : "status"}
-					aria-live="polite"
+					aria-live={
+						feedback.kind === "error" ? undefined : "polite"
+					}
 					className={
 						feedback.kind === "error"
 							? "mt-3 rounded-xl border border-danger/30 bg-danger-soft px-4 py-3 text-sm font-medium text-danger"

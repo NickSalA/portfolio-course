@@ -29,7 +29,7 @@ export function TeacherSidebar({ name }: { name: string }) {
 		<aside className="glass flex w-full shrink-0 flex-col border-b border-white/20 shadow-[8px_0_30px_rgb(15_23_42/4%)] md:fixed md:inset-y-0 md:left-0 md:z-30 md:h-dvh md:w-60 md:border-b-0 md:border-r">
 			<div className="flex h-18 items-center justify-between gap-3 px-5">
 				<div className="flex min-w-0 items-center gap-3">
-					<span className="grid size-9 shrink-0 place-items-center rounded-lg bg-accent text-sm font-bold text-white">
+					<span className="grid size-9 shrink-0 place-items-center rounded-lg bg-accent text-sm font-bold text-on-accent">
 						{name.slice(0, 1).toUpperCase()}
 					</span>
 					<span className="min-w-0">

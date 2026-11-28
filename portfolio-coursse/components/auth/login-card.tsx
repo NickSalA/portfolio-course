@@ -70,7 +70,8 @@ export function LoginCard({ initialError }: LoginCardProps) {
 				type="button"
 				onClick={signInWithGoogle}
 				disabled={loading}
-				className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-border bg-surface px-4 text-sm font-semibold text-foreground shadow-sm transition hover:border-accent hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-60"
+				aria-busy={loading}
+				className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-border bg-surface px-4 text-sm font-semibold text-foreground shadow-sm transition hover:border-accent hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
 			>
 				<GoogleIcon />
 				{loading ? "Conectando…" : "Continuar con Google"}
